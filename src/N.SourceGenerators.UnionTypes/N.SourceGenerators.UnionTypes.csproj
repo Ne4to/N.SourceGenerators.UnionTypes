@@ -10,8 +10,7 @@
         <IsRoslynComponent>true</IsRoslynComponent>
         <IsPackable>true</IsPackable>
         <PackageOutputPath>./nupkg</PackageOutputPath>
-        <VersionPrefix>0.4.0</VersionPrefix>
-        <Version Condition="'$(BuildMetadata)' != ''">$(VersionPrefix)+$(BuildMetadata)</Version>
+        <VersionPrefix>0.5.0</VersionPrefix>
         <EnableNETAnalyzers>true</EnableNETAnalyzers>
         <NoWarn>$(NoWarn);NU5128</NoWarn>
     </PropertyGroup>
@@ -22,7 +21,7 @@
         <PublishRepositoryUrl>true</PublishRepositoryUrl>
         <PackageLicenseExpression>MIT</PackageLicenseExpression>
         <Authors>Alexey Sosnin</Authors>
-        <PackageTags>discriminated union;source generator</PackageTags>
+        <PackageTags>discriminated-union;source-generator</PackageTags>
         <Description>Discriminated union type source generator</Description>
         <PackageReadmeFile>README.md</PackageReadmeFile>
     </PropertyGroup>
@@ -39,6 +38,7 @@
     <ItemGroup>
         <PackageReference Include="Microsoft.CodeAnalysis.CSharp" Version="4.4.0" PrivateAssets="all" />
         <PackageReference Include="Microsoft.CodeAnalysis.Analyzers" Version="3.3.3" PrivateAssets="all" />
+        <PackageReference Include="Microsoft.SourceLink.GitHub" Version="1.1.1" PrivateAssets="All"/>
     </ItemGroup>
 
 </Project>
