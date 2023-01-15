@@ -43,7 +43,7 @@ public partial class FooResult
 
 ## Examples
 
-All examples can be found in [examples project](./examples/N.SourceGenerators.UnionTypes.Examples/Program.cs)
+All examples can be found in [examples project](https://github.com/Ne4to/N.SourceGenerators.UnionTypes/blob/main/examples/N.SourceGenerators.UnionTypes.Examples/Program.cs)
 
 Implicit conversion
 ```csharp
