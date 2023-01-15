@@ -16,11 +16,11 @@ jobs:
     - name: Install dependencies
       run: dotnet restore
     - name: Build
-      run: dotnet build --configuration Release --no-restore
+      run: dotnet build --configuration Release --no-restore -p:BuildMetadata=${GITHUB_SHA}
     - name: Test
       run: dotnet test --configuration Release --no-build --verbosity normal
     - name: Pack
-      run: dotnet pack --configuration Release --no-build --version-suffix "+${GITHUB_SHA}"
+      run: dotnet pack --configuration Release --no-build
     #  "rc.${GITHUB_RUN_NUMBER}+${GITHUB_SHA::8}"
     - name: Push
       run: dotnet nuget push */bin/Release/*.nupkg -k ${{ secrets.NUGET_ORG_API_KEY }} -s https://api.nuget.org/v3/index.json --skip-duplicate
