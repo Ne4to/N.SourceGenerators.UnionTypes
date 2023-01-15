@@ -1,8 +1,5 @@
 ﻿// Ported from https://github.com/CommunityToolkit/dotnet/tree/main/src/CommunityToolkit.Mvvm.SourceGenerators
 
-using Microsoft.CodeAnalysis;
-using Microsoft.CodeAnalysis.CSharp;
-
 namespace N.SourceGenerators.UnionTypes.Extensions;
 
 /// <summary>

@@ -2,8 +2,6 @@
 
 using System.Collections.Immutable;
 
-using Microsoft.CodeAnalysis;
-
 namespace N.SourceGenerators.UnionTypes.Extensions;
 
 /// <summary>

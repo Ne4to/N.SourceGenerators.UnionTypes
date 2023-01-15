@@ -1,14 +1,9 @@
 ﻿using System.Text;
 
-using Microsoft.CodeAnalysis;
-using Microsoft.CodeAnalysis.CSharp;
-using Microsoft.CodeAnalysis.CSharp.Syntax;
 using Microsoft.CodeAnalysis.Text;
 
 using N.SourceGenerators.UnionTypes.Extensions;
 using N.SourceGenerators.UnionTypes.Models;
-
-using static Microsoft.CodeAnalysis.CSharp.SyntaxFactory;
 
 namespace N.SourceGenerators.UnionTypes;
 
@@ -16,17 +11,10 @@ namespace N.SourceGenerators.UnionTypes;
 public class UnionTypesGenerator : IIncrementalGenerator
 {
     private const string FuncType = "global::System.Func";
-    private const string TaskType = "global::System.Threading.Tasks.Task";
     private const string CancellationTokenType = "global::System.Threading.CancellationToken";
 
     private const string UnionTypeAttributeName = "N.SourceGenerators.UnionTypes.UnionTypeAttribute";
 
-    // TODO add #if NET7_0_OR_GREATER
-    // #if NET7_0_OR_GREATER
-    // // class A()
-    // #else
-    // // class A()
-    // #endif   
     private const string UnionTypeAttributeText = """        
         #nullable enable
         using System;
@@ -133,8 +121,8 @@ public class UnionTypesGenerator : IIncrementalGenerator
             .AddModifiers(Token(SyntaxKind.PartialKeyword))
             .AddMembers(VariantsMembers(unionType))
             .AddMembers(
-                MatchMethod(unionType),
-                MatchAsyncMethod(unionType)
+                MatchMethod(unionType, isAsync: false),
+                MatchMethod(unionType, isAsync: true)
             );
 
         SyntaxTriviaList syntaxTriviaList = TriviaList(
@@ -208,17 +196,6 @@ public class UnionTypesGenerator : IIncrementalGenerator
                     IdentifierName(variant.FieldName),
                     LiteralExpression(SyntaxKind.NullLiteralExpression))))
             .WithSemicolonToken(Token(SyntaxKind.SemicolonToken));
-    }
-
-    private static ArgumentSyntax StringLiteralArgument(string value)
-    {
-        ArgumentSyntax argument = Argument(
-            LiteralExpression(
-                SyntaxKind.StringLiteralExpression,
-                Literal(value)
-            ));
-
-        return argument;
     }
 
     private static PropertyDeclarationSyntax AsProperty(UnionTypeVariant variant)
@@ -319,68 +296,40 @@ public class UnionTypesGenerator : IIncrementalGenerator
             .WithSemicolonToken(Token(SyntaxKind.SemicolonToken));
     }
 
-    private static MemberDeclarationSyntax MatchMethod(UnionType unionType)
+    private static MemberDeclarationSyntax MatchMethod(UnionType unionType, bool isAsync)
     {
         return
             MethodDeclaration(
-                    IdentifierName("TOut"),
-                    "Match"
+                    isAsync ? TaskIdentifier("TOut") : IdentifierName("TOut"),
+                    isAsync ? "MatchAsync" : "Match"
                 )
                 .AddModifiers(
                     Token(SyntaxKind.PublicKeyword)
                 )
+                .AddModifierWhen(isAsync, Token(SyntaxKind.AsyncKeyword))
                 .AddTypeParameterListParameters(
                     TypeParameter("TOut")
                 )
                 .AddParameterListParameters(
-                    unionType
-                        .Variants
-                        .Select(MatchMethodParameter)
-                        .ToArray()
+                    VariantsParameters(unionType, v => MatchMethodParameter(v, isAsync))
                 )
-                .AddBodyStatements(
-                    MatchMethodBodyStatements(unionType)
-                );
-    }
-
-    private static MemberDeclarationSyntax MatchAsyncMethod(UnionType unionType)
-    {
-        return
-            MethodDeclaration(
-                    TaskIdentifier("TOut"),
-                    "MatchAsync"
-                )
-                .AddModifiers(
-                    Token(SyntaxKind.PublicKeyword),
-                    Token(SyntaxKind.AsyncKeyword)
-                )
-                .AddTypeParameterListParameters(
-                    TypeParameter("TOut")
-                )
-                .AddParameterListParameters(
-                    unionType
-                        .Variants
-                        .Select(MatchAsyncMethodParameter)
-                        .ToArray()
-                )
-                .AddParameterListParameters(
-                    Parameter(
-                            Identifier("ct"))
+                .AddParameterListParameterWhen(
+                    isAsync,
+                    Parameter(Identifier("ct"))
                         .WithType(IdentifierName(CancellationTokenType))
                 )
                 .AddBodyStatements(
-                    MatchAsyncMethodBodyStatements(unionType)
+                    VariantsBodyStatements(unionType, v => MatchStatement(v, isAsync))
                 );
     }
 
-    private static ParameterSyntax MatchMethodParameter(UnionTypeVariant variant)
+    private static ParameterSyntax MatchMethodParameter(UnionTypeVariant variant, bool isAsync)
     {
         var parameterType =
             GenericName(FuncType)
-                .AddTypeArgumentListArguments(
-                    IdentifierName(variant.TypeFullName),
-                    IdentifierName("TOut")
-                );
+                .AddTypeArgumentListArguments(IdentifierName(variant.TypeFullName))
+                .AddTypeArgumentListArgumentsWhen(isAsync, IdentifierName(CancellationTokenType))
+                .AddTypeArgumentListArguments(isAsync ? TaskIdentifier("TOut") : IdentifierName("TOut"));
 
         var parameter =
             Parameter(Identifier($"match{variant.Alias}"))
@@ -389,46 +338,39 @@ public class UnionTypesGenerator : IIncrementalGenerator
         return parameter;
     }
 
-    private static ParameterSyntax MatchAsyncMethodParameter(UnionTypeVariant variant)
+    private static StatementSyntax MatchStatement(UnionTypeVariant variant, bool isAsync)
     {
-        var parameterType =
-            GenericName(FuncType)
-                .AddTypeArgumentListArguments(
-                    IdentifierName(variant.TypeFullName),
-                    IdentifierName(CancellationTokenType),
-                    TaskIdentifier("TOut")
-                );
-
-        var parameter =
-            Parameter(Identifier($"match{variant.Alias}"))
-                .WithType(parameterType);
-
-        return parameter;
+        return IfStatement(
+            IdentifierName(variant.IsPropertyName),
+            ReturnStatement(
+                InvocationExpression(IdentifierName($"match{variant.Alias}"))
+                    .AddArgumentListArguments(
+                        Argument(IdentifierName(variant.AsPropertyName))
+                    )
+                    .AddArgumentListArgumentWhen(isAsync, Argument(IdentifierName("ct")))
+                    .AwaitWithConfigureAwaitWhen(isAsync)
+            )
+        );
     }
 
-    private static GenericNameSyntax TaskIdentifier(string type)
-    {
-        return GenericName(TaskType)
-            .AddTypeArgumentListArguments(
-                IdentifierName(type)
-            );
-    }
+    #region Helper methods
 
-    private static StatementSyntax[] MatchMethodBodyStatements(UnionType unionType)
+    private static StatementSyntax[] VariantsBodyStatements(UnionType unionType,
+        Func<UnionTypeVariant, StatementSyntax> statementFunc)
     {
         return unionType
             .Variants
-            .Select(MatchStatement)
+            .Select(statementFunc)
             .Concat(new StatementSyntax[] { ThrowUnknownType() })
             .ToArray();
     }
 
-    private static StatementSyntax[] MatchAsyncMethodBodyStatements(UnionType unionType)
+    private static ParameterSyntax[] VariantsParameters(UnionType unionType,
+        Func<UnionTypeVariant, ParameterSyntax> selector)
     {
         return unionType
             .Variants
-            .Select(MatchAsyncStatement)
-            .Concat(new StatementSyntax[] { ThrowUnknownType() })
+            .Select(selector)
             .ToArray();
     }
 
@@ -439,57 +381,5 @@ public class UnionTypesGenerator : IIncrementalGenerator
         );
     }
 
-    private static ObjectCreationExpressionSyntax NewInvalidOperationException(string message)
-    {
-        return ObjectCreationExpression(
-                IdentifierName("InvalidOperationException")
-            )
-            .AddArgumentListArguments(
-                StringLiteralArgument(message)
-            );
-    }
-
-    private static StatementSyntax MatchStatement(UnionTypeVariant variant)
-    {
-        return IfStatement(
-            IdentifierName(variant.IsPropertyName),
-            ReturnStatement(
-                InvocationExpression(IdentifierName($"match{variant.Alias}"))
-                    .AddArgumentListArguments(
-                        Argument(IdentifierName(variant.AsPropertyName))
-                    )
-            )
-        );
-    }
-
-    private static StatementSyntax MatchAsyncStatement(UnionTypeVariant variant)
-    {
-        return IfStatement(
-            IdentifierName(variant.IsPropertyName),
-            ReturnStatement(
-                AwaitWithConfigureAwait(
-                    InvocationExpression(IdentifierName($"match{variant.Alias}"))
-                        .AddArgumentListArguments(
-                            Argument(IdentifierName(variant.AsPropertyName)),
-                            Argument(IdentifierName("ct"))
-                        )
-                )
-            )
-        );
-    }
-
-    private static AwaitExpressionSyntax AwaitWithConfigureAwait(ExpressionSyntax expression)
-    {
-        return AwaitExpression(
-            InvocationExpression(
-                MemberAccessExpression(
-                    SyntaxKind.SimpleMemberAccessExpression,
-                    expression,
-                    IdentifierName("ConfigureAwait")
-                )
-            ).AddArgumentListArguments(
-                Argument(LiteralExpression(SyntaxKind.FalseLiteralExpression))
-            )
-        );
-    }
+    #endregion
 }

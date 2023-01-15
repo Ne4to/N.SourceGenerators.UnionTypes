@@ -1,7 +1,4 @@
-﻿using Microsoft.CodeAnalysis;
-using Microsoft.CodeAnalysis.CSharp.Syntax;
-
-namespace N.SourceGenerators.UnionTypes.Extensions;
+﻿namespace N.SourceGenerators.UnionTypes.Extensions;
 
 internal static class SyntaxNodeExtensions
 {
@@ -11,5 +8,20 @@ internal static class SyntaxNodeExtensions
         {
             AttributeLists.Count: > 0
         };
+    }
+    
+    public static AwaitExpressionSyntax AwaitWithConfigureAwait(this ExpressionSyntax expression)
+    {
+        return AwaitExpression(
+            InvocationExpression(
+                MemberAccessExpression(
+                    SyntaxKind.SimpleMemberAccessExpression,
+                    expression,
+                    IdentifierName("ConfigureAwait")
+                )
+            ).AddArgumentListArguments(
+                Argument(LiteralExpression(SyntaxKind.FalseLiteralExpression))
+            )
+        );
     }
 }

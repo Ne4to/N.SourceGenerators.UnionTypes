@@ -1,6 +1,4 @@
-﻿using Microsoft.CodeAnalysis;
-
-using N.SourceGenerators.UnionTypes.Extensions;
+﻿using N.SourceGenerators.UnionTypes.Extensions;
 
 namespace N.SourceGenerators.UnionTypes.Models;
 

@@ -2,9 +2,9 @@
 Discriminated union type source generator
 
 ## Motivation
-C# doesn't support discriminated unions yet. This source generator helps automate writing union types.
+C# doesn't support discriminated unions yet. This source generator helps automate writing union types with set of helper methods.
 
-## Using
+## Getting Started
 Add package reference to `N.SourceGenerators.UnionTypes`
 ```shell
 dotnet add package N.SourceGenerators.UnionTypes

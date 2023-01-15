@@ -1,7 +1,5 @@
 ﻿// Ported from https://github.com/CommunityToolkit/dotnet/tree/main/src/CommunityToolkit.Mvvm.SourceGenerators
 
-using Microsoft.CodeAnalysis;
-
 using N.SourceGenerators.UnionTypes.Helpers;
 
 namespace N.SourceGenerators.UnionTypes.Extensions;
