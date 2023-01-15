@@ -8,7 +8,7 @@ using N.SourceGenerators.UnionTypes.Models;
 namespace N.SourceGenerators.UnionTypes;
 
 [Generator(LanguageNames.CSharp)]
-public class UnionTypesGenerator : IIncrementalGenerator
+public partial class UnionTypesGenerator : IIncrementalGenerator
 {
     private const string FuncType = "global::System.Func";
     private const string CancellationTokenType = "global::System.Threading.CancellationToken";
@@ -47,7 +47,7 @@ public class UnionTypesGenerator : IIncrementalGenerator
         });
 
         // Do a simple filter for classes
-        IncrementalValuesProvider<UnionType> classDeclarations = context.SyntaxProvider
+        IncrementalValuesProvider<UnionReference> unionReferences = context.SyntaxProvider
             .CreateSyntaxProvider(
                 static (s, _) => s.IsClassWithAttributes(),
                 static (ctx, ct) =>
@@ -72,43 +72,51 @@ public class UnionTypesGenerator : IIncrementalGenerator
                         return default;
                     }
 
-                    // ClassDeclarationSyntax classSyntax = (ClassDeclarationSyntax)ctx.Node;
-                    // var r = (Syntax: classSyntax, Symbol: symbol);
-                    // bool isPartial = classSyntax.Modifiers.Any(SyntaxKind.PartialKeyword);
-
-                    // TODO add diagnostics - type is not partial
-                    // TODO add diagnostics - variants duplication
-
-                    List<UnionTypeVariant>? variants = null;
-                    foreach (AttributeData attribute in symbol.GetAttributes())
-                    {
-                        if (attribute.AttributeClass?.ToDisplayString() == UnionTypeAttributeName)
-                        {
-                            variants ??= new List<UnionTypeVariant>();
-
-                            var typeSymbol = attribute.ConstructorArguments[0].Value as INamedTypeSymbol;
-
-                            var alias = attribute.ConstructorArguments[1].Value?.ToString();
-                            var order = (int)attribute.ConstructorArguments[2].Value!;
-
-                            variants.Add(new UnionTypeVariant(typeSymbol!, alias, order));
-                        }
-                    }
-
-                    if (variants == null)
-                    {
-                        return default;
-                    }
-
-                    UnionType unionType = new(symbol, variants.OrderBy(t => t.Order).ToArray());
-                    return unionType;
+                    ClassDeclarationSyntax classSyntax = (ClassDeclarationSyntax)ctx.Node;
+                    return new UnionReference(classSyntax, symbol);
                 })
-            .Where(static m => m is not null)!;
+            .Where(static u => u is not null)!;
 
-        context.RegisterImplementationSourceOutput(classDeclarations, static (context, item) =>
+        ReportTypeIsNotPartialError(context, unionReferences);
+
+        IncrementalValuesProvider<UnionType> unionTypes = unionReferences
+            .Where(static r => r.Syntax.IsPartial())
+            .Select(static (r, ct) =>
+            {
+                ct.ThrowIfCancellationRequested();
+
+                List<UnionTypeVariant>? variants = null;
+                foreach (AttributeData attribute in r.Symbol.GetAttributes())
+                {
+                    if (attribute.AttributeClass?.ToDisplayString() == UnionTypeAttributeName)
+                    {
+                        variants ??= new List<UnionTypeVariant>();
+
+                        var typeSymbol = attribute.ConstructorArguments[0].Value as INamedTypeSymbol;
+
+                        var alias = attribute.ConstructorArguments[1].Value?.ToString();
+                        var order = (int)attribute.ConstructorArguments[2].Value!;
+
+                        variants.Add(new UnionTypeVariant(typeSymbol!, alias, order));
+                    }
+                }
+
+                if (variants == null)
+                {
+                    return default;
+                }
+
+                UnionType unionType = new(r.Symbol, variants.OrderBy(t => t.Order).ToArray());
+                return unionType;
+            })
+            .Where(static u => u is not null)!;
+
+        context.RegisterImplementationSourceOutput(unionTypes, static (context, item) =>
         {
             Execute(item, context);
         });
+
+        // TODO add diagnostics - variants duplication (1 - Type, 2 - Alias, 3 - Order)
     }
 
     static void Execute(UnionType unionType,

@@ -9,6 +9,11 @@ internal static class SyntaxNodeExtensions
             AttributeLists.Count: > 0
         };
     }
+
+    public static bool IsPartial(this TypeDeclarationSyntax s)
+    {
+        return s.Modifiers.Any(SyntaxKind.PartialKeyword);
+    }
     
     public static AwaitExpressionSyntax AwaitWithConfigureAwait(this ExpressionSyntax expression)
     {

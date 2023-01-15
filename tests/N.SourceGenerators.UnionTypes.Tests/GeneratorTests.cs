@@ -45,4 +45,27 @@ namespace MyApp
 
         return TestHelper.Verify<UnionTypesGenerator>(source);
     }
+    
+    [Fact]
+    public Task NotPartialTypeReportsDiagnostics()
+    {
+        const string source = @"
+using System;
+using N.SourceGenerators.UnionTypes;
+
+namespace MyApp
+{
+    public record Success;
+    public record Error;
+
+    [UnionType(typeof(Success))]
+    [UnionType(typeof(Error))]
+    public class Result
+    {
+    }
+}
+";
+
+        return TestHelper.Verify<UnionTypesGenerator>(source);
+    }
 }

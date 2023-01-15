@@ -1,0 +1,16 @@
+﻿{
+  Diagnostics: [
+    {
+      Id: UTGEN001,
+      Title: Union type must be partial,
+      Severity: Error,
+      WarningLevel: 0,
+      Location: : (9,4)-(13,5),
+      Description: ,
+      HelpLink: ,
+      MessageFormat: Union type '{0}' must be partial,
+      Message: Union type 'Result' must be partial,
+      Category: UnionTypesGenerator
+    }
+  ]
+}
