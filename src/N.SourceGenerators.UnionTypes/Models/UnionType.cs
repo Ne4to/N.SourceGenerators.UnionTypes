@@ -1,5 +1,7 @@
 ﻿using Microsoft.CodeAnalysis;
 
+using N.SourceGenerators.UnionTypes.Extensions;
+
 namespace N.SourceGenerators.UnionTypes.Models;
 
 internal class UnionType
@@ -40,7 +42,7 @@ internal class UnionTypeVariant
         Alias = alias ?? typeSymbol.Name;
         Order = order;
 
-        TypeFullName = TypeSymbol.ToDisplayString();
+        TypeFullName = TypeSymbol.GetFullyQualifiedName();
         FieldName = $"_{Alias}";
         IsPropertyName = $"Is{Alias}";
         AsPropertyName = $"As{Alias}";

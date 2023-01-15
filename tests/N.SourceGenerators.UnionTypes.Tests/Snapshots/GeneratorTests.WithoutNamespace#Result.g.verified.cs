@@ -4,26 +4,34 @@
 #nullable enable
 partial class Result
 {
-    private readonly Success? _Success;
+    private readonly global::Success? _Success;
     public bool IsSuccess => _Success != null;
-    public Success AsSuccess => _Success ?? throw new System.InvalidOperationException("This is not a Success");
-    public Result(Success Success)
+    public global::Success AsSuccess => _Success ?? throw new System.InvalidOperationException("This is not a Success");
+    public Result(global::Success Success)
     {
         System.ArgumentNullException.ThrowIfNull(Success);
         _Success = Success;
     }
 
-    public static implicit operator Result(Success Success) => new Result(Success);
-    public static explicit operator Success(Result value) => value.AsSuccess;
-    private readonly Error? _Error;
+    public static implicit operator Result(global::Success Success) => new Result(Success);
+    public static explicit operator global::Success(Result value) => value.AsSuccess;
+    private readonly global::Error? _Error;
     public bool IsError => _Error != null;
-    public Error AsError => _Error ?? throw new System.InvalidOperationException("This is not a Error");
-    public Result(Error Error)
+    public global::Error AsError => _Error ?? throw new System.InvalidOperationException("This is not a Error");
+    public Result(global::Error Error)
     {
         System.ArgumentNullException.ThrowIfNull(Error);
         _Error = Error;
     }
 
-    public static implicit operator Result(Error Error) => new Result(Error);
-    public static explicit operator Error(Result value) => value.AsError;
+    public static implicit operator Result(global::Error Error) => new Result(Error);
+    public static explicit operator global::Error(Result value) => value.AsError;
+    public TOut Match<TOut>(global::System.Func<global::Success, TOut> matchSuccess, global::System.Func<global::Error, TOut> matchError)
+    {
+        if (IsSuccess)
+            return matchSuccess(AsSuccess);
+        if (IsError)
+            return matchError(AsError);
+        throw new InvalidOperationException("Unknown type");
+    }
 }

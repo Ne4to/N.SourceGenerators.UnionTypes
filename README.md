@@ -60,3 +60,14 @@ public ValidationError ExplicitCast(FooResult result)
     return (ValidationError)result;
 }
 ```
+Match method forces you to handle all possible variations
+```csharp
+public IActionResult MatchMethod(FooResult result)
+{
+    return result.Match<IActionResult>(
+        success => new OkResult(),
+        validationError => new BadRequestResult(),
+        notFoundError => new NotFoundResult()
+    );
+}
+```

@@ -6,27 +6,35 @@ namespace MyApp
 {
     partial class Result
     {
-        private readonly MyApp.Success? _Success;
+        private readonly global::MyApp.Success? _Success;
         public bool IsSuccess => _Success != null;
-        public MyApp.Success AsSuccess => _Success ?? throw new System.InvalidOperationException("This is not a Success");
-        public Result(MyApp.Success Success)
+        public global::MyApp.Success AsSuccess => _Success ?? throw new System.InvalidOperationException("This is not a Success");
+        public Result(global::MyApp.Success Success)
         {
             System.ArgumentNullException.ThrowIfNull(Success);
             _Success = Success;
         }
 
-        public static implicit operator Result(MyApp.Success Success) => new Result(Success);
-        public static explicit operator MyApp.Success(Result value) => value.AsSuccess;
-        private readonly MyApp.Error? _Error;
+        public static implicit operator Result(global::MyApp.Success Success) => new Result(Success);
+        public static explicit operator global::MyApp.Success(Result value) => value.AsSuccess;
+        private readonly global::MyApp.Error? _Error;
         public bool IsError => _Error != null;
-        public MyApp.Error AsError => _Error ?? throw new System.InvalidOperationException("This is not a Error");
-        public Result(MyApp.Error Error)
+        public global::MyApp.Error AsError => _Error ?? throw new System.InvalidOperationException("This is not a Error");
+        public Result(global::MyApp.Error Error)
         {
             System.ArgumentNullException.ThrowIfNull(Error);
             _Error = Error;
         }
 
-        public static implicit operator Result(MyApp.Error Error) => new Result(Error);
-        public static explicit operator MyApp.Error(Result value) => value.AsError;
+        public static implicit operator Result(global::MyApp.Error Error) => new Result(Error);
+        public static explicit operator global::MyApp.Error(Result value) => value.AsError;
+        public TOut Match<TOut>(global::System.Func<global::MyApp.Success, TOut> matchSuccess, global::System.Func<global::MyApp.Error, TOut> matchError)
+        {
+            if (IsSuccess)
+                return matchSuccess(AsSuccess);
+            if (IsError)
+                return matchError(AsError);
+            throw new InvalidOperationException("Unknown type");
+        }
     }
 }

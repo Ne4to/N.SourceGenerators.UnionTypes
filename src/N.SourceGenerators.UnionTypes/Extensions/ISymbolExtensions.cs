@@ -12,6 +12,16 @@ namespace N.SourceGenerators.UnionTypes.Extensions;
 internal static class ISymbolExtensions
 {
     /// <summary>
+    /// Gets the fully qualified name for a given symbol.
+    /// </summary>
+    /// <param name="symbol">The input <see cref="ISymbol"/> instance.</param>
+    /// <returns>The fully qualified name for <paramref name="symbol"/>.</returns>
+    public static string GetFullyQualifiedName(this ISymbol symbol)
+    {
+        return symbol.ToDisplayString(SymbolDisplayFormat.FullyQualifiedFormat);
+    }
+    
+    /// <summary>
     /// Checks whether or not a given symbol has an attribute with the specified fully qualified metadata name.
     /// </summary>
     /// <param name="symbol">The input <see cref="ISymbol"/> instance to check.</param>
