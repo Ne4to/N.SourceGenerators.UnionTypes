@@ -11,6 +11,15 @@
         <IsPackable>true</IsPackable>
         <VersionPrefix>0.1.0</VersionPrefix>
         <EnableNETAnalyzers>true</EnableNETAnalyzers>
+        <NoWarn>$(NoWarn);NU5128</NoWarn>
+    </PropertyGroup>
+    
+    <PropertyGroup>
+        <RepositoryUrl>https://github.com/Ne4to/N.SourceGenerators.UnionTypes</RepositoryUrl>
+        <PackageLicenseExpression>MIT</PackageLicenseExpression>
+        <Authors>Alexey Sosnin</Authors>
+        <PackageTags>discriminated union;source generator</PackageTags>
+        <Description>Discriminated union type source generator</Description>
     </PropertyGroup>
 
     <ItemGroup>

@@ -119,6 +119,8 @@ public class UnionTypesGenerator : IIncrementalGenerator
     static void Execute(UnionType unionType,
         SourceProductionContext context)
     {
+        context.CancellationToken.ThrowIfCancellationRequested();
+        
         // TODO add property `public Type ValueType { get; }`
         ClassDeclarationSyntax classDeclarationSyntax = ClassDeclaration(unionType.ContainerType.Name)
             .AddModifiers(Token(SyntaxKind.PartialKeyword))

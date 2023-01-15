@@ -23,6 +23,11 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "N.SourceGenerators.UnionTyp
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "N.SourceGenerators.UnionTypes.Tests", "tests\N.SourceGenerators.UnionTypes.Tests\N.SourceGenerators.UnionTypes.Tests.csproj", "{26FF57BD-99BE-4A3E-A8BF-AA7B3D9FC02F}"
 EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "workflows", "workflows", "{CAD9CCB8-F691-4535-9A5E-30F4FB551EF9}"
+	ProjectSection(SolutionItems) = preProject
+		.github\workflows\push-package.yml = .github\workflows\push-package.yml
+	EndProjectSection
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -35,6 +40,7 @@ Global
 		{2C39796B-5B3A-42F9-84DF-0501A44030B7} = {A838F419-B488-4482-A0ED-C017B92A7D29}
 		{2345EBD2-CF3A-4FB9-B80F-0DEB5650EBB1} = {432FABD2-1B70-4E29-935B-AEE6D93559E2}
 		{26FF57BD-99BE-4A3E-A8BF-AA7B3D9FC02F} = {08535BFD-5C2B-4D8B-90B7-520C578BA7E4}
+		{CAD9CCB8-F691-4535-9A5E-30F4FB551EF9} = {C8B5C061-4496-46B7-B9C5-10381520FA4D}
 	EndGlobalSection
 	GlobalSection(ProjectConfigurationPlatforms) = postSolution
 		{2C39796B-5B3A-42F9-84DF-0501A44030B7}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
