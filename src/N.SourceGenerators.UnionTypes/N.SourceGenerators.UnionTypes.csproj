@@ -9,6 +9,7 @@
         <IncludeBuildOutput>false</IncludeBuildOutput>
         <IsRoslynComponent>true</IsRoslynComponent>
         <IsPackable>true</IsPackable>
+        <PackageOutputPath>./nupkg</PackageOutputPath>
         <VersionPrefix>0.1.0</VersionPrefix>
         <Version Condition="'$(BuildMetadata)' != ''">$(VersionPrefix)+$(BuildMetadata)</Version>
         <EnableNETAnalyzers>true</EnableNETAnalyzers>

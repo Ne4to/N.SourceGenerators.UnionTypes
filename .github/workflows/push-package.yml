@@ -23,4 +23,4 @@ jobs:
       run: dotnet pack --configuration Release --no-build
     #  "rc.${GITHUB_RUN_NUMBER}+${GITHUB_SHA::8}"
     - name: Push
-      run: dotnet nuget push */bin/Release/*.nupkg -k ${{ secrets.NUGET_ORG_API_KEY }} -s https://api.nuget.org/v3/index.json --skip-duplicate
+      run: dotnet nuget push ./src/N.SourceGenerators.UnionTypes/nupkg/*.nupkg -k ${{ secrets.NUGET_ORG_API_KEY }} -s https://api.nuget.org/v3/index.json --skip-duplicate
