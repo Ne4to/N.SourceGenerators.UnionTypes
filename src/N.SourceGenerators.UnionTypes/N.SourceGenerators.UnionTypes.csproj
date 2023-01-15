@@ -10,7 +10,7 @@
         <IsRoslynComponent>true</IsRoslynComponent>
         <IsPackable>true</IsPackable>
         <PackageOutputPath>./nupkg</PackageOutputPath>
-        <VersionPrefix>0.3.0</VersionPrefix>
+        <VersionPrefix>0.4.0</VersionPrefix>
         <Version Condition="'$(BuildMetadata)' != ''">$(VersionPrefix)+$(BuildMetadata)</Version>
         <EnableNETAnalyzers>true</EnableNETAnalyzers>
         <NoWarn>$(NoWarn);NU5128</NoWarn>

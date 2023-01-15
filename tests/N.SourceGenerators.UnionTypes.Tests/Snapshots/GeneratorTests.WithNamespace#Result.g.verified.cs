@@ -8,7 +8,7 @@ namespace MyApp
     {
         private readonly global::MyApp.Success? _Success;
         public bool IsSuccess => _Success != null;
-        public global::MyApp.Success AsSuccess => _Success ?? throw new System.InvalidOperationException("This is not a Success");
+        public global::MyApp.Success AsSuccess => _Success ?? throw new InvalidOperationException("This is not a Success");
         public Result(global::MyApp.Success Success)
         {
             System.ArgumentNullException.ThrowIfNull(Success);
@@ -19,7 +19,7 @@ namespace MyApp
         public static explicit operator global::MyApp.Success(Result value) => value.AsSuccess;
         private readonly global::MyApp.Error? _Error;
         public bool IsError => _Error != null;
-        public global::MyApp.Error AsError => _Error ?? throw new System.InvalidOperationException("This is not a Error");
+        public global::MyApp.Error AsError => _Error ?? throw new InvalidOperationException("This is not a Error");
         public Result(global::MyApp.Error Error)
         {
             System.ArgumentNullException.ThrowIfNull(Error);
@@ -34,6 +34,15 @@ namespace MyApp
                 return matchSuccess(AsSuccess);
             if (IsError)
                 return matchError(AsError);
+            throw new InvalidOperationException("Unknown type");
+        }
+
+        public async global::System.Threading.Tasks.Task<TOut> MatchAsync<TOut>(global::System.Func<global::MyApp.Success, global::System.Threading.CancellationToken, global::System.Threading.Tasks.Task<TOut>> matchSuccess, global::System.Func<global::MyApp.Error, global::System.Threading.CancellationToken, global::System.Threading.Tasks.Task<TOut>> matchError, global::System.Threading.CancellationToken ct)
+        {
+            if (IsSuccess)
+                return await matchSuccess(AsSuccess, ct).ConfigureAwait(false);
+            if (IsError)
+                return await matchError(AsError, ct).ConfigureAwait(false);
             throw new InvalidOperationException("Unknown type");
         }
     }

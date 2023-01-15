@@ -15,6 +15,12 @@ namespace N.SourceGenerators.UnionTypes;
 [Generator(LanguageNames.CSharp)]
 public class UnionTypesGenerator : IIncrementalGenerator
 {
+    private const string FuncType = "global::System.Func";
+    private const string TaskType = "global::System.Threading.Tasks.Task";
+    private const string CancellationTokenType = "global::System.Threading.CancellationToken";
+
+    private const string UnionTypeAttributeName = "N.SourceGenerators.UnionTypes.UnionTypeAttribute";
+
     // TODO add #if NET7_0_OR_GREATER
     // #if NET7_0_OR_GREATER
     // // class A()
@@ -44,8 +50,6 @@ public class UnionTypesGenerator : IIncrementalGenerator
             }
         }
         """;
-
-    private const string UnionTypeAttributeName = "N.SourceGenerators.UnionTypes.UnionTypeAttribute";
 
     public void Initialize(IncrementalGeneratorInitializationContext context)
     {
@@ -83,6 +87,9 @@ public class UnionTypesGenerator : IIncrementalGenerator
                     // ClassDeclarationSyntax classSyntax = (ClassDeclarationSyntax)ctx.Node;
                     // var r = (Syntax: classSyntax, Symbol: symbol);
                     // bool isPartial = classSyntax.Modifiers.Any(SyntaxKind.PartialKeyword);
+
+                    // TODO add diagnostics - type is not partial
+                    // TODO add diagnostics - variants duplication
 
                     List<UnionTypeVariant>? variants = null;
                     foreach (AttributeData attribute in symbol.GetAttributes())
@@ -126,7 +133,8 @@ public class UnionTypesGenerator : IIncrementalGenerator
             .AddModifiers(Token(SyntaxKind.PartialKeyword))
             .AddMembers(VariantsMembers(unionType))
             .AddMembers(
-                MatchMethod(unionType)
+                MatchMethod(unionType),
+                MatchAsyncMethod(unionType)
             );
 
         SyntaxTriviaList syntaxTriviaList = TriviaList(
@@ -221,11 +229,7 @@ public class UnionTypesGenerator : IIncrementalGenerator
                 BinaryExpression(SyntaxKind.CoalesceExpression,
                     IdentifierName(variant.FieldName),
                     ThrowExpression(
-                        ObjectCreationExpression(
-                            IdentifierName("System.InvalidOperationException")
-                        ).AddArgumentListArguments(
-                            StringLiteralArgument($"This is not a {variant.TypeSymbol.Name}")
-                        )
+                        NewInvalidOperationException($"This is not a {variant.TypeSymbol.Name}")
                     )
                 )))
             .WithSemicolonToken(Token(SyntaxKind.SemicolonToken));
@@ -233,18 +237,15 @@ public class UnionTypesGenerator : IIncrementalGenerator
 
     private static MemberDeclarationSyntax Ctor(UnionType unionType, UnionTypeVariant variant)
     {
-        ParameterSyntax parameter = Parameter(Identifier(variant.Alias)).WithType(IdentifierName(variant.TypeFullName));
-        ParameterListSyntax parameterList = ParameterList(new SeparatedSyntaxList<ParameterSyntax>().Add(parameter));
-
-        var argument = Argument(IdentifierName(variant.Alias));
-
         InvocationExpressionSyntax checkArgumentExpression = InvocationExpression(
-            MemberAccessExpression(
-                SyntaxKind.SimpleMemberAccessExpression,
-                IdentifierName("System.ArgumentNullException"),
-                IdentifierName("ThrowIfNull")),
-            ArgumentList(new SeparatedSyntaxList<ArgumentSyntax>().Add(argument))
-        );
+                MemberAccessExpression(
+                    SyntaxKind.SimpleMemberAccessExpression,
+                    IdentifierName("System.ArgumentNullException"),
+                    IdentifierName("ThrowIfNull"))
+            )
+            .AddArgumentListArguments(
+                Argument(IdentifierName(variant.Alias))
+            );
 
         AssignmentExpressionSyntax assignmentExpression = AssignmentExpression(
             SyntaxKind.SimpleAssignmentExpression,
@@ -252,25 +253,23 @@ public class UnionTypesGenerator : IIncrementalGenerator
             IdentifierName(variant.Alias));
 
         BlockSyntax body =
-            Block(new StatementSyntax[]
-            {
-                ExpressionStatement(checkArgumentExpression), ExpressionStatement(assignmentExpression)
-            });
+            Block(
+                ExpressionStatement(checkArgumentExpression),
+                ExpressionStatement(assignmentExpression)
+            );
 
         return ConstructorDeclaration(Identifier(unionType.ContainerType.Name))
             .AddModifiers(Token(SyntaxKind.PublicKeyword))
-            .WithParameterList(parameterList)
+            .AddParameterListParameters(
+                Parameter(Identifier(variant.Alias))
+                    .WithType(IdentifierName(variant.TypeFullName))
+            )
             .WithBody(body);
     }
 
     private static ConversionOperatorDeclarationSyntax ImplicitOperatorToUnion(UnionType unionType,
         UnionTypeVariant variant)
     {
-        ParameterSyntax parameter = Parameter(Identifier(variant.Alias)).WithType(IdentifierName(variant.TypeFullName));
-        ParameterListSyntax parameterList = ParameterList(new SeparatedSyntaxList<ParameterSyntax>().Add(parameter));
-
-        ArgumentSyntax argument = Argument(IdentifierName(variant.Alias));
-
         return ConversionOperatorDeclaration(
                 Token(SyntaxKind.ImplicitKeyword),
                 IdentifierName(unionType.ContainerType.Name)
@@ -279,12 +278,16 @@ public class UnionTypesGenerator : IIncrementalGenerator
                 Token(SyntaxKind.PublicKeyword),
                 Token(SyntaxKind.StaticKeyword)
             )
-            .WithParameterList(parameterList)
+            .AddParameterListParameters(
+                Parameter(Identifier(variant.Alias))
+                    .WithType(IdentifierName(variant.TypeFullName))
+            )
             .WithExpressionBody(
                 ArrowExpressionClause(
-                    ObjectCreationExpression(IdentifierName(unionType.ContainerType.Name),
-                        ArgumentList(new SeparatedSyntaxList<ArgumentSyntax>().Add(argument)),
-                        null)
+                    ObjectCreationExpression(IdentifierName(unionType.ContainerType.Name))
+                        .AddArgumentListArguments(
+                            Argument(IdentifierName(variant.Alias))
+                        )
                 ))
             .WithSemicolonToken(Token(SyntaxKind.SemicolonToken));
     }
@@ -330,52 +333,120 @@ public class UnionTypesGenerator : IIncrementalGenerator
                     TypeParameter("TOut")
                 )
                 .AddParameterListParameters(
-                    MatchMethodParameters(unionType)
+                    unionType
+                        .Variants
+                        .Select(MatchMethodParameter)
+                        .ToArray()
                 )
                 .AddBodyStatements(
                     MatchMethodBodyStatements(unionType)
                 );
     }
 
-    private static ParameterSyntax[] MatchMethodParameters(UnionType unionType)
+    private static MemberDeclarationSyntax MatchAsyncMethod(UnionType unionType)
     {
-        var result = new ParameterSyntax[unionType.Variants.Count];
+        return
+            MethodDeclaration(
+                    TaskIdentifier("TOut"),
+                    "MatchAsync"
+                )
+                .AddModifiers(
+                    Token(SyntaxKind.PublicKeyword),
+                    Token(SyntaxKind.AsyncKeyword)
+                )
+                .AddTypeParameterListParameters(
+                    TypeParameter("TOut")
+                )
+                .AddParameterListParameters(
+                    unionType
+                        .Variants
+                        .Select(MatchAsyncMethodParameter)
+                        .ToArray()
+                )
+                .AddParameterListParameters(
+                    Parameter(
+                            Identifier("ct"))
+                        .WithType(IdentifierName(CancellationTokenType))
+                )
+                .AddBodyStatements(
+                    MatchAsyncMethodBodyStatements(unionType)
+                );
+    }
 
-        for (int variantIndex = 0; variantIndex < unionType.Variants.Count; variantIndex++)
-        {
-            UnionTypeVariant variant = unionType.Variants[variantIndex];
+    private static ParameterSyntax MatchMethodParameter(UnionTypeVariant variant)
+    {
+        var parameterType =
+            GenericName(FuncType)
+                .AddTypeArgumentListArguments(
+                    IdentifierName(variant.TypeFullName),
+                    IdentifierName("TOut")
+                );
 
-            var parameterType =
-                GenericName("global::System.Func")
-                    .AddTypeArgumentListArguments(
-                        IdentifierName(variant.TypeFullName),
-                        IdentifierName("TOut")
-                    );
+        var parameter =
+            Parameter(Identifier($"match{variant.Alias}"))
+                .WithType(parameterType);
 
-            var parameter =
-                Parameter(Identifier($"match{variant.Alias}"))
-                    .WithType(parameterType);
+        return parameter;
+    }
 
-            result[variantIndex] = parameter;
-        }
+    private static ParameterSyntax MatchAsyncMethodParameter(UnionTypeVariant variant)
+    {
+        var parameterType =
+            GenericName(FuncType)
+                .AddTypeArgumentListArguments(
+                    IdentifierName(variant.TypeFullName),
+                    IdentifierName(CancellationTokenType),
+                    TaskIdentifier("TOut")
+                );
 
-        return result;
+        var parameter =
+            Parameter(Identifier($"match{variant.Alias}"))
+                .WithType(parameterType);
+
+        return parameter;
+    }
+
+    private static GenericNameSyntax TaskIdentifier(string type)
+    {
+        return GenericName(TaskType)
+            .AddTypeArgumentListArguments(
+                IdentifierName(type)
+            );
     }
 
     private static StatementSyntax[] MatchMethodBodyStatements(UnionType unionType)
     {
-        var throwStatement = ThrowStatement(
-            ObjectCreationExpression(IdentifierName("InvalidOperationException"))
-                .AddArgumentListArguments(
-                    StringLiteralArgument("Unknown type")
-                )
-        );
-
         return unionType
             .Variants
             .Select(MatchStatement)
-            .Concat(new StatementSyntax[] { throwStatement })
+            .Concat(new StatementSyntax[] { ThrowUnknownType() })
             .ToArray();
+    }
+
+    private static StatementSyntax[] MatchAsyncMethodBodyStatements(UnionType unionType)
+    {
+        return unionType
+            .Variants
+            .Select(MatchAsyncStatement)
+            .Concat(new StatementSyntax[] { ThrowUnknownType() })
+            .ToArray();
+    }
+
+    private static ThrowStatementSyntax ThrowUnknownType()
+    {
+        return ThrowStatement(
+            NewInvalidOperationException("Unknown type")
+        );
+    }
+
+    private static ObjectCreationExpressionSyntax NewInvalidOperationException(string message)
+    {
+        return ObjectCreationExpression(
+                IdentifierName("InvalidOperationException")
+            )
+            .AddArgumentListArguments(
+                StringLiteralArgument(message)
+            );
     }
 
     private static StatementSyntax MatchStatement(UnionTypeVariant variant)
@@ -387,6 +458,37 @@ public class UnionTypesGenerator : IIncrementalGenerator
                     .AddArgumentListArguments(
                         Argument(IdentifierName(variant.AsPropertyName))
                     )
+            )
+        );
+    }
+
+    private static StatementSyntax MatchAsyncStatement(UnionTypeVariant variant)
+    {
+        return IfStatement(
+            IdentifierName(variant.IsPropertyName),
+            ReturnStatement(
+                AwaitWithConfigureAwait(
+                    InvocationExpression(IdentifierName($"match{variant.Alias}"))
+                        .AddArgumentListArguments(
+                            Argument(IdentifierName(variant.AsPropertyName)),
+                            Argument(IdentifierName("ct"))
+                        )
+                )
+            )
+        );
+    }
+
+    private static AwaitExpressionSyntax AwaitWithConfigureAwait(ExpressionSyntax expression)
+    {
+        return AwaitExpression(
+            InvocationExpression(
+                MemberAccessExpression(
+                    SyntaxKind.SimpleMemberAccessExpression,
+                    expression,
+                    IdentifierName("ConfigureAwait")
+                )
+            ).AddArgumentListArguments(
+                Argument(LiteralExpression(SyntaxKind.FalseLiteralExpression))
             )
         );
     }

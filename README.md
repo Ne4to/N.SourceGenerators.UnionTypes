@@ -49,7 +49,7 @@ Implicit conversion
 ```csharp
 public FooResult ImplicitReturn()
 {
-    // you can return any union type variant without creating FooResult
+    // you can return any union type variation without creating FooResult
     return new NotFoundError();
 }
 ```
@@ -60,7 +60,7 @@ public ValidationError ExplicitCast(FooResult result)
     return (ValidationError)result;
 }
 ```
-Match method forces you to handle all possible variations
+Match and MatchAsync methods force you to handle all possible variations
 ```csharp
 public IActionResult MatchMethod(FooResult result)
 {
@@ -69,5 +69,28 @@ public IActionResult MatchMethod(FooResult result)
         validationError => new BadRequestResult(),
         notFoundError => new NotFoundResult()
     );
+}
+
+public async Task<IActionResult> MatchAsyncMethod(FooResult result, CancellationToken cancellationToken)
+{
+    return await result.MatchAsync<IActionResult>(
+        static async (success, ct) =>
+        {
+            await SomeWork(ct);
+            return new OkResult();
+        }, static async (validationError, ct) =>
+        {
+            await SomeWork(ct);
+            return new BadRequestResult();
+        }, static async (notFoundError, ct) =>
+        {
+            await SomeWork(ct);
+            return new NotFoundResult();
+        }, cancellationToken);
+
+    static Task SomeWork(CancellationToken ct)
+    {
+        return Task.Delay(100, ct);
+    }
 }
 ```
