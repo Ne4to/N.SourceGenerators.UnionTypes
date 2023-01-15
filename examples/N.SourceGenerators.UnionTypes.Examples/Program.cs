@@ -20,4 +20,9 @@ class Bar
         // you can return any union type variant without creating FooResult
         return new NotFoundError();
     }
+
+    public ValidationError ExplicitCast(FooResult result)
+    {
+        return (ValidationError)result;
+    }
 }

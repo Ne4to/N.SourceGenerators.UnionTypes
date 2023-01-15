@@ -14,6 +14,7 @@ partial class Result
     }
 
     public static implicit operator Result(Success Success) => new Result(Success);
+    public static explicit operator Success(Result value) => value.AsSuccess;
     private readonly Error? _Error;
     public bool IsError => _Error != null;
     public Error AsError => _Error ?? throw new System.InvalidOperationException("This is not a Error");
@@ -24,4 +25,5 @@ partial class Result
     }
 
     public static implicit operator Result(Error Error) => new Result(Error);
+    public static explicit operator Error(Result value) => value.AsError;
 }

@@ -16,6 +16,7 @@ namespace MyApp
         }
 
         public static implicit operator Result(MyApp.Success Success) => new Result(Success);
+        public static explicit operator MyApp.Success(Result value) => value.AsSuccess;
         private readonly MyApp.Error? _Error;
         public bool IsError => _Error != null;
         public MyApp.Error AsError => _Error ?? throw new System.InvalidOperationException("This is not a Error");
@@ -26,5 +27,6 @@ namespace MyApp
         }
 
         public static implicit operator Result(MyApp.Error Error) => new Result(Error);
+        public static explicit operator MyApp.Error(Result value) => value.AsError;
     }
 }

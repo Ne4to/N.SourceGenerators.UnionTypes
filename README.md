@@ -42,11 +42,21 @@ public partial class FooResult
 ```
 
 ## Examples
+
+All examples can be found in [examples project](./examples/N.SourceGenerators.UnionTypes.Examples/Program.cs)
+
 Implicit conversion
 ```csharp
 public FooResult ImplicitReturn()
 {
     // you can return any union type variant without creating FooResult
     return new NotFoundError();
+}
+```
+Explicit conversion
+```csharp
+public ValidationError ExplicitCast(FooResult result)
+{
+    return (ValidationError)result;
 }
 ```
