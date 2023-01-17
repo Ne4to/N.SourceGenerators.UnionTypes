@@ -11,6 +11,7 @@ namespace N.SourceGenerators.UnionTypes;
 public partial class UnionTypesGenerator : IIncrementalGenerator
 {
     private const string FuncType = "global::System.Func";
+    private const string ActionType = "global::System.Action";
     private const string CancellationTokenType = "global::System.Threading.CancellationToken";
 
     private const string UnionTypeAttributeName = "N.SourceGenerators.UnionTypes.UnionTypeAttribute";
@@ -141,7 +142,9 @@ public partial class UnionTypesGenerator : IIncrementalGenerator
             .AddMembers(VariantsMembers(unionType))
             .AddMembers(
                 MatchMethod(unionType, isAsync: false),
-                MatchMethod(unionType, isAsync: true)
+                MatchMethod(unionType, isAsync: true),
+                SwitchMethod(unionType, isAsync: false),
+                SwitchMethod(unionType, isAsync: true)
             );
 
         SyntaxTriviaList syntaxTriviaList = TriviaList(
@@ -368,6 +371,62 @@ public partial class UnionTypesGenerator : IIncrementalGenerator
                     )
                     .AddArgumentListArgumentWhen(isAsync, Argument(IdentifierName("ct")))
                     .AwaitWithConfigureAwaitWhen(isAsync)
+            )
+        );
+    }
+
+    private static MemberDeclarationSyntax SwitchMethod(UnionType unionType, bool isAsync)
+    {
+        return
+            MethodDeclaration(
+                    isAsync ? IdentifierName(TaskType) : PredefinedType(Token(SyntaxKind.VoidKeyword)),
+                    isAsync ? "SwitchAsync" : "Switch"
+                )
+                .AddModifiers(
+                    Token(SyntaxKind.PublicKeyword)
+                )
+                .AddModifierWhen(isAsync, Token(SyntaxKind.AsyncKeyword))
+                .AddParameterListParameters(
+                    VariantsParameters(unionType, v => SwitchMethodParameter(v, isAsync))
+                )
+                .AddParameterListParameterWhen(
+                    isAsync,
+                    Parameter(Identifier("ct"))
+                        .WithType(IdentifierName(CancellationTokenType))
+                )
+                .AddBodyStatements(
+                    VariantsBodyStatements(unionType, v => SwitchStatement(v, isAsync))
+                );
+    }
+
+    private static ParameterSyntax SwitchMethodParameter(UnionTypeVariant variant, bool isAsync)
+    {
+        var parameterType =
+            GenericName(isAsync ? FuncType : ActionType)
+                .AddTypeArgumentListArguments(IdentifierName(variant.TypeFullName))
+                .AddTypeArgumentListArgumentsWhen(isAsync, IdentifierName(CancellationTokenType))
+                .AddTypeArgumentListArgumentsWhen(isAsync, IdentifierName(TaskType));
+
+        var parameter =
+            Parameter(Identifier($"switch{variant.Alias}"))
+                .WithType(parameterType);
+
+        return parameter;
+    }
+
+    private static StatementSyntax SwitchStatement(UnionTypeVariant variant, bool isAsync)
+    {
+        return IfStatement(
+            IdentifierName(variant.IsPropertyName),
+            Block(
+                ExpressionStatement(
+                    InvocationExpression(IdentifierName($"switch{variant.Alias}"))
+                        .AddArgumentListArguments(
+                            Argument(IdentifierName(variant.AsPropertyName))
+                        )
+                        .AddArgumentListArgumentWhen(isAsync, Argument(IdentifierName("ct")))
+                        .AwaitWithConfigureAwaitWhen(isAsync)),
+                ReturnStatement()
             )
         );
     }

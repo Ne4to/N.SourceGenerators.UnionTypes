@@ -2,7 +2,7 @@
 
 internal static class RoslynUtils
 {
-    private const string TaskType = "global::System.Threading.Tasks.Task";
+    public const string TaskType = "global::System.Threading.Tasks.Task";
 
     public static ObjectCreationExpressionSyntax NewInvalidOperationException(string message)
     {

@@ -44,19 +44,53 @@ class Bar
         return await result.MatchAsync<IActionResult>(
             static async (success, ct) =>
             {
-                await SomeWork(ct);
+                await SomeWork(success, ct);
                 return new OkResult();
             }, static async (validationError, ct) =>
             {
-                await SomeWork(ct);
+                await SomeWork(validationError, ct);
                 return new BadRequestResult();
             }, static async (notFoundError, ct) =>
             {
-                await SomeWork(ct);
+                await SomeWork(notFoundError, ct);
                 return new NotFoundResult();
             }, cancellationToken);
 
-        static Task SomeWork(CancellationToken ct)
+        static Task SomeWork<T>(T value, CancellationToken ct)
+        {
+            return Task.Delay(100, ct);
+        }
+    }
+
+    public void SwitchMethod(FooResult result)
+    {
+        result.Switch(
+            success => SomeWork(success),
+            validationError => SomeWork(validationError),
+            notFoundError => SomeWork(notFoundError)
+        );
+
+        static void SomeWork<T>(T value)
+        {
+            throw new NotImplementedException();
+        }
+    }
+
+    public async Task SwitchAsyncMethod(FooResult result, CancellationToken cancellationToken)
+    {
+        await result.SwitchAsync(
+            static async (success, ct) =>
+            {
+                await SomeWork(success, ct);
+            }, static async (validationError, ct) =>
+            {
+                await SomeWork(validationError, ct);
+            }, static async (notFoundError, ct) =>
+            {
+                await SomeWork(notFoundError, ct);
+            }, cancellationToken);
+
+        static Task SomeWork<T>(T value, CancellationToken ct)
         {
             return Task.Delay(100, ct);
         }

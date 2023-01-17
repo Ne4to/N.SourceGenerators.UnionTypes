@@ -45,5 +45,39 @@ namespace MyApp
                 return await matchError(AsError, ct).ConfigureAwait(false);
             throw new InvalidOperationException("Unknown type");
         }
+
+        public void Switch(global::System.Action<global::MyApp.Success> switchSuccess, global::System.Action<global::MyApp.Error> switchError)
+        {
+            if (IsSuccess)
+            {
+                switchSuccess(AsSuccess);
+                return;
+            }
+
+            if (IsError)
+            {
+                switchError(AsError);
+                return;
+            }
+
+            throw new InvalidOperationException("Unknown type");
+        }
+
+        public async global::System.Threading.Tasks.Task SwitchAsync(global::System.Func<global::MyApp.Success, global::System.Threading.CancellationToken, global::System.Threading.Tasks.Task> switchSuccess, global::System.Func<global::MyApp.Error, global::System.Threading.CancellationToken, global::System.Threading.Tasks.Task> switchError, global::System.Threading.CancellationToken ct)
+        {
+            if (IsSuccess)
+            {
+                await switchSuccess(AsSuccess, ct).ConfigureAwait(false);
+                return;
+            }
+
+            if (IsError)
+            {
+                await switchError(AsError, ct).ConfigureAwait(false);
+                return;
+            }
+
+            throw new InvalidOperationException("Unknown type");
+        }
     }
 }
