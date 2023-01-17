@@ -1,0 +1,16 @@
+﻿{
+  Diagnostics: [
+    {
+      Id: UTGEN004,
+      Title: Union type variant's order must be unique,
+      Severity: Warning,
+      WarningLevel: 1,
+      Location: : (8,4)-(12,5),
+      Description: ,
+      HelpLink: ,
+      MessageFormat: Union type '{0}' has variants with duplicate order '{1}',
+      Message: Union type 'Result' has variants with duplicate order '42',
+      Category: UnionTypesGenerator
+    }
+  ]
+}

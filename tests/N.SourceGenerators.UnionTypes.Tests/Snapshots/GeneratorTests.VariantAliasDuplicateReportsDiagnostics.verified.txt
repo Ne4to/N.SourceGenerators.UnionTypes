@@ -1,0 +1,16 @@
+﻿{
+  Diagnostics: [
+    {
+      Id: UTGEN003,
+      Title: Union type variant's alias must be unique,
+      Severity: Warning,
+      WarningLevel: 1,
+      Location: : (8,4)-(12,5),
+      Description: ,
+      HelpLink: ,
+      MessageFormat: Union type '{0}' has variants with duplicate alias '{1}',
+      Message: Union type 'Result' has variants with duplicate alias 'FriendlyName',
+      Category: UnionTypesGenerator
+    }
+  ]
+}

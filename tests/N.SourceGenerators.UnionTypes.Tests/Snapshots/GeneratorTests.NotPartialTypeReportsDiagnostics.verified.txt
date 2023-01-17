@@ -3,8 +3,8 @@
     {
       Id: UTGEN001,
       Title: Union type must be partial,
-      Severity: Error,
-      WarningLevel: 0,
+      Severity: Warning,
+      WarningLevel: 1,
       Location: : (9,4)-(13,5),
       Description: ,
       HelpLink: ,
