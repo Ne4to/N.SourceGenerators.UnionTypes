@@ -2,9 +2,9 @@
 
 internal static class SyntaxNodeExtensions
 {
-    public static bool IsClassWithAttributes(this SyntaxNode s)
+    public static bool IsTypeWithAttributes(this SyntaxNode s)
     {
-        return s is ClassDeclarationSyntax
+        return s is TypeDeclarationSyntax
         {
             AttributeLists.Count: > 0
         };

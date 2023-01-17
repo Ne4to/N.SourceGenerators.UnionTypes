@@ -67,7 +67,7 @@ public partial class UnionTypesGenerator : IIncrementalGenerator
     {
         return context.SyntaxProvider
             .CreateSyntaxProvider(
-                static (s, _) => s.IsClassWithAttributes(),
+                static (s, _) => s.IsTypeWithAttributes(),
                 static (ctx, ct) =>
                 {
                     ct.ThrowIfCancellationRequested();
@@ -90,8 +90,8 @@ public partial class UnionTypesGenerator : IIncrementalGenerator
                         return default;
                     }
 
-                    ClassDeclarationSyntax classSyntax = (ClassDeclarationSyntax)ctx.Node;
-                    return new UnionReference(classSyntax, symbol);
+                    TypeDeclarationSyntax typeDeclaration = (TypeDeclarationSyntax)ctx.Node;
+                    return new UnionReference(typeDeclaration, symbol);
                 })
             .Where(static u => u is not null)!;
     }
@@ -137,7 +137,15 @@ public partial class UnionTypesGenerator : IIncrementalGenerator
         context.CancellationToken.ThrowIfCancellationRequested();
 
         // TODO add property `public Type ValueType { get; }`
-        ClassDeclarationSyntax classDeclarationSyntax = ClassDeclaration(unionType.ContainerType.Name)
+        // TODO override ToString
+        // TODO add DebuggerDisplayAttribute
+        // TODO add equality operators / Equals / GetHashCode
+        // TODO implement serialization to JSON (and back?)
+        TypeDeclarationSyntax typeDeclaration = unionType.ContainerType.IsReferenceType
+            ? ClassDeclaration(unionType.ContainerType.Name)
+            : StructDeclaration(unionType.ContainerType.Name);
+
+        typeDeclaration = typeDeclaration
             .AddModifiers(Token(SyntaxKind.PartialKeyword))
             .AddMembers(VariantsMembers(unionType))
             .AddMembers(
@@ -156,7 +164,7 @@ public partial class UnionTypesGenerator : IIncrementalGenerator
         if (unionType.ContainerType.ContainingNamespace.Name is "")
         {
             compilationUnit = CompilationUnit()
-                .AddMembers(classDeclarationSyntax.WithLeadingTrivia(syntaxTriviaList))
+                .AddMembers(typeDeclaration.WithLeadingTrivia(syntaxTriviaList))
                 .NormalizeWhitespace();
         }
         else
@@ -165,7 +173,7 @@ public partial class UnionTypesGenerator : IIncrementalGenerator
                 .AddMembers(
                     NamespaceDeclaration(IdentifierName(unionType.ContainerType.ContainingNamespace.Name))
                         .WithLeadingTrivia(syntaxTriviaList)
-                        .AddMembers(classDeclarationSyntax)
+                        .AddMembers(typeDeclaration)
                 )
                 .NormalizeWhitespace();
         }

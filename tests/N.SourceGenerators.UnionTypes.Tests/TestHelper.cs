@@ -7,7 +7,7 @@ namespace N.SourceGenerators.UnionTypes.Tests;
 
 public static class TestHelper
 {
-    public static Task Verify<TGenerator>(string source)
+    public static Task Verify<TGenerator>(string source, string? parametersText = null)
         where TGenerator : IIncrementalGenerator, new()
     {
         // Parse the provided string into a C# syntax tree
@@ -35,8 +35,16 @@ public static class TestHelper
         driver = driver.RunGenerators(compilation);
 
         // Use verify to snapshot test the source generator output!
-        return Verifier
+        SettingsTask settingsTask = Verifier
             .Verify(driver)
             .UseDirectory("Snapshots");
+
+        if (parametersText != null)
+        {
+            settingsTask = settingsTask
+                .UseTextForParameters(parametersText);
+        }
+
+        return settingsTask;
     }
 }

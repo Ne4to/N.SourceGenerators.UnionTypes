@@ -9,7 +9,7 @@ Add package reference to `N.SourceGenerators.UnionTypes`
 ```shell
 dotnet add package N.SourceGenerators.UnionTypes
 ```
-Create a partial class that will be used as a union type
+Create a partial class or struct that will be used as a union type
 ```csharp
 public partial class FooResult
 {

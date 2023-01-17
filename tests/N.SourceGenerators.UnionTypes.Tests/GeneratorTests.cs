@@ -3,49 +3,55 @@ namespace N.SourceGenerators.UnionTypes.Tests;
 [UsesVerify]
 public class GeneratorTests
 {
-    [Fact]
-    public Task WithoutNamespace()
+    [Theory]
+    [InlineData("partial class")]
+    [InlineData("partial struct")]
+    [InlineData("readonly partial struct")]
+    public Task WithoutNamespace(string typeModifiers)
     {
-        const string source = @"
-using System;
-using N.SourceGenerators.UnionTypes;
+        string source = $$"""           
+            using System;
+            using N.SourceGenerators.UnionTypes;
+            
+            public record Success;
+            public record Error;
+            
+            [UnionType(typeof(Success))]
+            [UnionType(typeof(Error))]
+            public {{typeModifiers}} Result
+            {
+            }
+            """;
 
-public record Success;
-public record Error;
-
-[UnionType(typeof(Success))]
-[UnionType(typeof(Error))]
-public partial class Result
-{
-}
-";
-
-        return TestHelper.Verify<UnionTypesGenerator>(source);
+        return TestHelper.Verify<UnionTypesGenerator>(source, typeModifiers.Replace(' ', '-'));
     }
-    
-    [Fact]
-    public Task WithNamespace()
+
+    [Theory]
+    [InlineData("partial class")]
+    [InlineData("partial struct")]
+    [InlineData("readonly partial struct")]
+    public Task WithNamespace(string typeModifiers)
     {
-        const string source = @"
-using System;
-using N.SourceGenerators.UnionTypes;
+        string source = $$"""            
+            using System;
+            using N.SourceGenerators.UnionTypes;
+            
+            namespace MyApp
+            {
+                public record Success;
+                public record Error;
+            
+                [UnionType(typeof(Success))]
+                [UnionType(typeof(Error))]
+                public {{typeModifiers}} Result
+                {
+                }
+            }
+            """;
 
-namespace MyApp
-{
-    public record Success;
-    public record Error;
-
-    [UnionType(typeof(Success))]
-    [UnionType(typeof(Error))]
-    public partial class Result
-    {
+        return TestHelper.Verify<UnionTypesGenerator>(source, typeModifiers.Replace(' ', '-'));
     }
-}
-";
 
-        return TestHelper.Verify<UnionTypesGenerator>(source);
-    }
-    
     [Fact]
     public Task NotPartialTypeReportsDiagnostics()
     {
@@ -68,7 +74,7 @@ namespace MyApp
 
         return TestHelper.Verify<UnionTypesGenerator>(source);
     }
-    
+
     [Fact]
     public Task VariantTypeDuplicateReportsDiagnostics()
     {
@@ -91,7 +97,7 @@ namespace MyApp
 
         return TestHelper.Verify<UnionTypesGenerator>(source);
     }
-    
+
     [Fact]
     public Task VariantAliasDuplicateReportsDiagnostics()
     {
@@ -113,8 +119,8 @@ namespace MyApp
 """;
 
         return TestHelper.Verify<UnionTypesGenerator>(source);
-    } 
-    
+    }
+
     [Fact]
     public Task VariantOrderDuplicateReportsDiagnostics()
     {
@@ -137,7 +143,7 @@ namespace MyApp
 
         return TestHelper.Verify<UnionTypesGenerator>(source);
     }
-    
+
     [Fact]
     public Task InvalidTypeReportsAllDiagnostics()
     {

@@ -17,6 +17,20 @@ public partial class FooResult
 {
 }
 
+[UnionType(typeof(Success))]
+[UnionType(typeof(ValidationError))]
+[UnionType(typeof(NotFoundError))]
+public partial struct FooStructResult
+{
+}
+
+[UnionType(typeof(Success))]
+[UnionType(typeof(ValidationError))]
+[UnionType(typeof(NotFoundError))]
+public readonly partial struct FooStructReadonlyResult
+{
+}
+
 class Bar
 {
     public FooResult ImplicitReturn()
