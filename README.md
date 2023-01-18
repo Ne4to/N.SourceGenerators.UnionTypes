@@ -60,6 +60,19 @@ public ValidationError ExplicitCast(FooResult result)
     return (ValidationError)result;
 }
 ```
+Checking value type
+```csharp
+public void ValueTypeProperty()
+{
+    FooResult foo = GetFoo();
+    Type valueType = foo.ValueType; // returns typeof(NotFoundError)
+
+    static FooResult GetFoo()
+    {
+        return new NotFoundError();
+    }
+}
+```
 Match and MatchAsync methods are used to convert union type to another type. These methods force you to handle all possible variations.
 ```csharp
 public IActionResult MatchMethod(FooResult result)
@@ -94,7 +107,7 @@ public async Task<IActionResult> MatchAsyncMethod(FooResult result, Cancellation
     }
 }
 ```
-Match and MatchAsync methods are used to execute some work based on inner type
+Switch and SwitchAsync methods are used to execute some work based on inner type
 ```csharp
  public void SwitchMethod(FooResult result)
 {

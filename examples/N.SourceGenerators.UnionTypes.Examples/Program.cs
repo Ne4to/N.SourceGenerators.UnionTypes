@@ -109,4 +109,15 @@ class Bar
             return Task.Delay(100, ct);
         }
     }
+
+    public void ValueTypeProperty()
+    {
+        FooResult foo = GetFoo();
+        Type valueType = foo.ValueType; // returns typeof(NotFoundError)
+
+        static FooResult GetFoo()
+        {
+            return new NotFoundError();
+        }
+    }
 }
