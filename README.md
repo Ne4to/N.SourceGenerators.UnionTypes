@@ -73,6 +73,22 @@ public void ValueTypeProperty()
     }
 }
 ```
+TryGet method is used to check if union contains a specific type
+```csharp
+public void TryGetValue()
+{
+    FooResult foo = GetFoo();
+    if (foo.TryGetNotFoundError(out var notFoundError))
+    {
+        // make something with notFoundError
+    }
+
+    static FooResult GetFoo()
+    {
+        return new NotFoundError();
+    }
+}
+```
 Match and MatchAsync methods are used to convert union type to another type. These methods force you to handle all possible variations.
 ```csharp
 public IActionResult MatchMethod(FooResult result)

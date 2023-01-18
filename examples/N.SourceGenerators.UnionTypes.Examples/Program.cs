@@ -43,6 +43,31 @@ class Bar
     {
         return (ValidationError)result;
     }
+    
+    public void ValueTypeProperty()
+    {
+        FooResult foo = GetFoo();
+        Type valueType = foo.ValueType; // returns typeof(NotFoundError)
+
+        static FooResult GetFoo()
+        {
+            return new NotFoundError();
+        }
+    }
+    
+    public void TryGetValue()
+    {
+        FooResult foo = GetFoo();
+        if (foo.TryGetNotFoundError(out var notFoundError))
+        {
+            // make something with notFoundError
+        }
+
+        static FooResult GetFoo()
+        {
+            return new NotFoundError();
+        }
+    }
 
     public IActionResult MatchMethod(FooResult result)
     {
@@ -107,17 +132,6 @@ class Bar
         static Task SomeWork<T>(T value, CancellationToken ct)
         {
             return Task.Delay(100, ct);
-        }
-    }
-
-    public void ValueTypeProperty()
-    {
-        FooResult foo = GetFoo();
-        Type valueType = foo.ValueType; // returns typeof(NotFoundError)
-
-        static FooResult GetFoo()
-        {
-            return new NotFoundError();
         }
     }
 }

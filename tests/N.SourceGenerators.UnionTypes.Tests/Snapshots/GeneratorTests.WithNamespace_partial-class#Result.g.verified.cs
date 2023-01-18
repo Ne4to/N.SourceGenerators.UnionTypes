@@ -20,6 +20,20 @@ namespace MyApp
 
         public static implicit operator Result(global::MyApp.Success Success) => new Result(Success);
         public static explicit operator global::MyApp.Success(Result value) => value.AsSuccess;
+        public bool TryGetSuccess([System.Diagnostics.CodeAnalysis.NotNullWhen(true)] out global::MyApp.Success? value)
+        {
+            if (_Success != null)
+            {
+                value = _Success;
+                return true;
+            }
+            else
+            {
+                value = default;
+                return false;
+            }
+        }
+
         private readonly global::MyApp.Error? _Error;
         public bool IsError => _Error != null;
         public global::MyApp.Error AsError => _Error ?? throw new InvalidOperationException("This is not a Error");
@@ -31,6 +45,20 @@ namespace MyApp
 
         public static implicit operator Result(global::MyApp.Error Error) => new Result(Error);
         public static explicit operator global::MyApp.Error(Result value) => value.AsError;
+        public bool TryGetError([System.Diagnostics.CodeAnalysis.NotNullWhen(true)] out global::MyApp.Error? value)
+        {
+            if (_Error != null)
+            {
+                value = _Error;
+                return true;
+            }
+            else
+            {
+                value = default;
+                return false;
+            }
+        }
+
         public TOut Match<TOut>(global::System.Func<global::MyApp.Success, TOut> matchSuccess, global::System.Func<global::MyApp.Error, TOut> matchError)
         {
             if (IsSuccess)
