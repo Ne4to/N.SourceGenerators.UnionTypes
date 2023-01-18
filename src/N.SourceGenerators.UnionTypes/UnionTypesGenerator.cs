@@ -209,6 +209,7 @@ public partial class UnionTypesGenerator : IIncrementalGenerator
         yield return Ctor(unionType, variant);
         yield return ImplicitOperatorToUnion(unionType, variant);
         yield return ExplicitOperatorFromUnion(unionType, variant);
+        yield return TryGetMethod(variant);
     }
 
     private static FieldDeclarationSyntax Field(UnionTypeVariant variant)
@@ -332,6 +333,63 @@ public partial class UnionTypesGenerator : IIncrementalGenerator
                 )
             )
             .WithSemicolonToken(Token(SyntaxKind.SemicolonToken));
+    }
+
+    private static MemberDeclarationSyntax TryGetMethod(UnionTypeVariant variant)
+    {
+        AttributeListSyntax attributeList = AttributeList()
+            .AddAttributes(
+                Attribute(IdentifierName("System.Diagnostics.CodeAnalysis.NotNullWhen"),
+                    AttributeArgumentList(
+                        SeparatedList(
+                            new[] { AttributeArgument(LiteralExpression(SyntaxKind.TrueLiteralExpression)) }
+                        )
+                    )
+                )
+            );
+
+        return MethodDeclaration(
+                IdentifierName("bool"),
+                Identifier($"TryGet{variant.Alias}")
+            )
+            .AddModifiers(
+                Token(SyntaxKind.PublicKeyword)
+            )
+            .AddParameterListParameters(
+                Parameter(Identifier("value"))
+                    .WithType(NullableType(IdentifierName(variant.TypeFullName)))
+                    .AddModifiers(Token(SyntaxKind.OutKeyword))
+                    .AddAttributeLists(attributeList)
+            ).WithBody(
+                Block(
+                    IfStatement(
+                            BinaryExpression(
+                                SyntaxKind.NotEqualsExpression,
+                                IdentifierName(variant.FieldName),
+                                LiteralExpression(SyntaxKind.NullLiteralExpression)
+                            ),
+                            Block(
+                                ExpressionStatement(
+                                    AssignmentExpression(SyntaxKind.SimpleAssignmentExpression,
+                                        IdentifierName("value"),
+                                        IdentifierName(variant.FieldName)
+                                    )
+                                ),
+                                ReturnStatement(LiteralExpression(SyntaxKind.TrueLiteralExpression))
+                            )
+                        )
+                        .WithElse(ElseClause(
+                            Block(
+                                ExpressionStatement(
+                                    AssignmentExpression(SyntaxKind.SimpleAssignmentExpression,
+                                        IdentifierName("value"),
+                                        LiteralExpression(SyntaxKind.DefaultLiteralExpression)
+                                    )
+                                ),
+                                ReturnStatement(LiteralExpression(SyntaxKind.FalseLiteralExpression))
+                            )))
+                )
+            );
     }
 
     private static MemberDeclarationSyntax MatchMethod(UnionType unionType, bool isAsync)
