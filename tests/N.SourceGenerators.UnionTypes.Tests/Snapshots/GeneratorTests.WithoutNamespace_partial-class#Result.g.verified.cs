@@ -5,7 +5,7 @@
 // </auto-generated>
 #pragma warning disable
 #nullable enable
-partial class Result
+partial class Result : IEquatable<Result>
 {
     private readonly global::Success? _success;
     public bool IsSuccess => _success != null;
@@ -119,5 +119,76 @@ partial class Result
                 return typeof(global::Error);
             throw new InvalidOperationException("Unknown type");
         }
+    }
+
+    private global::System.Object InnerValue
+    {
+        get
+        {
+            if (IsSuccess)
+                return AsSuccess;
+            if (IsError)
+                return AsError;
+            throw new InvalidOperationException("Unknown type");
+        }
+    }
+
+    public override int GetHashCode()
+    {
+        return InnerValue.GetHashCode();
+    }
+
+    public static bool operator ==(Result? left, Result? right)
+    {
+        return Equals(left, right);
+    }
+
+    public static bool operator !=(Result? left, Result? right)
+    {
+        return !Equals(left, right);
+    }
+
+    public bool Equals(Result? other)
+    {
+        if (ReferenceEquals(null, other))
+        {
+            return false;
+        }
+
+        if (ReferenceEquals(this, other))
+        {
+            return true;
+        }
+
+        if (ValueType != other.ValueType)
+        {
+            return false;
+        }
+
+        if (IsSuccess)
+            return EqualityComparer<global::Success>.Default.Equals(AsSuccess, other.AsSuccess);
+        if (IsError)
+            return EqualityComparer<global::Error>.Default.Equals(AsError, other.AsError);
+        throw new InvalidOperationException("Unknown type");
+    }
+
+    public override bool Equals(object? other)
+    {
+        if (ReferenceEquals(null, other))
+        {
+            return false;
+        }
+
+        if (ReferenceEquals(this, other))
+        {
+            return true;
+        }
+
+        if (other.GetType() != typeof(Result))
+        {
+            return false;
+        }
+
+        return Equals((Result)other);
     }
 }

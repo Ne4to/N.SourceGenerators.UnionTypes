@@ -7,7 +7,7 @@
 #nullable enable
 namespace MyApp
 {
-    partial struct Result
+    partial struct Result : IEquatable<Result>
     {
         private readonly global::MyApp.Success? _success;
         public bool IsSuccess => _success != null;
@@ -250,6 +250,64 @@ namespace MyApp
                     return typeof(global::System.Tuple<int, string>);
                 throw new InvalidOperationException("Unknown type");
             }
+        }
+
+        private global::System.Object InnerValue
+        {
+            get
+            {
+                if (IsSuccess)
+                    return AsSuccess;
+                if (IsError)
+                    return AsError;
+                if (IsIReadOnlyListOfInt)
+                    return AsIReadOnlyListOfInt;
+                if (IsArrayOfString)
+                    return AsArrayOfString;
+                if (IsTupleOfIntAndString)
+                    return AsTupleOfIntAndString;
+                throw new InvalidOperationException("Unknown type");
+            }
+        }
+
+        public override int GetHashCode()
+        {
+            return InnerValue.GetHashCode();
+        }
+
+        public static bool operator ==(Result left, Result right)
+        {
+            return left.Equals(right);
+        }
+
+        public static bool operator !=(Result left, Result right)
+        {
+            return !left.Equals(right);
+        }
+
+        public bool Equals(Result other)
+        {
+            if (ValueType != other.ValueType)
+            {
+                return false;
+            }
+
+            if (IsSuccess)
+                return EqualityComparer<global::MyApp.Success>.Default.Equals(AsSuccess, other.AsSuccess);
+            if (IsError)
+                return EqualityComparer<global::MyApp.Error>.Default.Equals(AsError, other.AsError);
+            if (IsIReadOnlyListOfInt)
+                return EqualityComparer<global::System.Collections.Generic.IReadOnlyList<int>>.Default.Equals(AsIReadOnlyListOfInt, other.AsIReadOnlyListOfInt);
+            if (IsArrayOfString)
+                return EqualityComparer<string[]>.Default.Equals(AsArrayOfString, other.AsArrayOfString);
+            if (IsTupleOfIntAndString)
+                return EqualityComparer<global::System.Tuple<int, string>>.Default.Equals(AsTupleOfIntAndString, other.AsTupleOfIntAndString);
+            throw new InvalidOperationException("Unknown type");
+        }
+
+        public override bool Equals(object? obj)
+        {
+            return obj is Result other && Equals(other);
         }
     }
 }

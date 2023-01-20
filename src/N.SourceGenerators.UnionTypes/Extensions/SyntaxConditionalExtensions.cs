@@ -31,7 +31,7 @@ internal static class SyntaxConditionalExtensions
             ? syntax.AddTypeArgumentListArguments(item)
             : syntax;
     }
-    
+
     public static InvocationExpressionSyntax AddArgumentListArgumentWhen(
         this InvocationExpressionSyntax syntax,
         bool condition,
@@ -47,5 +47,32 @@ internal static class SyntaxConditionalExtensions
         return condition
             ? expression.AwaitWithConfigureAwait()
             : expression;
+    }
+
+    public static ExpressionSyntax LogicalNotWhen(this ExpressionSyntax expression, bool condition)
+    {
+        return condition
+            ? PrefixUnaryExpression(
+                SyntaxKind.LogicalNotExpression,
+                expression
+            )
+            : expression;
+    }
+
+    public static TypeSyntax NullableTypeWhen(this TypeSyntax syntax, bool condition)
+    {
+        return condition
+            ? NullableType(syntax)
+            : syntax;
+    }
+
+    public static TypeDeclarationSyntax AddMembersWhen(
+        this TypeDeclarationSyntax syntax,
+        bool condition,
+        params MemberDeclarationSyntax[] items)
+    {
+        return condition
+            ? syntax.AddMembers(items)
+            : syntax;
     }
 }

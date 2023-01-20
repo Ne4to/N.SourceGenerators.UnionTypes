@@ -14,12 +14,17 @@ internal static class RoslynUtils
             );
     }
 
+    public static GenericNameSyntax GenericType(string type, string t1)
+    {
+        return GenericName(type)
+            .AddTypeArgumentListArguments(
+                IdentifierName(t1)
+            );
+    }
+
     public static GenericNameSyntax TaskIdentifier(string type)
     {
-        return GenericName(TaskType)
-            .AddTypeArgumentListArguments(
-                IdentifierName(type)
-            );
+        return GenericType(TaskType, type);
     }
 
     private static ArgumentSyntax StringLiteralArgument(string value)
@@ -31,5 +36,24 @@ internal static class RoslynUtils
             ));
 
         return argument;
+    }
+
+    public static MemberAccessExpressionSyntax MemberAccess(string expression, string name)
+    {
+        return MemberAccessExpression(
+            SyntaxKind.SimpleMemberAccessExpression,
+            IdentifierName(expression),
+            IdentifierName(name)
+        );
+    }
+
+    public static ReturnStatementSyntax ReturnTrue()
+    {
+        return ReturnStatement(LiteralExpression(SyntaxKind.TrueLiteralExpression));
+    }
+    
+    public static ReturnStatementSyntax ReturnFalse()
+    {
+        return ReturnStatement(LiteralExpression(SyntaxKind.FalseLiteralExpression));
     }
 }
