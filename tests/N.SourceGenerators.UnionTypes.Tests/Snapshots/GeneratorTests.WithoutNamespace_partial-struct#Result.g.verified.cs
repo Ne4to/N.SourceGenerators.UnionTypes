@@ -7,22 +7,22 @@
 #nullable enable
 partial struct Result
 {
-    private readonly global::Success? _Success;
-    public bool IsSuccess => _Success != null;
-    public global::Success AsSuccess => _Success ?? throw new InvalidOperationException("This is not a Success");
+    private readonly global::Success? _success;
+    public bool IsSuccess => _success != null;
+    public global::Success AsSuccess => _success ?? throw new InvalidOperationException("This is not a global::Success");
     public Result(global::Success Success)
     {
         System.ArgumentNullException.ThrowIfNull(Success);
-        _Success = Success;
+        _success = Success;
     }
 
     public static implicit operator Result(global::Success Success) => new Result(Success);
     public static explicit operator global::Success(Result value) => value.AsSuccess;
     public bool TryGetSuccess([System.Diagnostics.CodeAnalysis.NotNullWhen(true)] out global::Success? value)
     {
-        if (_Success != null)
+        if (_success != null)
         {
-            value = _Success;
+            value = _success;
             return true;
         }
         else
@@ -32,22 +32,22 @@ partial struct Result
         }
     }
 
-    private readonly global::Error? _Error;
-    public bool IsError => _Error != null;
-    public global::Error AsError => _Error ?? throw new InvalidOperationException("This is not a Error");
+    private readonly global::Error? _error;
+    public bool IsError => _error != null;
+    public global::Error AsError => _error ?? throw new InvalidOperationException("This is not a global::Error");
     public Result(global::Error Error)
     {
         System.ArgumentNullException.ThrowIfNull(Error);
-        _Error = Error;
+        _error = Error;
     }
 
     public static implicit operator Result(global::Error Error) => new Result(Error);
     public static explicit operator global::Error(Result value) => value.AsError;
     public bool TryGetError([System.Diagnostics.CodeAnalysis.NotNullWhen(true)] out global::Error? value)
     {
-        if (_Error != null)
+        if (_error != null)
         {
-            value = _Error;
+            value = _error;
             return true;
         }
         else
