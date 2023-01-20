@@ -110,8 +110,8 @@ public partial class UnionTypesGenerator : IIncrementalGenerator
                     if (attribute.AttributeClass?.ToDisplayString() == UnionTypeAttributeName)
                     {
                         variants ??= new List<UnionTypeVariant>();
-
-                        var typeSymbol = attribute.ConstructorArguments[0].Value as INamedTypeSymbol;
+                        
+                        var typeSymbol = attribute.ConstructorArguments[0].Value as ITypeSymbol;
 
                         var alias = attribute.ConstructorArguments[1].Value?.ToString();
                         var order = (int)attribute.ConstructorArguments[2].Value!;
@@ -136,7 +136,6 @@ public partial class UnionTypesGenerator : IIncrementalGenerator
     {
         context.CancellationToken.ThrowIfCancellationRequested();
 
-        // TODO add public bool TryGet{Alias}([NotNullWhen(true)] out Alias? alias)
         // TODO override ToString
         // TODO add DebuggerDisplayAttribute
         // TODO add equality operators / Equals / GetHashCode
@@ -245,7 +244,7 @@ public partial class UnionTypesGenerator : IIncrementalGenerator
                 BinaryExpression(SyntaxKind.CoalesceExpression,
                     IdentifierName(variant.FieldName),
                     ThrowExpression(
-                        NewInvalidOperationException($"This is not a {variant.TypeSymbol.Name}")
+                        NewInvalidOperationException($"This is not a {variant.TypeFullName}")
                     )
                 )))
             .WithSemicolonToken(Token(SyntaxKind.SemicolonToken));

@@ -34,6 +34,7 @@ public class GeneratorTests
     {
         string source = $$"""            
             using System;
+            using System.Collections.Generic;
             using N.SourceGenerators.UnionTypes;
             
             namespace MyApp
@@ -43,6 +44,9 @@ public class GeneratorTests
             
                 [UnionType(typeof(Success))]
                 [UnionType(typeof(Error))]
+                [UnionType(typeof(IReadOnlyList<int>))]
+                [UnionType(typeof(string[]))]
+                [UnionType(typeof(Tuple<int,string>))]
                 public {{typeModifiers}} Result
                 {
                 }
