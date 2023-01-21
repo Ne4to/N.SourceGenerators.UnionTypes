@@ -133,6 +133,18 @@ partial struct Result : IEquatable<Result>
         }
     }
 
+    private string InnerValueAlias
+    {
+        get
+        {
+            if (IsSuccess)
+                return "Success";
+            if (IsError)
+                return "Error";
+            throw new InvalidOperationException("Unknown type");
+        }
+    }
+
     public override int GetHashCode()
     {
         return InnerValue.GetHashCode();
@@ -160,6 +172,11 @@ partial struct Result : IEquatable<Result>
         if (IsError)
             return EqualityComparer<global::Error>.Default.Equals(AsError, other.AsError);
         throw new InvalidOperationException("Unknown type");
+    }
+
+    public override string ToString()
+    {
+        return $"{InnerValueAlias} - {InnerValue}";
     }
 
     public override bool Equals(object? obj)
