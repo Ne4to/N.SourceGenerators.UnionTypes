@@ -153,10 +153,12 @@ public partial class UnionTypesGenerator : IIncrementalGenerator
                 SwitchMethod(unionType, isAsync: true),
                 ValueTypeProperty(unionType),
                 InnerValueProperty(unionType),
+                InnerValueAliasProperty(unionType),
                 GetHashCodeMethod(),
                 EqualsOperator(unionType, equal: true),
                 EqualsOperator(unionType, equal: false),
-                GenericEqualsMethod(unionType)
+                GenericEqualsMethod(unionType),
+                ToStringMethod()
             )
             .AddMembersWhen(unionType.IsReferenceType, ClassEqualsMethod(unionType))
             .AddMembersWhen(!unionType.IsReferenceType, StructEqualsMethod(unionType))
@@ -571,6 +573,74 @@ public partial class UnionTypesGenerator : IIncrementalGenerator
                 IdentifierName(variant.AsPropertyName)
             )
         );
+    }
+
+    private static MemberDeclarationSyntax InnerValueAliasProperty(UnionType unionType)
+    {
+        return
+            PropertyDeclaration(
+                    IdentifierName("string"),
+                    "InnerValueAlias"
+                )
+                .AddModifiers(
+                    Token(SyntaxKind.PrivateKeyword)
+                )
+                .AddAccessorListAccessors(
+                    AccessorDeclaration(
+                        SyntaxKind.GetAccessorDeclaration,
+                        Block(
+                            VariantsBodyStatements(unionType, AliasStatement)
+                        )
+                    )
+                );
+
+        static StatementSyntax AliasStatement(UnionTypeVariant variant)
+        {
+            return IfStatement(
+                IdentifierName(variant.IsPropertyName),
+                ReturnStatement(
+                    LiteralExpression(
+                        SyntaxKind.StringLiteralExpression,
+                        Literal(variant.Alias)
+                    )
+                )
+            );
+        }
+    }
+
+    private static MemberDeclarationSyntax ToStringMethod()
+    {
+        return MethodDeclaration(
+                IdentifierName("string"),
+                Identifier("ToString")
+            )
+            .AddModifiers(
+                Token(SyntaxKind.PublicKeyword),
+                Token(SyntaxKind.OverrideKeyword)
+            )
+            .AddBodyStatements(
+                ReturnStatement(
+                    InterpolatedStringExpression(
+                        Token(SyntaxKind.InterpolatedStringStartToken),
+                        new SyntaxList<InterpolatedStringContentSyntax>(
+                            new InterpolatedStringContentSyntax[]
+                            {
+                                Interpolation(IdentifierName("InnerValueAlias")),
+                                InterpolatedStringText(
+                                    Token(
+                                        SyntaxTriviaList.Empty,
+                                        SyntaxKind.InterpolatedStringTextToken,
+                                        " - ",
+                                        " - ",
+                                        SyntaxTriviaList.Empty
+                                    )
+                                ),
+                                Interpolation(IdentifierName("InnerValue"))
+                            }
+                        )
+                    )
+                )
+            );
     }
 
 

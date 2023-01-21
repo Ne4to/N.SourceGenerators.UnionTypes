@@ -270,6 +270,24 @@ namespace MyApp
             }
         }
 
+        private string InnerValueAlias
+        {
+            get
+            {
+                if (IsSuccess)
+                    return "Success";
+                if (IsError)
+                    return "Error";
+                if (IsIReadOnlyListOfInt)
+                    return "IReadOnlyListOfInt";
+                if (IsArrayOfString)
+                    return "ArrayOfString";
+                if (IsTupleOfIntAndString)
+                    return "TupleOfIntAndString";
+                throw new InvalidOperationException("Unknown type");
+            }
+        }
+
         public override int GetHashCode()
         {
             return InnerValue.GetHashCode();
@@ -303,6 +321,11 @@ namespace MyApp
             if (IsTupleOfIntAndString)
                 return EqualityComparer<global::System.Tuple<int, string>>.Default.Equals(AsTupleOfIntAndString, other.AsTupleOfIntAndString);
             throw new InvalidOperationException("Unknown type");
+        }
+
+        public override string ToString()
+        {
+            return $"{InnerValueAlias} - {InnerValue}";
         }
 
         public override bool Equals(object? obj)
