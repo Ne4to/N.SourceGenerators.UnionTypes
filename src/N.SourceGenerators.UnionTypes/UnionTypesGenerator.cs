@@ -136,9 +136,6 @@ public partial class UnionTypesGenerator : IIncrementalGenerator
     {
         context.CancellationToken.ThrowIfCancellationRequested();
 
-        // TODO override ToString
-        // TODO add DebuggerDisplayAttribute
-        // TODO implement serialization to JSON (and back?)
         TypeDeclarationSyntax typeDeclaration = unionType.IsReferenceType
             ? ClassDeclaration(unionType.Name)
             : StructDeclaration(unionType.Name);
