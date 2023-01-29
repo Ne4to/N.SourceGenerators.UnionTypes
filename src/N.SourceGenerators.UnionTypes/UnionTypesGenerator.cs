@@ -40,6 +40,8 @@ public partial class UnionTypesGenerator : IIncrementalGenerator
         }
         """;
 
+    private const string VariantIdFieldName = "_variantId";
+
     public void Initialize(IncrementalGeneratorInitializationContext context)
     {
         context.RegisterPostInitializationOutput(ctx =>
@@ -141,7 +143,9 @@ public partial class UnionTypesGenerator : IIncrementalGenerator
             : StructDeclaration(unionType.Name);
 
         typeDeclaration = typeDeclaration
+            .AddAttributeLists(GetTypeAttributes(unionType))
             .AddModifiers(Token(SyntaxKind.PartialKeyword))
+            .AddMembersWhen(unionType.UseStructLayout, VariantIdField())
             .AddMembers(VariantsMembers(unionType))
             .AddMembers(
                 MatchMethod(unionType, isAsync: false),
@@ -206,6 +210,51 @@ public partial class UnionTypesGenerator : IIncrementalGenerator
         context.AddSource($"{unionType.Name}.g.cs", compilationUnit.GetText(Encoding.UTF8));
     }
 
+    private static MemberDeclarationSyntax VariantIdField()
+    {
+        AttributeListSyntax attributes = AttributeList()
+            .AddAttributes(
+                FieldOffsetAttribute(0)
+            );
+
+        return FieldDeclaration(
+                VariableDeclaration(PredefinedType(Token(SyntaxKind.IntKeyword)))
+                    .AddVariables(VariableDeclarator(Identifier(VariantIdFieldName)))
+            )
+            .AddModifiers(
+                Token(SyntaxKind.PrivateKeyword),
+                Token(SyntaxKind.ReadOnlyKeyword)
+            ).AddAttributeLists(attributes);
+    }
+
+    private static AttributeSyntax FieldOffsetAttribute(int offset)
+    {
+        return Attribute(IdentifierName("System.Runtime.InteropServices.FieldOffset"))
+            .AddArgumentListArguments(
+                AttributeArgument(NumericLiteral(offset))
+            );
+    }
+
+    private static AttributeListSyntax[] GetTypeAttributes(UnionType unionType)
+    {
+        if (!unionType.UseStructLayout)
+        {
+            return Array.Empty<AttributeListSyntax>();
+        }
+
+        AttributeListSyntax attributes = AttributeList()
+            .AddAttributes(
+                Attribute(IdentifierName("System.Runtime.InteropServices.StructLayout"))
+                    .AddArgumentListArguments(
+                        AttributeArgument(
+                            MemberAccess("System.Runtime.InteropServices.LayoutKind", "Explicit")
+                        )
+                    )
+            );
+
+        return new[] { attributes };
+    }
+
     private static MemberDeclarationSyntax[] VariantsMembers(UnionType unionType)
     {
         var variantsMembers = unionType
@@ -220,8 +269,13 @@ public partial class UnionTypesGenerator : IIncrementalGenerator
         UnionType unionType,
         UnionTypeVariant variant)
     {
-        yield return Field(variant);
-        yield return IsProperty(variant);
+        if (unionType.UseStructLayout)
+        {
+            yield return VariantConstant(variant);
+        }
+
+        yield return Field(unionType, variant);
+        yield return IsProperty(unionType, variant);
         yield return AsProperty(variant);
         yield return Ctor(unionType, variant);
         yield return ImplicitOperatorToUnion(unionType, variant);
@@ -229,9 +283,30 @@ public partial class UnionTypesGenerator : IIncrementalGenerator
         yield return TryGetMethod(variant);
     }
 
-    private static FieldDeclarationSyntax Field(UnionTypeVariant variant)
+    private static MemberDeclarationSyntax VariantConstant(UnionTypeVariant variant)
     {
-        NullableTypeSyntax fieldType = NullableType(IdentifierName(variant.TypeFullName));
+        return FieldDeclaration(
+            VariableDeclaration(PredefinedType(Token(SyntaxKind.IntKeyword)))
+                .AddVariables(
+                    VariableDeclarator(
+                        Identifier(variant.IdConstName),
+                        null,
+                        EqualsValueClause(
+                            NumericLiteral(variant.IdConstValue)
+                        )
+                    )
+                )
+        ).AddModifiers(
+            Token(SyntaxKind.PrivateKeyword),
+            Token(SyntaxKind.ConstKeyword)
+        );
+    }
+
+    private static FieldDeclarationSyntax Field(UnionType unionType, UnionTypeVariant variant)
+    {
+        TypeSyntax fieldType = IdentifierName(variant.TypeFullName)
+            .NullableTypeWhen(!unionType.UseStructLayout);
+
         var field = FieldDeclaration(
                 VariableDeclaration(fieldType)
                     .AddVariables(VariableDeclarator(Identifier(variant.FieldName)))
@@ -239,18 +314,29 @@ public partial class UnionTypesGenerator : IIncrementalGenerator
             .AddModifiers(
                 Token(SyntaxKind.PrivateKeyword),
                 Token(SyntaxKind.ReadOnlyKeyword)
-            );
+            ).AddAttributeListsWhen(
+                unionType.UseStructLayout,
+                AttributeList()
+                    .AddAttributes(
+                        FieldOffsetAttribute(4)
+                    ));
         return field;
     }
 
-    private static PropertyDeclarationSyntax IsProperty(UnionTypeVariant variant)
+    private static PropertyDeclarationSyntax IsProperty(UnionType unionType, UnionTypeVariant variant)
     {
+        var condition = unionType.UseStructLayout
+            ? BinaryExpression(
+                SyntaxKind.EqualsExpression,
+                IdentifierName(VariantIdFieldName),
+                IdentifierName(variant.IdConstName))
+            : BinaryExpression(SyntaxKind.NotEqualsExpression,
+                IdentifierName(variant.FieldName),
+                LiteralExpression(SyntaxKind.NullLiteralExpression));
+
         return PropertyDeclaration(IdentifierName("bool"), Identifier(variant.IsPropertyName))
             .AddModifiers(Token(SyntaxKind.PublicKeyword))
-            .WithExpressionBody(ArrowExpressionClause(
-                BinaryExpression(SyntaxKind.NotEqualsExpression,
-                    IdentifierName(variant.FieldName),
-                    LiteralExpression(SyntaxKind.NullLiteralExpression))))
+            .WithExpressionBody(ArrowExpressionClause(condition))
             .WithSemicolonToken(Token(SyntaxKind.SemicolonToken));
     }
 
@@ -258,14 +344,24 @@ public partial class UnionTypesGenerator : IIncrementalGenerator
     {
         return PropertyDeclaration(IdentifierName(variant.TypeFullName), Identifier(variant.AsPropertyName))
             .AddModifiers(Token(SyntaxKind.PublicKeyword))
-            .WithExpressionBody(ArrowExpressionClause(
-                BinaryExpression(SyntaxKind.CoalesceExpression,
-                    IdentifierName(variant.FieldName),
-                    ThrowExpression(
-                        NewInvalidOperationException($"This is not a {variant.TypeFullName}")
+            .AddAccessorListAccessors(
+                AccessorDeclaration(SyntaxKind.GetAccessorDeclaration)
+                    .AddBodyStatements(
+                        IfStatement(
+                            IdentifierName(variant.IsPropertyName),
+                            ReturnStatement(IdentifierName(variant.FieldName))
+                        ),
+                        ThrowStatement(
+                            NewInvalidOperationException(
+                                InterpolatedString(
+                                    InterpolatedText("Inner value is "),
+                                    Interpolation(IdentifierName("InnerValueAlias")),
+                                    InterpolatedText($", not {variant.Alias}")
+                                )
+                            )
+                        )
                     )
-                )))
-            .WithSemicolonToken(Token(SyntaxKind.SemicolonToken));
+            );
     }
 
     private static MemberDeclarationSyntax Ctor(UnionType unionType, UnionTypeVariant variant)
@@ -288,8 +384,14 @@ public partial class UnionTypesGenerator : IIncrementalGenerator
                 Parameter(Identifier(variant.Alias))
                     .WithType(IdentifierName(variant.TypeFullName))
             )
+            .AddBodyStatementsWhen(!variant.IsValueType, ExpressionStatement(checkArgumentExpression))
+            .AddBodyStatementsWhen(
+                variant.IsValueType,
+                ExpressionStatement(AssignmentExpression(
+                    SyntaxKind.SimpleAssignmentExpression,
+                    IdentifierName(VariantIdFieldName),
+                    IdentifierName(variant.IdConstName))))
             .AddBodyStatements(
-                ExpressionStatement(checkArgumentExpression),
                 ExpressionStatement(assignmentExpression)
             );
     }
@@ -369,11 +471,7 @@ public partial class UnionTypesGenerator : IIncrementalGenerator
                     .AddAttributeLists(attributeList)
             ).AddBodyStatements(
                 IfStatement(
-                        BinaryExpression(
-                            SyntaxKind.NotEqualsExpression,
-                            IdentifierName(variant.FieldName),
-                            LiteralExpression(SyntaxKind.NullLiteralExpression)
-                        ),
+                        IdentifierName(variant.IsPropertyName),
                         Block(
                             ExpressionStatement(
                                 AssignmentExpression(SyntaxKind.SimpleAssignmentExpression,
@@ -617,24 +715,10 @@ public partial class UnionTypesGenerator : IIncrementalGenerator
             )
             .AddBodyStatements(
                 ReturnStatement(
-                    InterpolatedStringExpression(
-                        Token(SyntaxKind.InterpolatedStringStartToken),
-                        new SyntaxList<InterpolatedStringContentSyntax>(
-                            new InterpolatedStringContentSyntax[]
-                            {
-                                Interpolation(IdentifierName("InnerValueAlias")),
-                                InterpolatedStringText(
-                                    Token(
-                                        SyntaxTriviaList.Empty,
-                                        SyntaxKind.InterpolatedStringTextToken,
-                                        " - ",
-                                        " - ",
-                                        SyntaxTriviaList.Empty
-                                    )
-                                ),
-                                Interpolation(IdentifierName("InnerValue"))
-                            }
-                        )
+                    InterpolatedString(
+                        Interpolation(IdentifierName("InnerValueAlias")),
+                        InterpolatedText(" - "),
+                        Interpolation(IdentifierName("InnerValue"))
                     )
                 )
             );
@@ -665,7 +749,7 @@ public partial class UnionTypesGenerator : IIncrementalGenerator
     private static ThrowStatementSyntax ThrowUnknownType()
     {
         return ThrowStatement(
-            NewInvalidOperationException("Unknown type")
+            NewInvalidOperationException("Inner type is unknown")
         );
     }
 

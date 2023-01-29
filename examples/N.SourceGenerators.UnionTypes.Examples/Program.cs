@@ -31,6 +31,17 @@ public readonly partial struct FooStructReadonlyResult
 {
 }
 
+public record struct SuccessStruct(int Value);
+public record struct ValidationErrorStruct(int ErrorCode);
+public record struct NotFoundErrorStruct;
+
+[UnionType(typeof(SuccessStruct))]
+[UnionType(typeof(ValidationErrorStruct))]
+[UnionType(typeof(NotFoundErrorStruct))]
+public partial struct ResultStructLayout
+{
+}
+
 class Bar
 {
     public FooResult ImplicitReturn()

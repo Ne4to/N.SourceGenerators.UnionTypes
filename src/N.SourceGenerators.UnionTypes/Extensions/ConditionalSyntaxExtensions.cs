@@ -1,6 +1,6 @@
 ﻿namespace N.SourceGenerators.UnionTypes.Extensions;
 
-internal static class SyntaxConditionalExtensions
+internal static class ConditionalSyntaxExtensions
 {
     public static MethodDeclarationSyntax AddModifierWhen(
         this MethodDeclarationSyntax syntax,
@@ -73,6 +73,26 @@ internal static class SyntaxConditionalExtensions
     {
         return condition
             ? syntax.AddMembers(items)
+            : syntax;
+    }
+
+    public static FieldDeclarationSyntax AddAttributeListsWhen(
+        this FieldDeclarationSyntax syntax,
+        bool condition,
+        params AttributeListSyntax[] items)
+    {
+        return condition
+            ? syntax.AddAttributeLists(items)
+            : syntax;
+    }
+
+    public static ConstructorDeclarationSyntax AddBodyStatementsWhen(
+        this ConstructorDeclarationSyntax syntax,
+        bool condition,
+        params StatementSyntax[] items)
+    {
+        return condition
+            ? syntax.AddBodyStatements(items)
             : syntax;
     }
 }

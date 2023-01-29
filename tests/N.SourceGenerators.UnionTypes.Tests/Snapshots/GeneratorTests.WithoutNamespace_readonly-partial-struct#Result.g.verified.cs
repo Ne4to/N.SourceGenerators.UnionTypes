@@ -9,7 +9,16 @@ partial struct Result : IEquatable<Result>
 {
     private readonly global::Success? _success;
     public bool IsSuccess => _success != null;
-    public global::Success AsSuccess => _success ?? throw new InvalidOperationException("This is not a global::Success");
+    public global::Success AsSuccess
+    {
+        get
+        {
+            if (IsSuccess)
+                return _success;
+            throw new InvalidOperationException($"Inner value is {InnerValueAlias}, not Success");
+        }
+    }
+
     public Result(global::Success Success)
     {
         System.ArgumentNullException.ThrowIfNull(Success);
@@ -20,7 +29,7 @@ partial struct Result : IEquatable<Result>
     public static explicit operator global::Success(Result value) => value.AsSuccess;
     public bool TryGetSuccess([System.Diagnostics.CodeAnalysis.NotNullWhen(true)] out global::Success? value)
     {
-        if (_success != null)
+        if (IsSuccess)
         {
             value = _success;
             return true;
@@ -34,7 +43,16 @@ partial struct Result : IEquatable<Result>
 
     private readonly global::Error? _error;
     public bool IsError => _error != null;
-    public global::Error AsError => _error ?? throw new InvalidOperationException("This is not a global::Error");
+    public global::Error AsError
+    {
+        get
+        {
+            if (IsError)
+                return _error;
+            throw new InvalidOperationException($"Inner value is {InnerValueAlias}, not Error");
+        }
+    }
+
     public Result(global::Error Error)
     {
         System.ArgumentNullException.ThrowIfNull(Error);
@@ -45,7 +63,7 @@ partial struct Result : IEquatable<Result>
     public static explicit operator global::Error(Result value) => value.AsError;
     public bool TryGetError([System.Diagnostics.CodeAnalysis.NotNullWhen(true)] out global::Error? value)
     {
-        if (_error != null)
+        if (IsError)
         {
             value = _error;
             return true;
@@ -63,7 +81,7 @@ partial struct Result : IEquatable<Result>
             return matchSuccess(AsSuccess);
         if (IsError)
             return matchError(AsError);
-        throw new InvalidOperationException("Unknown type");
+        throw new InvalidOperationException("Inner type is unknown");
     }
 
     public async global::System.Threading.Tasks.Task<TOut> MatchAsync<TOut>(global::System.Func<global::Success, global::System.Threading.CancellationToken, global::System.Threading.Tasks.Task<TOut>> matchSuccess, global::System.Func<global::Error, global::System.Threading.CancellationToken, global::System.Threading.Tasks.Task<TOut>> matchError, global::System.Threading.CancellationToken ct)
@@ -72,7 +90,7 @@ partial struct Result : IEquatable<Result>
             return await matchSuccess(AsSuccess, ct).ConfigureAwait(false);
         if (IsError)
             return await matchError(AsError, ct).ConfigureAwait(false);
-        throw new InvalidOperationException("Unknown type");
+        throw new InvalidOperationException("Inner type is unknown");
     }
 
     public void Switch(global::System.Action<global::Success> switchSuccess, global::System.Action<global::Error> switchError)
@@ -89,7 +107,7 @@ partial struct Result : IEquatable<Result>
             return;
         }
 
-        throw new InvalidOperationException("Unknown type");
+        throw new InvalidOperationException("Inner type is unknown");
     }
 
     public async global::System.Threading.Tasks.Task SwitchAsync(global::System.Func<global::Success, global::System.Threading.CancellationToken, global::System.Threading.Tasks.Task> switchSuccess, global::System.Func<global::Error, global::System.Threading.CancellationToken, global::System.Threading.Tasks.Task> switchError, global::System.Threading.CancellationToken ct)
@@ -106,7 +124,7 @@ partial struct Result : IEquatable<Result>
             return;
         }
 
-        throw new InvalidOperationException("Unknown type");
+        throw new InvalidOperationException("Inner type is unknown");
     }
 
     public global::System.Type ValueType
@@ -117,7 +135,7 @@ partial struct Result : IEquatable<Result>
                 return typeof(global::Success);
             if (IsError)
                 return typeof(global::Error);
-            throw new InvalidOperationException("Unknown type");
+            throw new InvalidOperationException("Inner type is unknown");
         }
     }
 
@@ -129,7 +147,7 @@ partial struct Result : IEquatable<Result>
                 return AsSuccess;
             if (IsError)
                 return AsError;
-            throw new InvalidOperationException("Unknown type");
+            throw new InvalidOperationException("Inner type is unknown");
         }
     }
 
@@ -141,7 +159,7 @@ partial struct Result : IEquatable<Result>
                 return "Success";
             if (IsError)
                 return "Error";
-            throw new InvalidOperationException("Unknown type");
+            throw new InvalidOperationException("Inner type is unknown");
         }
     }
 
@@ -171,7 +189,7 @@ partial struct Result : IEquatable<Result>
             return EqualityComparer<global::Success>.Default.Equals(AsSuccess, other.AsSuccess);
         if (IsError)
             return EqualityComparer<global::Error>.Default.Equals(AsError, other.AsError);
-        throw new InvalidOperationException("Unknown type");
+        throw new InvalidOperationException("Inner type is unknown");
     }
 
     public override string ToString()
