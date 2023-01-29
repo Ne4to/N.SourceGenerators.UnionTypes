@@ -8,13 +8,17 @@ public struct FooStructResultWithStructLayout : IEquatable<FooStructResultWithSt
     private const int ValidationErrorStructVariant = 2;
     private const int NotFoundErrorStructVariant = 3;
 
-    [FieldOffset(0)] private readonly int _variant;
+    [FieldOffset(0)] 
+    private readonly int _variant;
 
-    [FieldOffset(sizeof(int))] private readonly SuccessStruct _successStruct;
+    [FieldOffset(sizeof(int))] 
+    private readonly SuccessStruct _successStruct;
 
-    [FieldOffset(sizeof(int))] private readonly ValidationErrorStruct _validationErrorStruct;
+    [FieldOffset(sizeof(int))] 
+    private readonly ValidationErrorStruct _validationErrorStruct;
 
-    [FieldOffset(sizeof(int))] private readonly NotFoundErrorStruct _notFoundErrorStruct;
+    [FieldOffset(sizeof(int))] 
+    private readonly NotFoundErrorStruct _notFoundErrorStruct;
 
 
     public bool IsSuccessStruct => _variant == SuccessStructVariant;
