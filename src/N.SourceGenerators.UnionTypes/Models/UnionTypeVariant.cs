@@ -13,6 +13,9 @@ internal class UnionTypeVariant
     public string FieldName { get; }
     public string IsPropertyName { get; }
     public string AsPropertyName { get; }
+    public bool IsValueType { get; }
+    public string IdConstName { get; }
+    public int IdConstValue { get; internal set; }
 
     public UnionTypeVariant(ITypeSymbol typeSymbol, string? alias, int order)
     {
@@ -23,6 +26,8 @@ internal class UnionTypeVariant
         FieldName = $"_{ToStartLowerCase(Alias)}";
         IsPropertyName = $"Is{Alias}";
         AsPropertyName = $"As{Alias}";
+        IsValueType = typeSymbol.IsValueType;
+        IdConstName = $"{Alias}Id";
     }
 
     private static string GetAlias(ITypeSymbol type)

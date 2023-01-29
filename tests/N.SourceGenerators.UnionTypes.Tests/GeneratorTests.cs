@@ -55,6 +55,31 @@ public class GeneratorTests
 
         return TestHelper.Verify<UnionTypesGenerator>(source, typeModifiers.Replace(' ', '-'));
     }
+    
+    [Fact]
+    public Task ExplicitStructLayout()
+    {
+        const string source = @"
+using System;
+using N.SourceGenerators.UnionTypes;
+
+namespace MyApp
+{
+    public record struct SuccessStruct(int Value);
+    public record struct ValidationErrorStruct(int ErrorCode);
+    public record struct NotFoundErrorStruct;
+
+    [UnionType(typeof(SuccessStruct))]
+    [UnionType(typeof(ValidationErrorStruct))]
+    [UnionType(typeof(NotFoundErrorStruct))]
+    public partial struct Result
+    {
+    }
+}
+";
+
+        return TestHelper.Verify<UnionTypesGenerator>(source);
+    }    
 
     [Fact]
     public Task NotPartialTypeReportsDiagnostics()

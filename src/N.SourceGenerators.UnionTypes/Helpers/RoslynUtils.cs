@@ -4,14 +4,20 @@ internal static class RoslynUtils
 {
     public const string TaskType = "global::System.Threading.Tasks.Task";
 
-    public static ObjectCreationExpressionSyntax NewInvalidOperationException(string message)
+    public static ObjectCreationExpressionSyntax NewInvalidOperationException(ExpressionSyntax expression)
     {
         return ObjectCreationExpression(
                 IdentifierName("InvalidOperationException")
             )
             .AddArgumentListArguments(
-                StringLiteralArgument(message)
+                Argument(expression)
             );
+    }
+
+    public static ObjectCreationExpressionSyntax NewInvalidOperationException(string message)
+    {
+        var expression = StringLiteral(message);
+        return NewInvalidOperationException(expression);
     }
 
     public static GenericNameSyntax GenericType(string type, string t1)
@@ -27,17 +33,6 @@ internal static class RoslynUtils
         return GenericType(TaskType, type);
     }
 
-    private static ArgumentSyntax StringLiteralArgument(string value)
-    {
-        ArgumentSyntax argument = Argument(
-            LiteralExpression(
-                SyntaxKind.StringLiteralExpression,
-                Literal(value)
-            ));
-
-        return argument;
-    }
-
     public static MemberAccessExpressionSyntax MemberAccess(string expression, string name)
     {
         return MemberAccessExpression(
@@ -51,9 +46,46 @@ internal static class RoslynUtils
     {
         return ReturnStatement(LiteralExpression(SyntaxKind.TrueLiteralExpression));
     }
-    
+
     public static ReturnStatementSyntax ReturnFalse()
     {
         return ReturnStatement(LiteralExpression(SyntaxKind.FalseLiteralExpression));
+    }
+
+
+    private static LiteralExpressionSyntax StringLiteral(string message)
+    {
+        return LiteralExpression(
+            SyntaxKind.StringLiteralExpression,
+            Literal(message)
+        );
+    }
+
+    public static LiteralExpressionSyntax NumericLiteral(int value)
+    {
+        return LiteralExpression(
+            SyntaxKind.NumericLiteralExpression,
+            Literal(value)
+        );
+    }
+
+    public static InterpolatedStringExpressionSyntax InterpolatedString(params InterpolatedStringContentSyntax[] items)
+    {
+        return InterpolatedStringExpression(
+            Token(SyntaxKind.InterpolatedStringStartToken)
+        ).AddContents(items);
+    }
+
+    public static InterpolatedStringTextSyntax InterpolatedText(string value)
+    {
+        return InterpolatedStringText(
+            Token(
+                SyntaxTriviaList.Empty,
+                SyntaxKind.InterpolatedStringTextToken,
+                value,
+                value,
+                SyntaxTriviaList.Empty
+            )
+        );
     }
 }

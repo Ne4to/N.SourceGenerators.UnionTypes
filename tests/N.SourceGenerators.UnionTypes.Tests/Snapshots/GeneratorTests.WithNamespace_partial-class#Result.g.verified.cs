@@ -11,7 +11,16 @@ namespace MyApp
     {
         private readonly global::MyApp.Success? _success;
         public bool IsSuccess => _success != null;
-        public global::MyApp.Success AsSuccess => _success ?? throw new InvalidOperationException("This is not a global::MyApp.Success");
+        public global::MyApp.Success AsSuccess
+        {
+            get
+            {
+                if (IsSuccess)
+                    return _success;
+                throw new InvalidOperationException($"Inner value is {InnerValueAlias}, not Success");
+            }
+        }
+
         public Result(global::MyApp.Success Success)
         {
             System.ArgumentNullException.ThrowIfNull(Success);
@@ -22,7 +31,7 @@ namespace MyApp
         public static explicit operator global::MyApp.Success(Result value) => value.AsSuccess;
         public bool TryGetSuccess([System.Diagnostics.CodeAnalysis.NotNullWhen(true)] out global::MyApp.Success? value)
         {
-            if (_success != null)
+            if (IsSuccess)
             {
                 value = _success;
                 return true;
@@ -36,7 +45,16 @@ namespace MyApp
 
         private readonly global::MyApp.Error? _error;
         public bool IsError => _error != null;
-        public global::MyApp.Error AsError => _error ?? throw new InvalidOperationException("This is not a global::MyApp.Error");
+        public global::MyApp.Error AsError
+        {
+            get
+            {
+                if (IsError)
+                    return _error;
+                throw new InvalidOperationException($"Inner value is {InnerValueAlias}, not Error");
+            }
+        }
+
         public Result(global::MyApp.Error Error)
         {
             System.ArgumentNullException.ThrowIfNull(Error);
@@ -47,7 +65,7 @@ namespace MyApp
         public static explicit operator global::MyApp.Error(Result value) => value.AsError;
         public bool TryGetError([System.Diagnostics.CodeAnalysis.NotNullWhen(true)] out global::MyApp.Error? value)
         {
-            if (_error != null)
+            if (IsError)
             {
                 value = _error;
                 return true;
@@ -61,7 +79,16 @@ namespace MyApp
 
         private readonly global::System.Collections.Generic.IReadOnlyList<int>? _iReadOnlyListOfInt;
         public bool IsIReadOnlyListOfInt => _iReadOnlyListOfInt != null;
-        public global::System.Collections.Generic.IReadOnlyList<int> AsIReadOnlyListOfInt => _iReadOnlyListOfInt ?? throw new InvalidOperationException("This is not a global::System.Collections.Generic.IReadOnlyList<int>");
+        public global::System.Collections.Generic.IReadOnlyList<int> AsIReadOnlyListOfInt
+        {
+            get
+            {
+                if (IsIReadOnlyListOfInt)
+                    return _iReadOnlyListOfInt;
+                throw new InvalidOperationException($"Inner value is {InnerValueAlias}, not IReadOnlyListOfInt");
+            }
+        }
+
         public Result(global::System.Collections.Generic.IReadOnlyList<int> IReadOnlyListOfInt)
         {
             System.ArgumentNullException.ThrowIfNull(IReadOnlyListOfInt);
@@ -72,7 +99,7 @@ namespace MyApp
         public static explicit operator global::System.Collections.Generic.IReadOnlyList<int>(Result value) => value.AsIReadOnlyListOfInt;
         public bool TryGetIReadOnlyListOfInt([System.Diagnostics.CodeAnalysis.NotNullWhen(true)] out global::System.Collections.Generic.IReadOnlyList<int>? value)
         {
-            if (_iReadOnlyListOfInt != null)
+            if (IsIReadOnlyListOfInt)
             {
                 value = _iReadOnlyListOfInt;
                 return true;
@@ -86,7 +113,16 @@ namespace MyApp
 
         private readonly string[]? _arrayOfString;
         public bool IsArrayOfString => _arrayOfString != null;
-        public string[] AsArrayOfString => _arrayOfString ?? throw new InvalidOperationException("This is not a string[]");
+        public string[] AsArrayOfString
+        {
+            get
+            {
+                if (IsArrayOfString)
+                    return _arrayOfString;
+                throw new InvalidOperationException($"Inner value is {InnerValueAlias}, not ArrayOfString");
+            }
+        }
+
         public Result(string[] ArrayOfString)
         {
             System.ArgumentNullException.ThrowIfNull(ArrayOfString);
@@ -97,7 +133,7 @@ namespace MyApp
         public static explicit operator string[](Result value) => value.AsArrayOfString;
         public bool TryGetArrayOfString([System.Diagnostics.CodeAnalysis.NotNullWhen(true)] out string[]? value)
         {
-            if (_arrayOfString != null)
+            if (IsArrayOfString)
             {
                 value = _arrayOfString;
                 return true;
@@ -111,7 +147,16 @@ namespace MyApp
 
         private readonly global::System.Tuple<int, string>? _tupleOfIntAndString;
         public bool IsTupleOfIntAndString => _tupleOfIntAndString != null;
-        public global::System.Tuple<int, string> AsTupleOfIntAndString => _tupleOfIntAndString ?? throw new InvalidOperationException("This is not a global::System.Tuple<int, string>");
+        public global::System.Tuple<int, string> AsTupleOfIntAndString
+        {
+            get
+            {
+                if (IsTupleOfIntAndString)
+                    return _tupleOfIntAndString;
+                throw new InvalidOperationException($"Inner value is {InnerValueAlias}, not TupleOfIntAndString");
+            }
+        }
+
         public Result(global::System.Tuple<int, string> TupleOfIntAndString)
         {
             System.ArgumentNullException.ThrowIfNull(TupleOfIntAndString);
@@ -122,7 +167,7 @@ namespace MyApp
         public static explicit operator global::System.Tuple<int, string>(Result value) => value.AsTupleOfIntAndString;
         public bool TryGetTupleOfIntAndString([System.Diagnostics.CodeAnalysis.NotNullWhen(true)] out global::System.Tuple<int, string>? value)
         {
-            if (_tupleOfIntAndString != null)
+            if (IsTupleOfIntAndString)
             {
                 value = _tupleOfIntAndString;
                 return true;
@@ -146,7 +191,7 @@ namespace MyApp
                 return matchArrayOfString(AsArrayOfString);
             if (IsTupleOfIntAndString)
                 return matchTupleOfIntAndString(AsTupleOfIntAndString);
-            throw new InvalidOperationException("Unknown type");
+            throw new InvalidOperationException("Inner type is unknown");
         }
 
         public async global::System.Threading.Tasks.Task<TOut> MatchAsync<TOut>(global::System.Func<global::MyApp.Success, global::System.Threading.CancellationToken, global::System.Threading.Tasks.Task<TOut>> matchSuccess, global::System.Func<global::MyApp.Error, global::System.Threading.CancellationToken, global::System.Threading.Tasks.Task<TOut>> matchError, global::System.Func<global::System.Collections.Generic.IReadOnlyList<int>, global::System.Threading.CancellationToken, global::System.Threading.Tasks.Task<TOut>> matchIReadOnlyListOfInt, global::System.Func<string[], global::System.Threading.CancellationToken, global::System.Threading.Tasks.Task<TOut>> matchArrayOfString, global::System.Func<global::System.Tuple<int, string>, global::System.Threading.CancellationToken, global::System.Threading.Tasks.Task<TOut>> matchTupleOfIntAndString, global::System.Threading.CancellationToken ct)
@@ -161,7 +206,7 @@ namespace MyApp
                 return await matchArrayOfString(AsArrayOfString, ct).ConfigureAwait(false);
             if (IsTupleOfIntAndString)
                 return await matchTupleOfIntAndString(AsTupleOfIntAndString, ct).ConfigureAwait(false);
-            throw new InvalidOperationException("Unknown type");
+            throw new InvalidOperationException("Inner type is unknown");
         }
 
         public void Switch(global::System.Action<global::MyApp.Success> switchSuccess, global::System.Action<global::MyApp.Error> switchError, global::System.Action<global::System.Collections.Generic.IReadOnlyList<int>> switchIReadOnlyListOfInt, global::System.Action<string[]> switchArrayOfString, global::System.Action<global::System.Tuple<int, string>> switchTupleOfIntAndString)
@@ -196,7 +241,7 @@ namespace MyApp
                 return;
             }
 
-            throw new InvalidOperationException("Unknown type");
+            throw new InvalidOperationException("Inner type is unknown");
         }
 
         public async global::System.Threading.Tasks.Task SwitchAsync(global::System.Func<global::MyApp.Success, global::System.Threading.CancellationToken, global::System.Threading.Tasks.Task> switchSuccess, global::System.Func<global::MyApp.Error, global::System.Threading.CancellationToken, global::System.Threading.Tasks.Task> switchError, global::System.Func<global::System.Collections.Generic.IReadOnlyList<int>, global::System.Threading.CancellationToken, global::System.Threading.Tasks.Task> switchIReadOnlyListOfInt, global::System.Func<string[], global::System.Threading.CancellationToken, global::System.Threading.Tasks.Task> switchArrayOfString, global::System.Func<global::System.Tuple<int, string>, global::System.Threading.CancellationToken, global::System.Threading.Tasks.Task> switchTupleOfIntAndString, global::System.Threading.CancellationToken ct)
@@ -231,7 +276,7 @@ namespace MyApp
                 return;
             }
 
-            throw new InvalidOperationException("Unknown type");
+            throw new InvalidOperationException("Inner type is unknown");
         }
 
         public global::System.Type ValueType
@@ -248,7 +293,7 @@ namespace MyApp
                     return typeof(string[]);
                 if (IsTupleOfIntAndString)
                     return typeof(global::System.Tuple<int, string>);
-                throw new InvalidOperationException("Unknown type");
+                throw new InvalidOperationException("Inner type is unknown");
             }
         }
 
@@ -266,7 +311,7 @@ namespace MyApp
                     return AsArrayOfString;
                 if (IsTupleOfIntAndString)
                     return AsTupleOfIntAndString;
-                throw new InvalidOperationException("Unknown type");
+                throw new InvalidOperationException("Inner type is unknown");
             }
         }
 
@@ -284,7 +329,7 @@ namespace MyApp
                     return "ArrayOfString";
                 if (IsTupleOfIntAndString)
                     return "TupleOfIntAndString";
-                throw new InvalidOperationException("Unknown type");
+                throw new InvalidOperationException("Inner type is unknown");
             }
         }
 
@@ -330,7 +375,7 @@ namespace MyApp
                 return EqualityComparer<string[]>.Default.Equals(AsArrayOfString, other.AsArrayOfString);
             if (IsTupleOfIntAndString)
                 return EqualityComparer<global::System.Tuple<int, string>>.Default.Equals(AsTupleOfIntAndString, other.AsTupleOfIntAndString);
-            throw new InvalidOperationException("Unknown type");
+            throw new InvalidOperationException("Inner type is unknown");
         }
 
         public override string ToString()
