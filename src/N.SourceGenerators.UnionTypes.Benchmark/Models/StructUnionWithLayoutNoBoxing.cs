@@ -1,8 +1,10 @@
 ﻿using System.Diagnostics.CodeAnalysis;
 using System.Runtime.InteropServices;
 
+namespace N.SourceGenerators.UnionTypes.Benchmark.Models;
+
 [StructLayout(LayoutKind.Explicit)]
-public struct FooStructResultWithStructLayout : IEquatable<FooStructResultWithStructLayout>
+public struct StructUnionWithLayoutNoBoxing : IEquatable<StructUnionWithLayoutNoBoxing>
 {
     private const int SuccessStructVariant = 1;
     private const int ValidationErrorStructVariant = 2;
@@ -34,16 +36,16 @@ public struct FooStructResultWithStructLayout : IEquatable<FooStructResultWithSt
         }
     }
 
-    public FooStructResultWithStructLayout(SuccessStruct successStruct)
+    public StructUnionWithLayoutNoBoxing(SuccessStruct successStruct)
     {
         _variant = SuccessStructVariant;
         _successStruct = successStruct;
     }
 
-    public static implicit operator FooStructResultWithStructLayout(SuccessStruct successStruct) =>
-        new FooStructResultWithStructLayout(successStruct);
+    public static implicit operator StructUnionWithLayoutNoBoxing(SuccessStruct successStruct) =>
+        new StructUnionWithLayoutNoBoxing(successStruct);
 
-    public static explicit operator SuccessStruct(FooStructResultWithStructLayout value) => value.AsSuccessStruct;
+    public static explicit operator SuccessStruct(StructUnionWithLayoutNoBoxing value) => value.AsSuccessStruct;
 
     public bool TryGetSuccessStruct([NotNullWhen(true)] out SuccessStruct? value)
     {
@@ -70,16 +72,16 @@ public struct FooStructResultWithStructLayout : IEquatable<FooStructResultWithSt
         }
     }
 
-    public FooStructResultWithStructLayout(ValidationErrorStruct validationErrorStruct)
+    public StructUnionWithLayoutNoBoxing(ValidationErrorStruct validationErrorStruct)
     {
         _variant = ValidationErrorStructVariant;
         _validationErrorStruct = validationErrorStruct;
     }
 
-    public static implicit operator FooStructResultWithStructLayout(ValidationErrorStruct validationErrorStruct) =>
-        new FooStructResultWithStructLayout(validationErrorStruct);
+    public static implicit operator StructUnionWithLayoutNoBoxing(ValidationErrorStruct validationErrorStruct) =>
+        new StructUnionWithLayoutNoBoxing(validationErrorStruct);
 
-    public static explicit operator ValidationErrorStruct(FooStructResultWithStructLayout value) =>
+    public static explicit operator ValidationErrorStruct(StructUnionWithLayoutNoBoxing value) =>
         value.AsValidationErrorStruct;
 
     public bool TryGetValidationErrorStruct([NotNullWhen(true)] out ValidationErrorStruct? value)
@@ -108,16 +110,16 @@ public struct FooStructResultWithStructLayout : IEquatable<FooStructResultWithSt
         }
     }
 
-    public FooStructResultWithStructLayout(NotFoundErrorStruct notFoundErrorStruct)
+    public StructUnionWithLayoutNoBoxing(NotFoundErrorStruct notFoundErrorStruct)
     {
         _variant = NotFoundErrorStructVariant;
         _notFoundErrorStruct = notFoundErrorStruct;
     }
 
-    public static implicit operator FooStructResultWithStructLayout(NotFoundErrorStruct notFoundErrorStruct) =>
-        new FooStructResultWithStructLayout(notFoundErrorStruct);
+    public static implicit operator StructUnionWithLayoutNoBoxing(NotFoundErrorStruct notFoundErrorStruct) =>
+        new StructUnionWithLayoutNoBoxing(notFoundErrorStruct);
 
-    public static explicit operator NotFoundErrorStruct(FooStructResultWithStructLayout value) =>
+    public static explicit operator NotFoundErrorStruct(StructUnionWithLayoutNoBoxing value) =>
         value.AsNotFoundErrorStruct;
 
     public bool TryGetNotFoundErrorStruct([NotNullWhen(true)] out NotFoundErrorStruct? value)
@@ -221,7 +223,6 @@ public struct FooStructResultWithStructLayout : IEquatable<FooStructResultWithSt
             throw new InvalidOperationException("Unknown type");
         }
     }
-
     private Object InnerValue
     {
         get
@@ -235,6 +236,7 @@ public struct FooStructResultWithStructLayout : IEquatable<FooStructResultWithSt
             throw new InvalidOperationException("Unknown type");
         }
     }
+
 
     private string InnerValueAlias
     {
@@ -252,20 +254,26 @@ public struct FooStructResultWithStructLayout : IEquatable<FooStructResultWithSt
 
     public override int GetHashCode()
     {
-        return InnerValue.GetHashCode();
+        if (IsSuccessStruct)
+            return _successStruct.GetHashCode();
+        if (IsValidationErrorStruct)
+            return _validationErrorStruct.GetHashCode();
+        if (IsNotFoundErrorStruct)
+            return _notFoundErrorStruct.GetHashCode();
+        throw new InvalidOperationException("Unknown type");
     }
 
-    public static bool operator ==(FooStructResultWithStructLayout left, FooStructResultWithStructLayout right)
+    public static bool operator ==(StructUnionWithLayoutNoBoxing left, StructUnionWithLayoutNoBoxing right)
     {
         return left.Equals(right);
     }
 
-    public static bool operator !=(FooStructResultWithStructLayout left, FooStructResultWithStructLayout right)
+    public static bool operator !=(StructUnionWithLayoutNoBoxing left, StructUnionWithLayoutNoBoxing right)
     {
         return !left.Equals(right);
     }
 
-    public bool Equals(FooStructResultWithStructLayout other)
+    public bool Equals(StructUnionWithLayoutNoBoxing other)
     {
         if (ValueType != other.ValueType)
         {
@@ -285,11 +293,17 @@ public struct FooStructResultWithStructLayout : IEquatable<FooStructResultWithSt
 
     public override string ToString()
     {
-        return $"{InnerValueAlias} - {InnerValue}";
+        if (IsSuccessStruct)
+            return $"{InnerValueAlias} - {_successStruct}";
+        if (IsValidationErrorStruct)
+            return $"{InnerValueAlias} - {_validationErrorStruct}";
+        if (IsNotFoundErrorStruct)
+            return $"{InnerValueAlias} - {_notFoundErrorStruct}";
+        throw new InvalidOperationException("Unknown type");
     }
 
     public override bool Equals(object? obj)
     {
-        return obj is FooStructResultWithStructLayout other && Equals(other);
+        return obj is StructUnionWithLayout other && Equals(other);
     }
 }
