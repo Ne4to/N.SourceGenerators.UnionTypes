@@ -17,7 +17,7 @@ partial struct Result : IEquatable<Result>
     }
 
     public static implicit operator Result(global::Success Success) => new Result(Success);
-    public static explicit operator global::Success(Result value) => value._success;
+    public static explicit operator global::Success(Result value) => value._success ?? throw new InvalidOperationException("Inner value is not Success");
     public bool TryGetSuccess([System.Diagnostics.CodeAnalysis.NotNullWhen(true)] out global::Success? value)
     {
         if (_success != null)
@@ -42,7 +42,7 @@ partial struct Result : IEquatable<Result>
     }
 
     public static implicit operator Result(global::Error Error) => new Result(Error);
-    public static explicit operator global::Error(Result value) => value._error;
+    public static explicit operator global::Error(Result value) => value._error ?? throw new InvalidOperationException("Inner value is not Error");
     public bool TryGetError([System.Diagnostics.CodeAnalysis.NotNullWhen(true)] out global::Error? value)
     {
         if (_error != null)

@@ -33,7 +33,13 @@ namespace MyApp
         }
 
         public static implicit operator Result(global::MyApp.SuccessStruct SuccessStruct) => new Result(SuccessStruct);
-        public static explicit operator global::MyApp.SuccessStruct(Result value) => value._successStruct;
+        public static explicit operator global::MyApp.SuccessStruct(Result value)
+        {
+            if (value._variantId == SuccessStructId)
+                return value._successStruct;
+            throw new InvalidOperationException("Inner value is not SuccessStruct");
+        }
+
         public bool TryGetSuccessStruct([System.Diagnostics.CodeAnalysis.NotNullWhen(true)] out global::MyApp.SuccessStruct? value)
         {
             if (_variantId == SuccessStructId)
@@ -69,7 +75,13 @@ namespace MyApp
         }
 
         public static implicit operator Result(global::MyApp.ValidationErrorStruct ValidationErrorStruct) => new Result(ValidationErrorStruct);
-        public static explicit operator global::MyApp.ValidationErrorStruct(Result value) => value._validationErrorStruct;
+        public static explicit operator global::MyApp.ValidationErrorStruct(Result value)
+        {
+            if (value._variantId == ValidationErrorStructId)
+                return value._validationErrorStruct;
+            throw new InvalidOperationException("Inner value is not ValidationErrorStruct");
+        }
+
         public bool TryGetValidationErrorStruct([System.Diagnostics.CodeAnalysis.NotNullWhen(true)] out global::MyApp.ValidationErrorStruct? value)
         {
             if (_variantId == ValidationErrorStructId)
@@ -105,7 +117,13 @@ namespace MyApp
         }
 
         public static implicit operator Result(global::MyApp.NotFoundErrorStruct NotFoundErrorStruct) => new Result(NotFoundErrorStruct);
-        public static explicit operator global::MyApp.NotFoundErrorStruct(Result value) => value._notFoundErrorStruct;
+        public static explicit operator global::MyApp.NotFoundErrorStruct(Result value)
+        {
+            if (value._variantId == NotFoundErrorStructId)
+                return value._notFoundErrorStruct;
+            throw new InvalidOperationException("Inner value is not NotFoundErrorStruct");
+        }
+
         public bool TryGetNotFoundErrorStruct([System.Diagnostics.CodeAnalysis.NotNullWhen(true)] out global::MyApp.NotFoundErrorStruct? value)
         {
             if (_variantId == NotFoundErrorStructId)

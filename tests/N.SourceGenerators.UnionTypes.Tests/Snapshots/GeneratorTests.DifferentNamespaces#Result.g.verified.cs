@@ -19,7 +19,7 @@ namespace MyApp.Domain.Child
         }
 
         public static implicit operator Result(global::MyApp.Models.S.Child.Success Success) => new Result(Success);
-        public static explicit operator global::MyApp.Models.S.Child.Success(Result value) => value._success;
+        public static explicit operator global::MyApp.Models.S.Child.Success(Result value) => value._success ?? throw new InvalidOperationException("Inner value is not Success");
         public bool TryGetSuccess([System.Diagnostics.CodeAnalysis.NotNullWhen(true)] out global::MyApp.Models.S.Child.Success? value)
         {
             if (_success != null)
@@ -44,7 +44,7 @@ namespace MyApp.Domain.Child
         }
 
         public static implicit operator Result(global::MyApp.Models.E.Child.Error Error) => new Result(Error);
-        public static explicit operator global::MyApp.Models.E.Child.Error(Result value) => value._error;
+        public static explicit operator global::MyApp.Models.E.Child.Error(Result value) => value._error ?? throw new InvalidOperationException("Inner value is not Error");
         public bool TryGetError([System.Diagnostics.CodeAnalysis.NotNullWhen(true)] out global::MyApp.Models.E.Child.Error? value)
         {
             if (_error != null)

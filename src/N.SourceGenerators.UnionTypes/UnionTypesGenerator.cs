@@ -335,12 +335,17 @@ public partial class UnionTypesGenerator : IIncrementalGenerator
             .WithSemicolonToken(Token(SyntaxKind.SemicolonToken));
     }
 
-    private static BinaryExpressionSyntax IsPropertyCondition(UnionType unionType, UnionTypeVariant variant)
+    private static BinaryExpressionSyntax IsPropertyCondition(
+        UnionType unionType,
+        UnionTypeVariant variant,
+        string? memberName = null)
     {
         return unionType.UseStructLayout
             ? BinaryExpression(
                 SyntaxKind.EqualsExpression,
-                IdentifierName(VariantIdFieldName),
+                memberName == null
+                    ? IdentifierName(VariantIdFieldName)
+                    : MemberAccess(memberName, VariantIdFieldName),
                 IdentifierName(variant.IdConstName))
             : BinaryExpression(SyntaxKind.NotEqualsExpression,
                 IdentifierName(variant.FieldName),
@@ -351,14 +356,23 @@ public partial class UnionTypesGenerator : IIncrementalGenerator
     {
         return PropertyDeclaration(IdentifierName(variant.TypeFullName), Identifier(variant.AsPropertyName))
             .AddModifiers(Token(SyntaxKind.PublicKeyword))
-            .WithExpressionBody(ArrowExpressionClause(
-                BinaryExpression(SyntaxKind.CoalesceExpression,
-                    IdentifierName(variant.FieldName),
-                    ThrowExpression(
-                        NewInvalidOperationException($"Inner value is not {variant.Alias}")
-                    )
-                )))
+            .WithExpressionBody(AsPropertyBody(variant, null))
             .WithSemicolonToken(Token(SyntaxKind.SemicolonToken));
+    }
+
+    private static ArrowExpressionClauseSyntax AsPropertyBody(UnionTypeVariant variant, string? memberName)
+    {
+        ExpressionSyntax left = memberName == null
+            ? IdentifierName(variant.FieldName)
+            : MemberAccess(memberName, variant.FieldName);
+
+        return ArrowExpressionClause(
+            BinaryExpression(SyntaxKind.CoalesceExpression,
+                left,
+                ThrowExpression(
+                    NewInvalidOperationException($"Inner value is not {variant.Alias}")
+                )
+            ));
     }
 
     private static PropertyDeclarationSyntax AsPropertyWithStructLayout(UnionType unionType, UnionTypeVariant variant)
@@ -368,17 +382,32 @@ public partial class UnionTypesGenerator : IIncrementalGenerator
             .AddAccessorListAccessors(
                 AccessorDeclaration(SyntaxKind.GetAccessorDeclaration)
                     .AddBodyStatements(
-                        IfStatement(
-                            IsPropertyCondition(unionType, variant),
-                            ReturnStatement(IdentifierName(variant.FieldName))
-                        ),
-                        ThrowStatement(
-                            NewInvalidOperationException(
-                                $"Inner value is not {variant.Alias}"
-                            )
-                        )
+                        AsPropertyWithStructLayoutBody(unionType, variant, null)
                     )
             );
+    }
+
+    private static StatementSyntax[] AsPropertyWithStructLayoutBody(
+        UnionType unionType,
+        UnionTypeVariant variant,
+        string? memberName)
+    {
+        ExpressionSyntax returnSyntax = memberName == null
+            ? IdentifierName(variant.FieldName)
+            : MemberAccess(memberName, variant.FieldName);
+
+        return new StatementSyntax[]
+        {
+            IfStatement(
+                IsPropertyCondition(unionType, variant, memberName),
+                ReturnStatement(returnSyntax)
+            ),
+            ThrowStatement(
+                NewInvalidOperationException(
+                    $"Inner value is not {variant.Alias}"
+                )
+            )
+        };
     }
 
     private static MemberDeclarationSyntax Ctor(UnionType unionType, UnionTypeVariant variant)
@@ -444,7 +473,7 @@ public partial class UnionTypesGenerator : IIncrementalGenerator
             Parameter(Identifier("value"))
                 .WithType(IdentifierName(unionType.Name));
 
-        return ConversionOperatorDeclaration(
+        var operatorDeclaration = ConversionOperatorDeclaration(
                 Token(SyntaxKind.ExplicitKeyword),
                 IdentifierName(variant.TypeFullName)
             )
@@ -452,13 +481,14 @@ public partial class UnionTypesGenerator : IIncrementalGenerator
                 Token(SyntaxKind.PublicKeyword),
                 Token(SyntaxKind.StaticKeyword)
             )
-            .AddParameterListParameters(parameter)
-            .WithExpressionBody(
-                ArrowExpressionClause(
-                    MemberAccess("value", variant.FieldName)
-                )
-            )
-            .WithSemicolonToken(Token(SyntaxKind.SemicolonToken));
+            .AddParameterListParameters(parameter);
+
+        return unionType.UseStructLayout
+            ? operatorDeclaration
+                .AddBodyStatements(AsPropertyWithStructLayoutBody(unionType, variant, "value"))
+            : operatorDeclaration
+                .WithExpressionBody(AsPropertyBody(variant, "value"))
+                .WithSemicolonToken(Token(SyntaxKind.SemicolonToken));
     }
 
     private static MemberDeclarationSyntax TryGetMethod(UnionType unionType, UnionTypeVariant variant)

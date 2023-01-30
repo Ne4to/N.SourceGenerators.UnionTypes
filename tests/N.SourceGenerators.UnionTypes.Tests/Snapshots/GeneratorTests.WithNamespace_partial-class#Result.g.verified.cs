@@ -19,7 +19,7 @@ namespace MyApp
         }
 
         public static implicit operator Result(global::MyApp.Success Success) => new Result(Success);
-        public static explicit operator global::MyApp.Success(Result value) => value._success;
+        public static explicit operator global::MyApp.Success(Result value) => value._success ?? throw new InvalidOperationException("Inner value is not Success");
         public bool TryGetSuccess([System.Diagnostics.CodeAnalysis.NotNullWhen(true)] out global::MyApp.Success? value)
         {
             if (_success != null)
@@ -44,7 +44,7 @@ namespace MyApp
         }
 
         public static implicit operator Result(global::MyApp.Error Error) => new Result(Error);
-        public static explicit operator global::MyApp.Error(Result value) => value._error;
+        public static explicit operator global::MyApp.Error(Result value) => value._error ?? throw new InvalidOperationException("Inner value is not Error");
         public bool TryGetError([System.Diagnostics.CodeAnalysis.NotNullWhen(true)] out global::MyApp.Error? value)
         {
             if (_error != null)
@@ -69,7 +69,7 @@ namespace MyApp
         }
 
         public static implicit operator Result(global::System.Collections.Generic.IReadOnlyList<int> IReadOnlyListOfInt) => new Result(IReadOnlyListOfInt);
-        public static explicit operator global::System.Collections.Generic.IReadOnlyList<int>(Result value) => value._iReadOnlyListOfInt;
+        public static explicit operator global::System.Collections.Generic.IReadOnlyList<int>(Result value) => value._iReadOnlyListOfInt ?? throw new InvalidOperationException("Inner value is not IReadOnlyListOfInt");
         public bool TryGetIReadOnlyListOfInt([System.Diagnostics.CodeAnalysis.NotNullWhen(true)] out global::System.Collections.Generic.IReadOnlyList<int>? value)
         {
             if (_iReadOnlyListOfInt != null)
@@ -94,7 +94,7 @@ namespace MyApp
         }
 
         public static implicit operator Result(string[] ArrayOfString) => new Result(ArrayOfString);
-        public static explicit operator string[](Result value) => value._arrayOfString;
+        public static explicit operator string[](Result value) => value._arrayOfString ?? throw new InvalidOperationException("Inner value is not ArrayOfString");
         public bool TryGetArrayOfString([System.Diagnostics.CodeAnalysis.NotNullWhen(true)] out string[]? value)
         {
             if (_arrayOfString != null)
@@ -119,7 +119,7 @@ namespace MyApp
         }
 
         public static implicit operator Result(global::System.Tuple<int, string> TupleOfIntAndString) => new Result(TupleOfIntAndString);
-        public static explicit operator global::System.Tuple<int, string>(Result value) => value._tupleOfIntAndString;
+        public static explicit operator global::System.Tuple<int, string>(Result value) => value._tupleOfIntAndString ?? throw new InvalidOperationException("Inner value is not TupleOfIntAndString");
         public bool TryGetTupleOfIntAndString([System.Diagnostics.CodeAnalysis.NotNullWhen(true)] out global::System.Tuple<int, string>? value)
         {
             if (_tupleOfIntAndString != null)
