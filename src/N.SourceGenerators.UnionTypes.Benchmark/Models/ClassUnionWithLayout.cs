@@ -1,8 +1,9 @@
-﻿
-using System.Runtime.InteropServices;
+﻿using System.Runtime.InteropServices;
+
+namespace N.SourceGenerators.UnionTypes.Benchmark.Models;
 
 [StructLayout(LayoutKind.Explicit)]
-public class FooResultLayout : IEquatable<FooResultLayout>
+public class ClassUnionWithLayout : IEquatable<ClassUnionWithLayout>
 {
     private const int SuccessVariant = 1;
     private const int ValidationErrorVariant = 2;
@@ -32,15 +33,15 @@ public class FooResultLayout : IEquatable<FooResultLayout>
         }
     }
 
-    public FooResultLayout(Success success)
+    public ClassUnionWithLayout(Success success)
     {
         ArgumentNullException.ThrowIfNull(success);
         _variant = SuccessVariant;
         _success = success;
     }
 
-    public static implicit operator FooResultLayout(Success success) => new FooResultLayout(success);
-    public static explicit operator Success(FooResultLayout value) => value.AsSuccess;
+    public static implicit operator ClassUnionWithLayout(Success success) => new ClassUnionWithLayout(success);
+    public static explicit operator Success(ClassUnionWithLayout value) => value.AsSuccess;
     public bool TryGetSuccess([System.Diagnostics.CodeAnalysis.NotNullWhen(true)] out Success? value)
     {
         if (_variant == SuccessVariant)
@@ -68,15 +69,15 @@ public class FooResultLayout : IEquatable<FooResultLayout>
         }
     }
 
-    public FooResultLayout(ValidationError validationError)
+    public ClassUnionWithLayout(ValidationError validationError)
     {
         ArgumentNullException.ThrowIfNull(validationError);
         _variant = ValidationErrorVariant;
         _validationError = validationError;
     }
 
-    public static implicit operator FooResultLayout(ValidationError validationError) => new FooResultLayout(validationError);
-    public static explicit operator ValidationError(FooResultLayout value) => value.AsValidationError;
+    public static implicit operator ClassUnionWithLayout(ValidationError validationError) => new ClassUnionWithLayout(validationError);
+    public static explicit operator ValidationError(ClassUnionWithLayout value) => value.AsValidationError;
     public bool TryGetValidationError([System.Diagnostics.CodeAnalysis.NotNullWhen(true)] out ValidationError? value)
     {
         if (_variant == ValidationErrorVariant)
@@ -103,15 +104,15 @@ public class FooResultLayout : IEquatable<FooResultLayout>
         }
     }
 
-    public FooResultLayout(NotFoundError notFoundError)
+    public ClassUnionWithLayout(NotFoundError notFoundError)
     {
         ArgumentNullException.ThrowIfNull(notFoundError);
         _variant = NotFoundErrorVariant;
         _notFoundError = notFoundError;
     }
 
-    public static implicit operator FooResultLayout(NotFoundError notFoundError) => new FooResultLayout(notFoundError);
-    public static explicit operator NotFoundError(FooResultLayout value) => value.AsNotFoundError;
+    public static implicit operator ClassUnionWithLayout(NotFoundError notFoundError) => new ClassUnionWithLayout(notFoundError);
+    public static explicit operator NotFoundError(ClassUnionWithLayout value) => value.AsNotFoundError;
     public bool TryGetNotFoundError([System.Diagnostics.CodeAnalysis.NotNullWhen(true)] out NotFoundError? value)
     {
         if (_variant == NotFoundErrorVariant)
@@ -241,17 +242,17 @@ public class FooResultLayout : IEquatable<FooResultLayout>
         return InnerValue.GetHashCode();
     }
 
-    public static bool operator ==(FooResultLayout? left, FooResultLayout? right)
+    public static bool operator ==(ClassUnionWithLayout? left, ClassUnionWithLayout? right)
     {
         return Equals(left, right);
     }
 
-    public static bool operator !=(FooResultLayout? left, FooResultLayout? right)
+    public static bool operator !=(ClassUnionWithLayout? left, ClassUnionWithLayout? right)
     {
         return !Equals(left, right);
     }
 
-    public bool Equals(FooResultLayout? other)
+    public bool Equals(ClassUnionWithLayout? other)
     {
         if (ReferenceEquals(null, other))
         {
@@ -294,11 +295,11 @@ public class FooResultLayout : IEquatable<FooResultLayout>
             return true;
         }
 
-        if (other.GetType() != typeof(FooResultLayout))
+        if (other.GetType() != typeof(ClassUnionWithLayout))
         {
             return false;
         }
 
-        return Equals((FooResultLayout)other);
+        return Equals((ClassUnionWithLayout)other);
     }
 }

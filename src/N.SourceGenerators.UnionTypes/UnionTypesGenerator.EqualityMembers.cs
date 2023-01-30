@@ -5,7 +5,7 @@ namespace N.SourceGenerators.UnionTypes;
 
 public partial class UnionTypesGenerator
 {
-    private static MemberDeclarationSyntax GetHashCodeMethod()
+    private static MemberDeclarationSyntax GetHashCodeMethod(UnionType unionType)
     {
         return MethodDeclaration(
             IdentifierName("int"),
@@ -14,12 +14,20 @@ public partial class UnionTypesGenerator
             Token(SyntaxKind.PublicKeyword),
             Token(SyntaxKind.OverrideKeyword)
         ).AddBodyStatements(
-            ReturnStatement(
-                InvocationExpression(
-                    MemberAccess("InnerValue", "GetHashCode")
-                )
-            )
+            VariantsBodyStatements(unionType, v => AliasStatement(unionType, v))
         );
+
+        static StatementSyntax AliasStatement(UnionType unionType, UnionTypeVariant variant)
+        {
+            return IfStatement(
+                IsPropertyCondition(unionType, variant),
+                ReturnStatement(
+                    InvocationExpression(
+                        MemberAccess(variant.FieldName, "GetHashCode")
+                    )
+                )
+            );
+        }
     }
 
     private static OperatorDeclarationSyntax EqualsOperator(UnionType unionType, bool equal)
@@ -102,7 +110,7 @@ public partial class UnionTypesGenerator
             foreach (UnionTypeVariant variant in unionType.Variants)
             {
                 yield return IfStatement(
-                    IdentifierName(variant.IsPropertyName),
+                    IsPropertyCondition(unionType, variant),
                     ReturnStatement(
                         InvocationExpression(
                             MemberAccessExpression(
@@ -115,8 +123,8 @@ public partial class UnionTypesGenerator
                                 IdentifierName("Equals")
                             )
                         ).AddArgumentListArguments(
-                            Argument(IdentifierName(variant.AsPropertyName)),
-                            Argument(MemberAccess("other", variant.AsPropertyName))
+                            Argument(IdentifierName(variant.FieldName)),
+                            Argument(MemberAccess("other", variant.FieldName))
                         )
                     )
                 );

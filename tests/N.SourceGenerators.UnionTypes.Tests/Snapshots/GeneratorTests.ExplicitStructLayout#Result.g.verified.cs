@@ -20,9 +20,9 @@ namespace MyApp
         {
             get
             {
-                if (IsSuccessStruct)
+                if (_variantId == SuccessStructId)
                     return _successStruct;
-                throw new InvalidOperationException($"Inner value is {InnerValueAlias}, not SuccessStruct");
+                throw new InvalidOperationException("Inner value is not SuccessStruct");
             }
         }
 
@@ -33,10 +33,16 @@ namespace MyApp
         }
 
         public static implicit operator Result(global::MyApp.SuccessStruct SuccessStruct) => new Result(SuccessStruct);
-        public static explicit operator global::MyApp.SuccessStruct(Result value) => value.AsSuccessStruct;
+        public static explicit operator global::MyApp.SuccessStruct(Result value)
+        {
+            if (value._variantId == SuccessStructId)
+                return value._successStruct;
+            throw new InvalidOperationException("Inner value is not SuccessStruct");
+        }
+
         public bool TryGetSuccessStruct([System.Diagnostics.CodeAnalysis.NotNullWhen(true)] out global::MyApp.SuccessStruct? value)
         {
-            if (IsSuccessStruct)
+            if (_variantId == SuccessStructId)
             {
                 value = _successStruct;
                 return true;
@@ -56,9 +62,9 @@ namespace MyApp
         {
             get
             {
-                if (IsValidationErrorStruct)
+                if (_variantId == ValidationErrorStructId)
                     return _validationErrorStruct;
-                throw new InvalidOperationException($"Inner value is {InnerValueAlias}, not ValidationErrorStruct");
+                throw new InvalidOperationException("Inner value is not ValidationErrorStruct");
             }
         }
 
@@ -69,10 +75,16 @@ namespace MyApp
         }
 
         public static implicit operator Result(global::MyApp.ValidationErrorStruct ValidationErrorStruct) => new Result(ValidationErrorStruct);
-        public static explicit operator global::MyApp.ValidationErrorStruct(Result value) => value.AsValidationErrorStruct;
+        public static explicit operator global::MyApp.ValidationErrorStruct(Result value)
+        {
+            if (value._variantId == ValidationErrorStructId)
+                return value._validationErrorStruct;
+            throw new InvalidOperationException("Inner value is not ValidationErrorStruct");
+        }
+
         public bool TryGetValidationErrorStruct([System.Diagnostics.CodeAnalysis.NotNullWhen(true)] out global::MyApp.ValidationErrorStruct? value)
         {
-            if (IsValidationErrorStruct)
+            if (_variantId == ValidationErrorStructId)
             {
                 value = _validationErrorStruct;
                 return true;
@@ -92,9 +104,9 @@ namespace MyApp
         {
             get
             {
-                if (IsNotFoundErrorStruct)
+                if (_variantId == NotFoundErrorStructId)
                     return _notFoundErrorStruct;
-                throw new InvalidOperationException($"Inner value is {InnerValueAlias}, not NotFoundErrorStruct");
+                throw new InvalidOperationException("Inner value is not NotFoundErrorStruct");
             }
         }
 
@@ -105,10 +117,16 @@ namespace MyApp
         }
 
         public static implicit operator Result(global::MyApp.NotFoundErrorStruct NotFoundErrorStruct) => new Result(NotFoundErrorStruct);
-        public static explicit operator global::MyApp.NotFoundErrorStruct(Result value) => value.AsNotFoundErrorStruct;
+        public static explicit operator global::MyApp.NotFoundErrorStruct(Result value)
+        {
+            if (value._variantId == NotFoundErrorStructId)
+                return value._notFoundErrorStruct;
+            throw new InvalidOperationException("Inner value is not NotFoundErrorStruct");
+        }
+
         public bool TryGetNotFoundErrorStruct([System.Diagnostics.CodeAnalysis.NotNullWhen(true)] out global::MyApp.NotFoundErrorStruct? value)
         {
-            if (IsNotFoundErrorStruct)
+            if (_variantId == NotFoundErrorStructId)
             {
                 value = _notFoundErrorStruct;
                 return true;
@@ -122,43 +140,43 @@ namespace MyApp
 
         public TOut Match<TOut>(global::System.Func<global::MyApp.SuccessStruct, TOut> matchSuccessStruct, global::System.Func<global::MyApp.ValidationErrorStruct, TOut> matchValidationErrorStruct, global::System.Func<global::MyApp.NotFoundErrorStruct, TOut> matchNotFoundErrorStruct)
         {
-            if (IsSuccessStruct)
-                return matchSuccessStruct(AsSuccessStruct);
-            if (IsValidationErrorStruct)
-                return matchValidationErrorStruct(AsValidationErrorStruct);
-            if (IsNotFoundErrorStruct)
-                return matchNotFoundErrorStruct(AsNotFoundErrorStruct);
+            if (_variantId == SuccessStructId)
+                return matchSuccessStruct(_successStruct);
+            if (_variantId == ValidationErrorStructId)
+                return matchValidationErrorStruct(_validationErrorStruct);
+            if (_variantId == NotFoundErrorStructId)
+                return matchNotFoundErrorStruct(_notFoundErrorStruct);
             throw new InvalidOperationException("Inner type is unknown");
         }
 
         public async global::System.Threading.Tasks.Task<TOut> MatchAsync<TOut>(global::System.Func<global::MyApp.SuccessStruct, global::System.Threading.CancellationToken, global::System.Threading.Tasks.Task<TOut>> matchSuccessStruct, global::System.Func<global::MyApp.ValidationErrorStruct, global::System.Threading.CancellationToken, global::System.Threading.Tasks.Task<TOut>> matchValidationErrorStruct, global::System.Func<global::MyApp.NotFoundErrorStruct, global::System.Threading.CancellationToken, global::System.Threading.Tasks.Task<TOut>> matchNotFoundErrorStruct, global::System.Threading.CancellationToken ct)
         {
-            if (IsSuccessStruct)
-                return await matchSuccessStruct(AsSuccessStruct, ct).ConfigureAwait(false);
-            if (IsValidationErrorStruct)
-                return await matchValidationErrorStruct(AsValidationErrorStruct, ct).ConfigureAwait(false);
-            if (IsNotFoundErrorStruct)
-                return await matchNotFoundErrorStruct(AsNotFoundErrorStruct, ct).ConfigureAwait(false);
+            if (_variantId == SuccessStructId)
+                return await matchSuccessStruct(_successStruct, ct).ConfigureAwait(false);
+            if (_variantId == ValidationErrorStructId)
+                return await matchValidationErrorStruct(_validationErrorStruct, ct).ConfigureAwait(false);
+            if (_variantId == NotFoundErrorStructId)
+                return await matchNotFoundErrorStruct(_notFoundErrorStruct, ct).ConfigureAwait(false);
             throw new InvalidOperationException("Inner type is unknown");
         }
 
         public void Switch(global::System.Action<global::MyApp.SuccessStruct> switchSuccessStruct, global::System.Action<global::MyApp.ValidationErrorStruct> switchValidationErrorStruct, global::System.Action<global::MyApp.NotFoundErrorStruct> switchNotFoundErrorStruct)
         {
-            if (IsSuccessStruct)
+            if (_variantId == SuccessStructId)
             {
-                switchSuccessStruct(AsSuccessStruct);
+                switchSuccessStruct(_successStruct);
                 return;
             }
 
-            if (IsValidationErrorStruct)
+            if (_variantId == ValidationErrorStructId)
             {
-                switchValidationErrorStruct(AsValidationErrorStruct);
+                switchValidationErrorStruct(_validationErrorStruct);
                 return;
             }
 
-            if (IsNotFoundErrorStruct)
+            if (_variantId == NotFoundErrorStructId)
             {
-                switchNotFoundErrorStruct(AsNotFoundErrorStruct);
+                switchNotFoundErrorStruct(_notFoundErrorStruct);
                 return;
             }
 
@@ -167,21 +185,21 @@ namespace MyApp
 
         public async global::System.Threading.Tasks.Task SwitchAsync(global::System.Func<global::MyApp.SuccessStruct, global::System.Threading.CancellationToken, global::System.Threading.Tasks.Task> switchSuccessStruct, global::System.Func<global::MyApp.ValidationErrorStruct, global::System.Threading.CancellationToken, global::System.Threading.Tasks.Task> switchValidationErrorStruct, global::System.Func<global::MyApp.NotFoundErrorStruct, global::System.Threading.CancellationToken, global::System.Threading.Tasks.Task> switchNotFoundErrorStruct, global::System.Threading.CancellationToken ct)
         {
-            if (IsSuccessStruct)
+            if (_variantId == SuccessStructId)
             {
-                await switchSuccessStruct(AsSuccessStruct, ct).ConfigureAwait(false);
+                await switchSuccessStruct(_successStruct, ct).ConfigureAwait(false);
                 return;
             }
 
-            if (IsValidationErrorStruct)
+            if (_variantId == ValidationErrorStructId)
             {
-                await switchValidationErrorStruct(AsValidationErrorStruct, ct).ConfigureAwait(false);
+                await switchValidationErrorStruct(_validationErrorStruct, ct).ConfigureAwait(false);
                 return;
             }
 
-            if (IsNotFoundErrorStruct)
+            if (_variantId == NotFoundErrorStructId)
             {
-                await switchNotFoundErrorStruct(AsNotFoundErrorStruct, ct).ConfigureAwait(false);
+                await switchNotFoundErrorStruct(_notFoundErrorStruct, ct).ConfigureAwait(false);
                 return;
             }
 
@@ -192,47 +210,25 @@ namespace MyApp
         {
             get
             {
-                if (IsSuccessStruct)
+                if (_variantId == SuccessStructId)
                     return typeof(global::MyApp.SuccessStruct);
-                if (IsValidationErrorStruct)
+                if (_variantId == ValidationErrorStructId)
                     return typeof(global::MyApp.ValidationErrorStruct);
-                if (IsNotFoundErrorStruct)
+                if (_variantId == NotFoundErrorStructId)
                     return typeof(global::MyApp.NotFoundErrorStruct);
-                throw new InvalidOperationException("Inner type is unknown");
-            }
-        }
-
-        private global::System.Object InnerValue
-        {
-            get
-            {
-                if (IsSuccessStruct)
-                    return AsSuccessStruct;
-                if (IsValidationErrorStruct)
-                    return AsValidationErrorStruct;
-                if (IsNotFoundErrorStruct)
-                    return AsNotFoundErrorStruct;
-                throw new InvalidOperationException("Inner type is unknown");
-            }
-        }
-
-        private string InnerValueAlias
-        {
-            get
-            {
-                if (IsSuccessStruct)
-                    return "SuccessStruct";
-                if (IsValidationErrorStruct)
-                    return "ValidationErrorStruct";
-                if (IsNotFoundErrorStruct)
-                    return "NotFoundErrorStruct";
                 throw new InvalidOperationException("Inner type is unknown");
             }
         }
 
         public override int GetHashCode()
         {
-            return InnerValue.GetHashCode();
+            if (_variantId == SuccessStructId)
+                return _successStruct.GetHashCode();
+            if (_variantId == ValidationErrorStructId)
+                return _validationErrorStruct.GetHashCode();
+            if (_variantId == NotFoundErrorStructId)
+                return _notFoundErrorStruct.GetHashCode();
+            throw new InvalidOperationException("Inner type is unknown");
         }
 
         public static bool operator ==(Result left, Result right)
@@ -252,18 +248,24 @@ namespace MyApp
                 return false;
             }
 
-            if (IsSuccessStruct)
-                return EqualityComparer<global::MyApp.SuccessStruct>.Default.Equals(AsSuccessStruct, other.AsSuccessStruct);
-            if (IsValidationErrorStruct)
-                return EqualityComparer<global::MyApp.ValidationErrorStruct>.Default.Equals(AsValidationErrorStruct, other.AsValidationErrorStruct);
-            if (IsNotFoundErrorStruct)
-                return EqualityComparer<global::MyApp.NotFoundErrorStruct>.Default.Equals(AsNotFoundErrorStruct, other.AsNotFoundErrorStruct);
+            if (_variantId == SuccessStructId)
+                return EqualityComparer<global::MyApp.SuccessStruct>.Default.Equals(_successStruct, other._successStruct);
+            if (_variantId == ValidationErrorStructId)
+                return EqualityComparer<global::MyApp.ValidationErrorStruct>.Default.Equals(_validationErrorStruct, other._validationErrorStruct);
+            if (_variantId == NotFoundErrorStructId)
+                return EqualityComparer<global::MyApp.NotFoundErrorStruct>.Default.Equals(_notFoundErrorStruct, other._notFoundErrorStruct);
             throw new InvalidOperationException("Inner type is unknown");
         }
 
         public override string ToString()
         {
-            return $"{InnerValueAlias} - {InnerValue}";
+            if (_variantId == SuccessStructId)
+                return _successStruct.ToString();
+            if (_variantId == ValidationErrorStructId)
+                return _validationErrorStruct.ToString();
+            if (_variantId == NotFoundErrorStructId)
+                return _notFoundErrorStruct.ToString();
+            throw new InvalidOperationException("Inner type is unknown");
         }
 
         public override bool Equals(object? obj)

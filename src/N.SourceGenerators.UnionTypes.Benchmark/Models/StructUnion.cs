@@ -1,18 +1,20 @@
 ﻿using System.Diagnostics.CodeAnalysis;
 
-public struct FooStructResult : IEquatable<FooStructResult>
+namespace N.SourceGenerators.UnionTypes.Benchmark.Models;
+
+public struct StructUnion : IEquatable<StructUnion>
 {
     private readonly SuccessStruct? _successStruct;
     public bool IsSuccessStruct => _successStruct != null;
     public SuccessStruct AsSuccessStruct => _successStruct ?? throw new InvalidOperationException("This is not a global::SuccessStruct");
-    public FooStructResult(SuccessStruct SuccessStruct)
+    public StructUnion(SuccessStruct SuccessStruct)
     {
         ArgumentNullException.ThrowIfNull(SuccessStruct);
         _successStruct = SuccessStruct;
     }
 
-    public static implicit operator FooStructResult(SuccessStruct SuccessStruct) => new FooStructResult(SuccessStruct);
-    public static explicit operator SuccessStruct(FooStructResult value) => value.AsSuccessStruct;
+    public static implicit operator StructUnion(SuccessStruct SuccessStruct) => new StructUnion(SuccessStruct);
+    public static explicit operator SuccessStruct(StructUnion value) => value.AsSuccessStruct;
     public bool TryGetSuccessStruct([NotNullWhen(true)] out SuccessStruct? value)
     {
         if (_successStruct != null)
@@ -28,14 +30,14 @@ public struct FooStructResult : IEquatable<FooStructResult>
     private readonly ValidationErrorStruct? _validationErrorStruct;
     public bool IsValidationErrorStruct => _validationErrorStruct != null;
     public ValidationErrorStruct AsValidationErrorStruct => _validationErrorStruct ?? throw new InvalidOperationException("This is not a global::ValidationErrorStruct");
-    public FooStructResult(ValidationErrorStruct ValidationErrorStruct)
+    public StructUnion(ValidationErrorStruct ValidationErrorStruct)
     {
         ArgumentNullException.ThrowIfNull(ValidationErrorStruct);
         _validationErrorStruct = ValidationErrorStruct;
     }
 
-    public static implicit operator FooStructResult(ValidationErrorStruct ValidationErrorStruct) => new FooStructResult(ValidationErrorStruct);
-    public static explicit operator ValidationErrorStruct(FooStructResult value) => value.AsValidationErrorStruct;
+    public static implicit operator StructUnion(ValidationErrorStruct ValidationErrorStruct) => new StructUnion(ValidationErrorStruct);
+    public static explicit operator ValidationErrorStruct(StructUnion value) => value.AsValidationErrorStruct;
     public bool TryGetValidationErrorStruct([NotNullWhen(true)] out ValidationErrorStruct? value)
     {
         if (_validationErrorStruct != null)
@@ -51,14 +53,14 @@ public struct FooStructResult : IEquatable<FooStructResult>
     private readonly NotFoundErrorStruct? _notFoundErrorStruct;
     public bool IsNotFoundErrorStruct => _notFoundErrorStruct != null;
     public NotFoundErrorStruct AsNotFoundErrorStruct => _notFoundErrorStruct ?? throw new InvalidOperationException("This is not a global::NotFoundErrorStruct");
-    public FooStructResult(NotFoundErrorStruct NotFoundErrorStruct)
+    public StructUnion(NotFoundErrorStruct NotFoundErrorStruct)
     {
         ArgumentNullException.ThrowIfNull(NotFoundErrorStruct);
         _notFoundErrorStruct = NotFoundErrorStruct;
     }
 
-    public static implicit operator FooStructResult(NotFoundErrorStruct NotFoundErrorStruct) => new FooStructResult(NotFoundErrorStruct);
-    public static explicit operator NotFoundErrorStruct(FooStructResult value) => value.AsNotFoundErrorStruct;
+    public static implicit operator StructUnion(NotFoundErrorStruct NotFoundErrorStruct) => new StructUnion(NotFoundErrorStruct);
+    public static explicit operator NotFoundErrorStruct(StructUnion value) => value.AsNotFoundErrorStruct;
     public bool TryGetNotFoundErrorStruct([NotNullWhen(true)] out NotFoundErrorStruct? value)
     {
         if (_notFoundErrorStruct != null)
@@ -186,17 +188,17 @@ public struct FooStructResult : IEquatable<FooStructResult>
         return InnerValue.GetHashCode();
     }
 
-    public static bool operator ==(FooStructResult left, FooStructResult right)
+    public static bool operator ==(StructUnion left, StructUnion right)
     {
         return left.Equals(right);
     }
 
-    public static bool operator !=(FooStructResult left, FooStructResult right)
+    public static bool operator !=(StructUnion left, StructUnion right)
     {
         return !left.Equals(right);
     }
 
-    public bool Equals(FooStructResult other)
+    public bool Equals(StructUnion other)
     {
         if (ValueType != other.ValueType)
         {
@@ -219,6 +221,6 @@ public struct FooStructResult : IEquatable<FooStructResult>
 
     public override bool Equals(object? obj)
     {
-        return obj is FooStructResult other && Equals(other);
+        return obj is StructUnion other && Equals(other);
     }
 }

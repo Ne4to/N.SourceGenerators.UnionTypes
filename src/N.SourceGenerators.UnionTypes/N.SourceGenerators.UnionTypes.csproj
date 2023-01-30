@@ -10,11 +10,11 @@
         <IsRoslynComponent>true</IsRoslynComponent>
         <IsPackable>true</IsPackable>
         <PackageOutputPath>./nupkg</PackageOutputPath>
-        <VersionPrefix>0.15.0</VersionPrefix>
+        <VersionPrefix>0.16.0</VersionPrefix>
         <EnableNETAnalyzers>true</EnableNETAnalyzers>
         <NoWarn>$(NoWarn);NU5128</NoWarn>
     </PropertyGroup>
-    
+
     <PropertyGroup>
         <RepositoryType>git</RepositoryType>
         <RepositoryUrl>https://github.com/Ne4to/N.SourceGenerators.UnionTypes</RepositoryUrl>

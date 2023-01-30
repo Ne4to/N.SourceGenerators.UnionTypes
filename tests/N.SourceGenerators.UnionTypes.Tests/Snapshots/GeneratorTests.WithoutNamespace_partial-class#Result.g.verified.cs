@@ -9,16 +9,7 @@ partial class Result : IEquatable<Result>
 {
     private readonly global::Success? _success;
     public bool IsSuccess => _success != null;
-    public global::Success AsSuccess
-    {
-        get
-        {
-            if (IsSuccess)
-                return _success;
-            throw new InvalidOperationException($"Inner value is {InnerValueAlias}, not Success");
-        }
-    }
-
+    public global::Success AsSuccess => _success ?? throw new InvalidOperationException("Inner value is not Success");
     public Result(global::Success Success)
     {
         System.ArgumentNullException.ThrowIfNull(Success);
@@ -26,10 +17,10 @@ partial class Result : IEquatable<Result>
     }
 
     public static implicit operator Result(global::Success Success) => new Result(Success);
-    public static explicit operator global::Success(Result value) => value.AsSuccess;
+    public static explicit operator global::Success(Result value) => value._success ?? throw new InvalidOperationException("Inner value is not Success");
     public bool TryGetSuccess([System.Diagnostics.CodeAnalysis.NotNullWhen(true)] out global::Success? value)
     {
-        if (IsSuccess)
+        if (_success != null)
         {
             value = _success;
             return true;
@@ -43,16 +34,7 @@ partial class Result : IEquatable<Result>
 
     private readonly global::Error? _error;
     public bool IsError => _error != null;
-    public global::Error AsError
-    {
-        get
-        {
-            if (IsError)
-                return _error;
-            throw new InvalidOperationException($"Inner value is {InnerValueAlias}, not Error");
-        }
-    }
-
+    public global::Error AsError => _error ?? throw new InvalidOperationException("Inner value is not Error");
     public Result(global::Error Error)
     {
         System.ArgumentNullException.ThrowIfNull(Error);
@@ -60,10 +42,10 @@ partial class Result : IEquatable<Result>
     }
 
     public static implicit operator Result(global::Error Error) => new Result(Error);
-    public static explicit operator global::Error(Result value) => value.AsError;
+    public static explicit operator global::Error(Result value) => value._error ?? throw new InvalidOperationException("Inner value is not Error");
     public bool TryGetError([System.Diagnostics.CodeAnalysis.NotNullWhen(true)] out global::Error? value)
     {
-        if (IsError)
+        if (_error != null)
         {
             value = _error;
             return true;
@@ -77,33 +59,33 @@ partial class Result : IEquatable<Result>
 
     public TOut Match<TOut>(global::System.Func<global::Success, TOut> matchSuccess, global::System.Func<global::Error, TOut> matchError)
     {
-        if (IsSuccess)
-            return matchSuccess(AsSuccess);
-        if (IsError)
-            return matchError(AsError);
+        if (_success != null)
+            return matchSuccess(_success);
+        if (_error != null)
+            return matchError(_error);
         throw new InvalidOperationException("Inner type is unknown");
     }
 
     public async global::System.Threading.Tasks.Task<TOut> MatchAsync<TOut>(global::System.Func<global::Success, global::System.Threading.CancellationToken, global::System.Threading.Tasks.Task<TOut>> matchSuccess, global::System.Func<global::Error, global::System.Threading.CancellationToken, global::System.Threading.Tasks.Task<TOut>> matchError, global::System.Threading.CancellationToken ct)
     {
-        if (IsSuccess)
-            return await matchSuccess(AsSuccess, ct).ConfigureAwait(false);
-        if (IsError)
-            return await matchError(AsError, ct).ConfigureAwait(false);
+        if (_success != null)
+            return await matchSuccess(_success, ct).ConfigureAwait(false);
+        if (_error != null)
+            return await matchError(_error, ct).ConfigureAwait(false);
         throw new InvalidOperationException("Inner type is unknown");
     }
 
     public void Switch(global::System.Action<global::Success> switchSuccess, global::System.Action<global::Error> switchError)
     {
-        if (IsSuccess)
+        if (_success != null)
         {
-            switchSuccess(AsSuccess);
+            switchSuccess(_success);
             return;
         }
 
-        if (IsError)
+        if (_error != null)
         {
-            switchError(AsError);
+            switchError(_error);
             return;
         }
 
@@ -112,15 +94,15 @@ partial class Result : IEquatable<Result>
 
     public async global::System.Threading.Tasks.Task SwitchAsync(global::System.Func<global::Success, global::System.Threading.CancellationToken, global::System.Threading.Tasks.Task> switchSuccess, global::System.Func<global::Error, global::System.Threading.CancellationToken, global::System.Threading.Tasks.Task> switchError, global::System.Threading.CancellationToken ct)
     {
-        if (IsSuccess)
+        if (_success != null)
         {
-            await switchSuccess(AsSuccess, ct).ConfigureAwait(false);
+            await switchSuccess(_success, ct).ConfigureAwait(false);
             return;
         }
 
-        if (IsError)
+        if (_error != null)
         {
-            await switchError(AsError, ct).ConfigureAwait(false);
+            await switchError(_error, ct).ConfigureAwait(false);
             return;
         }
 
@@ -131,41 +113,21 @@ partial class Result : IEquatable<Result>
     {
         get
         {
-            if (IsSuccess)
+            if (_success != null)
                 return typeof(global::Success);
-            if (IsError)
+            if (_error != null)
                 return typeof(global::Error);
-            throw new InvalidOperationException("Inner type is unknown");
-        }
-    }
-
-    private global::System.Object InnerValue
-    {
-        get
-        {
-            if (IsSuccess)
-                return AsSuccess;
-            if (IsError)
-                return AsError;
-            throw new InvalidOperationException("Inner type is unknown");
-        }
-    }
-
-    private string InnerValueAlias
-    {
-        get
-        {
-            if (IsSuccess)
-                return "Success";
-            if (IsError)
-                return "Error";
             throw new InvalidOperationException("Inner type is unknown");
         }
     }
 
     public override int GetHashCode()
     {
-        return InnerValue.GetHashCode();
+        if (_success != null)
+            return _success.GetHashCode();
+        if (_error != null)
+            return _error.GetHashCode();
+        throw new InvalidOperationException("Inner type is unknown");
     }
 
     public static bool operator ==(Result? left, Result? right)
@@ -195,16 +157,20 @@ partial class Result : IEquatable<Result>
             return false;
         }
 
-        if (IsSuccess)
-            return EqualityComparer<global::Success>.Default.Equals(AsSuccess, other.AsSuccess);
-        if (IsError)
-            return EqualityComparer<global::Error>.Default.Equals(AsError, other.AsError);
+        if (_success != null)
+            return EqualityComparer<global::Success>.Default.Equals(_success, other._success);
+        if (_error != null)
+            return EqualityComparer<global::Error>.Default.Equals(_error, other._error);
         throw new InvalidOperationException("Inner type is unknown");
     }
 
     public override string ToString()
     {
-        return $"{InnerValueAlias} - {InnerValue}";
+        if (_success != null)
+            return _success.ToString();
+        if (_error != null)
+            return _error.ToString();
+        throw new InvalidOperationException("Inner type is unknown");
     }
 
     public override bool Equals(object? other)

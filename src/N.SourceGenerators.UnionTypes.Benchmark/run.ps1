@@ -1,16 +1,30 @@
 [CmdletBinding()]
 param (
-    [ValidateSet("Ctor", "ReadValue", "Hash")]
+    [ValidateSet('All', 'Ctor', 'ReadValue', 'Hash', 'ToString')]
     [string]$Mode
 )
 
-$Filter = ''
+$Filters = @()
+if ($Mode -eq 'All') {
+    $ModeValues = $MyInvocation.
+        MyCommand.
+        Parameters["Mode"].
+        Attributes.
+        Where{$_ -is [System.Management.Automation.ValidateSetAttribute]}.
+        ValidValues.
+        Where{$_ -ne 'All'};
 
-switch ($Mode) {
-    "Ctor" { $Filter = '*CtorBenchmark*' }
-    "ReadValue" { $Filter = '*ReadValueBenchmark*' }
-    "Hash" { $Filter = '*HashBenchmark*' }
-    Default {}
+    foreach ($BenchName in $ModeValues) {
+        $Filters += "*$($BenchName)Benchmark*"
+    }
+} else {
+    $Filters += "*$($Mode)Benchmark*"
 }
 
-. dotnet run -c Release -- --job short --runtimes net7.0 --filter $Filter
+foreach ($Filter in $Filters) {
+    . dotnet run -c Release -- --job short --runtimes net7.0 --filter $Filter
+}
+
+if ($Mode -eq 'All') {
+    ./update-readme.ps1
+}

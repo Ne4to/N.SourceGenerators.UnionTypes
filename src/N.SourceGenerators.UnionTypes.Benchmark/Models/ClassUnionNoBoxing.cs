@@ -1,16 +1,18 @@
-﻿public class FooResult : IEquatable<FooResult>
+﻿namespace N.SourceGenerators.UnionTypes.Benchmark.Models;
+
+public class ClassUnionNoBoxing : IEquatable<ClassUnionNoBoxing>
 {
     private readonly Success? _success;
     public bool IsSuccess => _success != null;
     public Success AsSuccess => _success ?? throw new InvalidOperationException("This is not a global::Success");
-    public FooResult(Success success)
+    public ClassUnionNoBoxing(Success success)
     {
         ArgumentNullException.ThrowIfNull(success);
         _success = success;
     }
 
-    public static implicit operator FooResult(Success success) => new FooResult(success);
-    public static explicit operator Success(FooResult value) => value.AsSuccess;
+    public static implicit operator ClassUnionNoBoxing(Success success) => new ClassUnionNoBoxing(success);
+    public static explicit operator Success(ClassUnionNoBoxing value) => value.AsSuccess;
     public bool TryGetSuccess([System.Diagnostics.CodeAnalysis.NotNullWhen(true)] out Success? value)
     {
         if (_success != null)
@@ -28,14 +30,14 @@
     private readonly ValidationError? _validationError;
     public bool IsValidationError => _validationError != null;
     public ValidationError AsValidationError => _validationError ?? throw new InvalidOperationException("This is not a global::ValidationError");
-    public FooResult(ValidationError ValidationError)
+    public ClassUnionNoBoxing(ValidationError ValidationError)
     {
         ArgumentNullException.ThrowIfNull(ValidationError);
         _validationError = ValidationError;
     }
 
-    public static implicit operator FooResult(ValidationError ValidationError) => new FooResult(ValidationError);
-    public static explicit operator ValidationError(FooResult value) => value.AsValidationError;
+    public static implicit operator ClassUnionNoBoxing(ValidationError ValidationError) => new ClassUnionNoBoxing(ValidationError);
+    public static explicit operator ValidationError(ClassUnionNoBoxing value) => value.AsValidationError;
     public bool TryGetValidationError([System.Diagnostics.CodeAnalysis.NotNullWhen(true)] out ValidationError? value)
     {
         if (_validationError != null)
@@ -53,14 +55,14 @@
     private readonly NotFoundError? _notFoundError;
     public bool IsNotFoundError => _notFoundError != null;
     public NotFoundError AsNotFoundError => _notFoundError ?? throw new InvalidOperationException("This is not a global::NotFoundError");
-    public FooResult(NotFoundError NotFoundError)
+    public ClassUnionNoBoxing(NotFoundError NotFoundError)
     {
         ArgumentNullException.ThrowIfNull(NotFoundError);
         _notFoundError = NotFoundError;
     }
 
-    public static implicit operator FooResult(NotFoundError NotFoundError) => new FooResult(NotFoundError);
-    public static explicit operator NotFoundError(FooResult value) => value.AsNotFoundError;
+    public static implicit operator ClassUnionNoBoxing(NotFoundError NotFoundError) => new ClassUnionNoBoxing(NotFoundError);
+    public static explicit operator NotFoundError(ClassUnionNoBoxing value) => value.AsNotFoundError;
     public bool TryGetNotFoundError([System.Diagnostics.CodeAnalysis.NotNullWhen(true)] out NotFoundError? value)
     {
         if (_notFoundError != null)
@@ -187,20 +189,26 @@
 
     public override int GetHashCode()
     {
-        return InnerValue.GetHashCode();
+        if (IsSuccess)
+            return _success!.GetHashCode();
+        if (IsValidationError)
+            return _validationError!.GetHashCode();
+        if (IsNotFoundError)
+            return _notFoundError!.GetHashCode();
+        throw new InvalidOperationException("Unknown type");
     }
 
-    public static bool operator ==(FooResult? left, FooResult? right)
+    public static bool operator ==(ClassUnionNoBoxing? left, ClassUnionNoBoxing? right)
     {
         return Equals(left, right);
     }
 
-    public static bool operator !=(FooResult? left, FooResult? right)
+    public static bool operator !=(ClassUnionNoBoxing? left, ClassUnionNoBoxing? right)
     {
         return !Equals(left, right);
     }
 
-    public bool Equals(FooResult? other)
+    public bool Equals(ClassUnionNoBoxing? other)
     {
         if (ReferenceEquals(null, other))
         {
@@ -228,7 +236,13 @@
 
     public override string ToString()
     {
-        return $"{InnerValueAlias} - {InnerValue}";
+        if (IsSuccess)
+            return $"{InnerValueAlias} - {_success}";
+        if (IsValidationError)
+            return $"{InnerValueAlias} - {_validationError}";
+        if (IsNotFoundError)
+            return $"{InnerValueAlias} - {_notFoundError}";
+        throw new InvalidOperationException("Unknown type");
     }
 
     public override bool Equals(object? other)
@@ -243,11 +257,11 @@
             return true;
         }
 
-        if (other.GetType() != typeof(FooResult))
+        if (other.GetType() != typeof(ClassUnionNoBoxing))
         {
             return false;
         }
 
-        return Equals((FooResult)other);
+        return Equals((ClassUnionNoBoxing)other);
     }
 }
