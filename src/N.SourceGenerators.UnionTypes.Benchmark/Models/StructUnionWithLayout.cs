@@ -13,15 +13,14 @@ public struct StructUnionWithLayout : IEquatable<StructUnionWithLayout>
     [FieldOffset(0)] 
     private readonly int _variant;
 
-    [FieldOffset(sizeof(int))] 
+    [FieldOffset(4)] 
     private readonly SuccessStruct _successStruct;
 
-    [FieldOffset(sizeof(int))] 
+    [FieldOffset(4)] 
     private readonly ValidationErrorStruct _validationErrorStruct;
 
-    [FieldOffset(sizeof(int))] 
+    [FieldOffset(4)] 
     private readonly NotFoundErrorStruct _notFoundErrorStruct;
-
 
     public bool IsSuccessStruct => _variant == SuccessStructVariant;
 

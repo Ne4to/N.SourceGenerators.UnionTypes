@@ -79,6 +79,37 @@ namespace MyApp
 ";
 
         return TestHelper.Verify<UnionTypesGenerator>(source);
+    }   
+    
+    [Fact]
+    public Task DifferentNamespaces()
+    {
+        string source = """
+            using System;
+            using System.Collections.Generic;
+            using N.SourceGenerators.UnionTypes;
+            
+            namespace MyApp.Models.S.Child
+            {
+                public record Success;
+            }
+
+            namespace MyApp.Models.E.Child
+            {
+                public record Error;
+            }
+
+            namespace MyApp.Domain.Child
+            {
+                [UnionType(typeof(MyApp.Models.S.Child.Success))]
+                [UnionType(typeof(MyApp.Models.E.Child.Error))]
+                public partial class Result
+                {
+                }
+            }
+            """;
+
+        return TestHelper.Verify<UnionTypesGenerator>(source);
     }    
 
     [Fact]

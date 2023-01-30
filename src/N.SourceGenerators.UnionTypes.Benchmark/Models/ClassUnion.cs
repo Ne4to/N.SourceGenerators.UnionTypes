@@ -62,7 +62,7 @@ public class ClassUnion : IEquatable<ClassUnion>
     }
 
     public static implicit operator ClassUnion(NotFoundError NotFoundError) => new ClassUnion(NotFoundError);
-    public static explicit operator NotFoundError(ClassUnion value) => value.AsNotFoundError;
+    public static explicit operator NotFoundError(ClassUnion value) => value._notFoundError;
     public bool TryGetNotFoundError([System.Diagnostics.CodeAnalysis.NotNullWhen(true)] out NotFoundError? value)
     {
         if (_notFoundError != null)

@@ -4,7 +4,7 @@ internal static class RoslynUtils
 {
     public const string TaskType = "global::System.Threading.Tasks.Task";
 
-    public static ObjectCreationExpressionSyntax NewInvalidOperationException(ExpressionSyntax expression)
+    private static ObjectCreationExpressionSyntax NewInvalidOperationException(ExpressionSyntax expression)
     {
         return ObjectCreationExpression(
                 IdentifierName("InvalidOperationException")
