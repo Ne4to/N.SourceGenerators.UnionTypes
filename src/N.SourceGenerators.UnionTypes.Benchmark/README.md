@@ -5,44 +5,42 @@ BenchmarkDotNet=v0.13.4, OS=Windows 11 (10.0.22621.1105)
 Intel Core i7-1065G7 CPU 1.30GHz, 1 CPU, 8 logical and 4 physical cores
 .NET SDK=7.0.102
   [Host]     : .NET 7.0.2 (7.0.222.60605), X64 RyuJIT AVX2
-  Job-FJCCER : .NET 7.0.2 (7.0.222.60605), X64 RyuJIT AVX2
+  Job-BKNSSQ : .NET 7.0.2 (7.0.222.60605), X64 RyuJIT AVX2
 
 Runtime=.NET 7.0  Toolchain=net7.0  IterationCount=3  
 LaunchCount=1  WarmupCount=3  
 
 ```
-|           Method |     Mean |     Error |    StdDev | Ratio | RatioSD | Code Size |   Gen0 | Allocated | Alloc Ratio |
-|----------------- |---------:|----------:|----------:|------:|--------:|----------:|-------:|----------:|------------:|
-|            Class | 9.577 ns | 0.7403 ns | 0.0406 ns |  1.00 |    0.00 |      86 B | 0.0153 |      64 B |        1.00 |
-|  ClassWithLayout | 9.186 ns | 4.2621 ns | 0.2336 ns |  0.96 |    0.03 |      93 B | 0.0134 |      56 B |        0.88 |
-|   ClassGenerated | 9.326 ns | 4.9795 ns | 0.2729 ns |  0.97 |    0.03 |      86 B | 0.0153 |      64 B |        1.00 |
-|           Struct | 5.650 ns | 1.1563 ns | 0.0634 ns |  0.59 |    0.01 |      59 B |      - |         - |        0.00 |
-| StructWithLayout | 4.400 ns | 1.1613 ns | 0.0637 ns |  0.46 |    0.01 |      31 B |      - |         - |        0.00 |
-|  StructGenerated | 4.498 ns | 0.6512 ns | 0.0357 ns |  0.47 |    0.00 |      31 B |      - |         - |        0.00 |
+|                       Method |     Mean |     Error |    StdDev | Ratio | RatioSD |   Gen0 | Allocated | Alloc Ratio |
+|----------------------------- |---------:|----------:|----------:|------:|--------:|-------:|----------:|------------:|
+|                        Class | 7.050 ns | 0.3546 ns | 0.0194 ns |  1.00 |    0.00 | 0.0153 |      64 B |        1.00 |
+|                  ClassSealed | 6.769 ns | 2.5824 ns | 0.1416 ns |  0.96 |    0.02 | 0.0153 |      64 B |        1.00 |
+|                       Struct | 3.302 ns | 0.5208 ns | 0.0285 ns |  0.47 |    0.00 | 0.0057 |      24 B |        0.38 |
+|               StructReadonly | 3.264 ns | 0.6143 ns | 0.0337 ns |  0.46 |    0.00 | 0.0057 |      24 B |        0.38 |
+|         StructExplicitLayout | 4.123 ns | 0.5004 ns | 0.0274 ns |  0.58 |    0.00 |      - |         - |        0.00 |
+| StructReadonlyExplicitLayout | 4.115 ns | 0.8700 ns | 0.0477 ns |  0.58 |    0.01 |      - |         - |        0.00 |
 
-## Hash
+## GetHashCode
 ``` ini
 
 BenchmarkDotNet=v0.13.4, OS=Windows 11 (10.0.22621.1105)
 Intel Core i7-1065G7 CPU 1.30GHz, 1 CPU, 8 logical and 4 physical cores
 .NET SDK=7.0.102
   [Host]     : .NET 7.0.2 (7.0.222.60605), X64 RyuJIT AVX2
-  Job-RIQQUW : .NET 7.0.2 (7.0.222.60605), X64 RyuJIT AVX2
+  Job-EOFGDV : .NET 7.0.2 (7.0.222.60605), X64 RyuJIT AVX2
 
 Runtime=.NET 7.0  Toolchain=net7.0  IterationCount=3  
 LaunchCount=1  WarmupCount=3  
 
 ```
-|                   Method |      Mean |     Error |    StdDev | Ratio | RatioSD | Code Size |   Gen0 | Allocated | Alloc Ratio |
-|------------------------- |----------:|----------:|----------:|------:|--------:|----------:|-------:|----------:|------------:|
-|                    Class | 27.823 ns | 15.085 ns | 0.8268 ns |  1.00 |    0.00 |      15 B |      - |         - |          NA |
-|            ClassNoBoxing | 25.913 ns | 14.242 ns | 0.7807 ns |  0.93 |    0.05 |      15 B |      - |         - |          NA |
-|          ClassWithLayout | 27.978 ns | 14.215 ns | 0.7792 ns |  1.01 |    0.04 |      15 B |      - |         - |          NA |
-|           ClassGenerated | 29.559 ns | 40.078 ns | 2.1968 ns |  1.06 |    0.10 |      15 B |      - |         - |          NA |
-|                   Struct | 10.400 ns |  5.393 ns | 0.2956 ns |  0.37 |    0.00 |     260 B | 0.0057 |      24 B |          NA |
-|         StructWithLayout |  9.895 ns |  4.774 ns | 0.2617 ns |  0.36 |    0.00 |     236 B | 0.0057 |      24 B |          NA |
-| StructWithLayoutNoBoxing |  3.529 ns | 13.204 ns | 0.7237 ns |  0.13 |    0.02 |     137 B |      - |         - |          NA |
-|          StructGenerated |  2.372 ns |  2.020 ns | 0.1107 ns |  0.09 |    0.01 |     137 B |      - |         - |          NA |
+|                       Method |      Mean |     Error |    StdDev | Ratio | RatioSD | Allocated | Alloc Ratio |
+|----------------------------- |----------:|----------:|----------:|------:|--------:|----------:|------------:|
+|                        Class |  6.758 ns | 0.5807 ns | 0.0318 ns |  1.00 |    0.00 |         - |          NA |
+|                  ClassSealed |  6.731 ns | 0.7423 ns | 0.0407 ns |  1.00 |    0.01 |         - |          NA |
+|                       Struct | 12.645 ns | 2.8756 ns | 0.1576 ns |  1.87 |    0.02 |         - |          NA |
+|               StructReadonly | 12.605 ns | 1.5499 ns | 0.0850 ns |  1.87 |    0.01 |         - |          NA |
+|         StructExplicitLayout |  2.465 ns | 0.1746 ns | 0.0096 ns |  0.36 |    0.00 |         - |          NA |
+| StructReadonlyExplicitLayout |  2.315 ns | 0.7554 ns | 0.0414 ns |  0.34 |    0.01 |         - |          NA |
 
 ## ReadValue
 ``` ini
@@ -51,20 +49,20 @@ BenchmarkDotNet=v0.13.4, OS=Windows 11 (10.0.22621.1105)
 Intel Core i7-1065G7 CPU 1.30GHz, 1 CPU, 8 logical and 4 physical cores
 .NET SDK=7.0.102
   [Host]     : .NET 7.0.2 (7.0.222.60605), X64 RyuJIT AVX2
-  Job-ICEOHC : .NET 7.0.2 (7.0.222.60605), X64 RyuJIT AVX2
+  Job-RVTMNA : .NET 7.0.2 (7.0.222.60605), X64 RyuJIT AVX2
 
 Runtime=.NET 7.0  Toolchain=net7.0  IterationCount=3  
 LaunchCount=1  WarmupCount=3  
 
 ```
-|           Method |      Mean |     Error |    StdDev | Ratio | RatioSD | Code Size | Allocated | Alloc Ratio |
-|----------------- |----------:|----------:|----------:|------:|--------:|----------:|----------:|------------:|
-|            Class | 1.5325 ns | 0.9072 ns | 0.0497 ns |  1.00 |    0.00 |      91 B |         - |          NA |
-|  ClassWithLayout | 1.6101 ns | 1.4895 ns | 0.0816 ns |  1.05 |    0.03 |      92 B |         - |          NA |
-|   ClassGenerated | 1.9662 ns | 3.0406 ns | 0.1667 ns |  1.28 |    0.08 |      91 B |         - |          NA |
-|           Struct | 2.2471 ns | 5.4308 ns | 0.2977 ns |  1.47 |    0.18 |     132 B |         - |          NA |
-| StructWithLayout | 0.1461 ns | 0.0257 ns | 0.0014 ns |  0.10 |    0.00 |      90 B |         - |          NA |
-|  StructGenerated | 0.1754 ns | 0.3844 ns | 0.0211 ns |  0.11 |    0.02 |      90 B |         - |          NA |
+|                       Method |     Mean |     Error |    StdDev | Ratio | RatioSD | Allocated | Alloc Ratio |
+|----------------------------- |---------:|----------:|----------:|------:|--------:|----------:|------------:|
+|                        Class | 1.674 ns | 0.2215 ns | 0.0121 ns |  1.00 |    0.00 |         - |          NA |
+|                  ClassSealed | 1.675 ns | 0.8915 ns | 0.0489 ns |  1.00 |    0.02 |         - |          NA |
+|                       Struct | 6.576 ns | 1.2893 ns | 0.0707 ns |  3.93 |    0.05 |         - |          NA |
+|               StructReadonly | 6.749 ns | 2.4536 ns | 0.1345 ns |  4.03 |    0.07 |         - |          NA |
+|         StructExplicitLayout | 1.727 ns | 1.0336 ns | 0.0567 ns |  1.03 |    0.03 |         - |          NA |
+| StructReadonlyExplicitLayout | 1.636 ns | 0.1580 ns | 0.0087 ns |  0.98 |    0.01 |         - |          NA |
 
 ## ToString
 ``` ini
@@ -73,20 +71,18 @@ BenchmarkDotNet=v0.13.4, OS=Windows 11 (10.0.22621.1105)
 Intel Core i7-1065G7 CPU 1.30GHz, 1 CPU, 8 logical and 4 physical cores
 .NET SDK=7.0.102
   [Host]     : .NET 7.0.2 (7.0.222.60605), X64 RyuJIT AVX2
-  Job-CXIHIO : .NET 7.0.2 (7.0.222.60605), X64 RyuJIT AVX2
+  Job-PKSHPT : .NET 7.0.2 (7.0.222.60605), X64 RyuJIT AVX2
 
 Runtime=.NET 7.0  Toolchain=net7.0  IterationCount=3  
 LaunchCount=1  WarmupCount=3  
 
 ```
-|                   Method |     Mean |     Error |  StdDev | Ratio | RatioSD | Code Size |   Gen0 | Allocated | Alloc Ratio |
-|------------------------- |---------:|----------:|--------:|------:|--------:|----------:|-------:|----------:|------------:|
-|                    Class | 258.5 ns |  64.96 ns | 3.56 ns |  1.00 |    0.00 |      15 B | 0.1507 |     632 B |        1.00 |
-|            ClassNoBoxing | 213.9 ns |  71.34 ns | 3.91 ns |  0.83 |    0.02 |      15 B | 0.1507 |     632 B |        1.00 |
-|          ClassWithLayout | 213.2 ns |  51.93 ns | 2.85 ns |  0.82 |    0.01 |      15 B | 0.1509 |     632 B |        1.00 |
-|           ClassGenerated | 132.2 ns |  62.16 ns | 3.41 ns |  0.51 |    0.01 |      15 B | 0.1128 |     472 B |        0.75 |
-|                   Struct | 238.8 ns |  85.52 ns | 4.69 ns |  0.92 |    0.03 |     436 B | 0.1564 |     656 B |        1.04 |
-|         StructWithLayout | 227.1 ns | 167.14 ns | 9.16 ns |  0.88 |    0.03 |     424 B | 0.1564 |     656 B |        1.04 |
-| StructWithLayoutNoBoxing | 224.9 ns |  73.94 ns | 4.05 ns |  0.87 |    0.01 |   1,256 B | 0.1509 |     632 B |        1.00 |
-|          StructGenerated | 136.3 ns | 102.42 ns | 5.61 ns |  0.53 |    0.02 |     156 B | 0.1147 |     480 B |        0.76 |
+|                       Method |     Mean |     Error |   StdDev | Ratio |   Gen0 | Allocated | Alloc Ratio |
+|----------------------------- |---------:|----------:|---------:|------:|-------:|----------:|------------:|
+|                        Class | 95.39 ns | 10.200 ns | 0.559 ns |  1.00 | 0.1128 |     472 B |        1.00 |
+|                  ClassSealed | 90.89 ns |  7.331 ns | 0.402 ns |  0.95 | 0.1128 |     472 B |        1.00 |
+|                       Struct | 99.57 ns | 10.057 ns | 0.551 ns |  1.04 | 0.1128 |     472 B |        1.00 |
+|               StructReadonly | 98.63 ns | 17.335 ns | 0.950 ns |  1.03 | 0.1128 |     472 B |        1.00 |
+|         StructExplicitLayout | 94.54 ns |  5.686 ns | 0.312 ns |  0.99 | 0.1147 |     480 B |        1.02 |
+| StructReadonlyExplicitLayout | 95.61 ns | 11.132 ns | 0.610 ns |  1.00 | 0.1147 |     480 B |        1.02 |
 

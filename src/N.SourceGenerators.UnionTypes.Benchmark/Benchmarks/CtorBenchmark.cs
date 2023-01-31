@@ -5,30 +5,29 @@ using N.SourceGenerators.UnionTypes.Benchmark.Models;
 namespace N.SourceGenerators.UnionTypes.Benchmark.Benchmarks;
 
 [MemoryDiagnoser]
-[DisassemblyDiagnoser]
 public class CtorBenchmark
 {
     [Benchmark(Baseline = true)]
-    public ClassUnion Class() =>
-        new ClassUnion(new ValidationError("something went wrong"));
-
-    [Benchmark]
-    public ClassUnionWithLayout ClassWithLayout() =>
-        new ClassUnionWithLayout(new ValidationError("something went wrong"));
+    public Class Class() 
+        => new Class(new ValidationError(42));
     
     [Benchmark]
-    public ClassGenerated ClassGenerated() =>
-        new ClassGenerated(new ValidationError("something went wrong"));
+    public ClassSealed ClassSealed() 
+        => new ClassSealed(new ValidationError(42));
     
     [Benchmark]
-    public StructUnion Struct() =>
-        new StructUnion(new ValidationErrorStruct(42));
-
-    [Benchmark]
-    public StructUnionWithLayout StructWithLayout() =>
-        new StructUnionWithLayout(new ValidationErrorStruct(42));
+    public Struct Struct() 
+        => new Struct(new ValidationError(42));
     
     [Benchmark]
-    public StructGenerated StructGenerated() =>
-        new StructGenerated(new ValidationErrorStruct(42));
+    public StructReadonly StructReadonly() 
+        => new StructReadonly(new ValidationError(42));
+    
+    [Benchmark]
+    public StructExplicitLayout StructExplicitLayout() 
+        => new StructExplicitLayout(new ValidationErrorStruct(42));
+    
+    [Benchmark]
+    public StructReadonlyExplicitLayout StructReadonlyExplicitLayout() 
+        => new StructReadonlyExplicitLayout(new ValidationErrorStruct(42));
 }
