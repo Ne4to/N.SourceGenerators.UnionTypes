@@ -1,6 +1,6 @@
 [CmdletBinding()]
 param (
-    [ValidateSet('All', 'Ctor', 'ReadValue', 'Hash', 'ToString')]
+    [ValidateSet('All', 'Ctor', 'ReadValue', 'GetHashCode', 'ToString')]
     [string]$Mode
 )
 

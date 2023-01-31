@@ -8,6 +8,6 @@ public record struct NotFoundErrorStruct;
 
 public record Success(int Value);
 
-public record ValidationError(string Message);
+public record ValidationError(int ErrorCode);
 
 public record NotFoundError;
