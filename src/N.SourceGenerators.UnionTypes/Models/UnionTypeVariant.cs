@@ -1,4 +1,5 @@
-﻿using System.Text;
+﻿using System.Reflection;
+using System.Text;
 
 using N.SourceGenerators.UnionTypes.Extensions;
 
@@ -6,16 +7,19 @@ namespace N.SourceGenerators.UnionTypes.Models;
 
 internal class UnionTypeVariant
 {
+    private static readonly ISet<string> Keywords = GetKeywords();
+
     public string Alias { get; }
     public int Order { get; }
-
     public string TypeFullName { get; }
     public string FieldName { get; }
+    public string ParameterName { get; }
     public string IsPropertyName { get; }
     public string AsPropertyName { get; }
-    public bool IsValueType { get; }
     public string IdConstName { get; }
+    public bool IsValueType { get; }
     public int IdConstValue { get; internal set; }
+    public bool IsInterface { get; }
 
     public UnionTypeVariant(ITypeSymbol typeSymbol, string? alias, int order)
     {
@@ -24,10 +28,28 @@ internal class UnionTypeVariant
 
         TypeFullName = typeSymbol.GetFullyQualifiedName();
         FieldName = $"_{ToStartLowerCase(Alias)}";
+        ParameterName = ToStartLowerCase(Alias);
+        if (Keywords.Contains(ParameterName))
+        {
+            ParameterName = '@' + ParameterName;
+        }
+
         IsPropertyName = $"Is{Alias}";
         AsPropertyName = $"As{Alias}";
-        IsValueType = typeSymbol.IsValueType;
         IdConstName = $"{Alias}Id";
+        IsValueType = typeSymbol.IsValueType;
+        IsInterface = typeSymbol is { IsReferenceType: true, BaseType: null };
+    }
+
+    private static HashSet<string> GetKeywords()
+    {
+        var memberInfos = typeof(SyntaxKind).GetMembers(BindingFlags.Public | BindingFlags.Static);
+        var keywords = from memberInfo in memberInfos
+            where memberInfo.Name.EndsWith("Keyword")
+            let keyword = memberInfo.Name.Substring(0, memberInfo.Name.Length - "Keyword".Length)
+            select keyword.ToLower();
+
+        return new HashSet<string>(keywords, StringComparer.Ordinal);
     }
 
     private static string GetAlias(ITypeSymbol type)
@@ -63,6 +85,7 @@ internal class UnionTypeVariant
             {
                 sb.Append("And");
             }
+
             sb.Append(ToStartUpperCase(argument.ToDisplayString(SymbolDisplayFormat.MinimallyQualifiedFormat)));
         }
 

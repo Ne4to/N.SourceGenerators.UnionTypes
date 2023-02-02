@@ -23,7 +23,8 @@ public static class TestHelper
         CSharpCompilation compilation = CSharpCompilation.Create(
             assemblyName: "Tests",
             syntaxTrees: new[] { syntaxTree },
-            references);
+            references,
+            new CSharpCompilationOptions(OutputKind.DynamicallyLinkedLibrary));
 
         // Create an instance of our EnumGenerator incremental source generator
         var generator = new TGenerator();
@@ -32,7 +33,16 @@ public static class TestHelper
         GeneratorDriver driver = CSharpGeneratorDriver.Create(generator);
 
         // Run the source generator!
-        driver = driver.RunGenerators(compilation);
+        driver = driver.RunGeneratorsAndUpdateCompilation(compilation, out var outputCompilation, out var diagnostics);
+
+        // check code can be compiled
+        foreach (var diagnostic in outputCompilation.GetDiagnostics())
+        {
+            if (diagnostic.DefaultSeverity == DiagnosticSeverity.Error)
+            {
+                throw new InvalidOperationException(diagnostic.ToString());
+            }
+        }
 
         // Use verify to snapshot test the source generator output!
         SettingsTask settingsTask = Verifier
