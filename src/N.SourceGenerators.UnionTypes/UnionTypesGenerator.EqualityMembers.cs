@@ -109,6 +109,12 @@ public partial class UnionTypesGenerator
 
             foreach (UnionTypeVariant variant in unionType.Variants)
             {
+                MemberAccessExpressionSyntax memberAccess = MemberAccess("other", variant.FieldName);
+                if (variant.IsValueType && !unionType.UseStructLayout)
+                {
+                    memberAccess = MemberAccess(memberAccess, "Value");
+                }
+                
                 yield return IfStatement(
                     IsPropertyCondition(unionType, variant),
                     ReturnStatement(
@@ -117,14 +123,14 @@ public partial class UnionTypesGenerator
                                 SyntaxKind.SimpleMemberAccessExpression,
                                 MemberAccessExpression(
                                     SyntaxKind.SimpleMemberAccessExpression,
-                                    GenericType("EqualityComparer", variant.TypeFullName),
+                                    GenericType("System.Collections.Generic.EqualityComparer", variant.TypeFullName),
                                     IdentifierName("Default")
                                 ),
                                 IdentifierName("Equals")
                             )
                         ).AddArgumentListArguments(
-                            Argument(IdentifierName(variant.FieldName)),
-                            Argument(MemberAccess("other", variant.FieldName))
+                            Argument(NotNullableArgumentExpression(unionType, variant)),
+                            Argument(memberAccess)
                         )
                     )
                 );

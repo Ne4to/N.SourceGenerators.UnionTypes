@@ -89,6 +89,16 @@ public void TryGetValue()
     }
 }
 ```
+Alias for each variant is generated based on type name. Use alias parameter to override it.
+```csharp
+[UnionType(typeof(int))]
+[UnionType(typeof(string))]
+// default alias is 'ArrayOfTupleOfIntAndString' but it is overriden by alias parameter
+[UnionType(typeof(Tuple<int,string>[]), alias: "Items")]
+public partial class AliasResult
+{
+}
+```
 Match and MatchAsync methods are used to convert union type to another type. These methods force you to handle all possible variations.
 ```csharp
 public IActionResult MatchMethod(FooResult result)

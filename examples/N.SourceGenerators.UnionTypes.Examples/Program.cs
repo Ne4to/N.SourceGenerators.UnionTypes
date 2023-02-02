@@ -42,6 +42,14 @@ public partial struct ResultStructLayout
 {
 }
 
+[UnionType(typeof(int))]
+[UnionType(typeof(string))]
+// default alias is 'ArrayOfTupleOfIntAndString' but it is overriden by alias parameter
+[UnionType(typeof(Tuple<int,string>[]), alias: "Items")]
+public partial class AliasResult
+{
+}
+
 class Bar
 {
     public FooResult ImplicitReturn()

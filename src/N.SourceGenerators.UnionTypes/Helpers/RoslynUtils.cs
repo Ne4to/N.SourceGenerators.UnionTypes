@@ -7,7 +7,7 @@ internal static class RoslynUtils
     private static ObjectCreationExpressionSyntax NewInvalidOperationException(ExpressionSyntax expression)
     {
         return ObjectCreationExpression(
-                IdentifierName("InvalidOperationException")
+                IdentifierName("System.InvalidOperationException")
             )
             .AddArgumentListArguments(
                 Argument(expression)
@@ -35,9 +35,14 @@ internal static class RoslynUtils
 
     public static MemberAccessExpressionSyntax MemberAccess(string expression, string name)
     {
+        return MemberAccess(IdentifierName(expression), name);
+    }
+    
+    public static MemberAccessExpressionSyntax MemberAccess(ExpressionSyntax expression, string name)
+    {
         return MemberAccessExpression(
             SyntaxKind.SimpleMemberAccessExpression,
-            IdentifierName(expression),
+            expression,
             IdentifierName(name)
         );
     }

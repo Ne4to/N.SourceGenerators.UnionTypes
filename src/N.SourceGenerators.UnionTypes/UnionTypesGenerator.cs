@@ -74,7 +74,6 @@ public partial class UnionTypesGenerator : IIncrementalGenerator
                 {
                     ct.ThrowIfCancellationRequested();
 
-                    // TODO add enum LanguageFeatures { GenericAttributes (CSharp11) }
                     if (!ctx.SemanticModel.Compilation.HasLanguageVersionAtLeastEqualTo(LanguageVersion.CSharp8))
                     {
                         return default;
@@ -167,7 +166,7 @@ public partial class UnionTypesGenerator : IIncrementalGenerator
                         new BaseTypeSyntax[]
                         {
                             SimpleBaseType(
-                                GenericType("IEquatable", unionType.Name)
+                                GenericType("System.IEquatable", unionType.Name)
                             )
                         }
                     )
@@ -280,8 +279,12 @@ public partial class UnionTypesGenerator : IIncrementalGenerator
             : AsProperty(variant);
 
         yield return Ctor(unionType, variant);
-        yield return ImplicitOperatorToUnion(unionType, variant);
-        yield return ExplicitOperatorFromUnion(unionType, variant);
+        if (!variant.IsInterface)
+        {
+            yield return ImplicitOperatorToUnion(unionType, variant);
+            yield return ExplicitOperatorFromUnion(unionType, variant);
+        }
+
         yield return TryGetMethod(unionType, variant);
     }
 
@@ -416,23 +419,23 @@ public partial class UnionTypesGenerator : IIncrementalGenerator
                 MemberAccess("System.ArgumentNullException", "ThrowIfNull")
             )
             .AddArgumentListArguments(
-                Argument(IdentifierName(variant.Alias))
+                Argument(IdentifierName(variant.ParameterName))
             );
 
         AssignmentExpressionSyntax assignmentExpression = AssignmentExpression(
             SyntaxKind.SimpleAssignmentExpression,
             IdentifierName(variant.FieldName),
-            IdentifierName(variant.Alias));
+            IdentifierName(variant.ParameterName));
 
         return ConstructorDeclaration(Identifier(unionType.Name))
             .AddModifiers(Token(SyntaxKind.PublicKeyword))
             .AddParameterListParameters(
-                Parameter(Identifier(variant.Alias))
+                Parameter(Identifier(variant.ParameterName))
                     .WithType(IdentifierName(variant.TypeFullName))
             )
-            .AddBodyStatementsWhen(!variant.IsValueType, ExpressionStatement(checkArgumentExpression))
+            .AddBodyStatementsWhen(!unionType.UseStructLayout, ExpressionStatement(checkArgumentExpression))
             .AddBodyStatementsWhen(
-                variant.IsValueType,
+                unionType.UseStructLayout,
                 ExpressionStatement(AssignmentExpression(
                     SyntaxKind.SimpleAssignmentExpression,
                     IdentifierName(VariantIdFieldName),
@@ -454,14 +457,14 @@ public partial class UnionTypesGenerator : IIncrementalGenerator
                 Token(SyntaxKind.StaticKeyword)
             )
             .AddParameterListParameters(
-                Parameter(Identifier(variant.Alias))
+                Parameter(Identifier(variant.ParameterName))
                     .WithType(IdentifierName(variant.TypeFullName))
             )
             .WithExpressionBody(
                 ArrowExpressionClause(
                     ObjectCreationExpression(IdentifierName(unionType.Name))
                         .AddArgumentListArguments(
-                            Argument(IdentifierName(variant.Alias))
+                            Argument(IdentifierName(variant.ParameterName))
                         )
                 ))
             .WithSemicolonToken(Token(SyntaxKind.SemicolonToken));
@@ -586,17 +589,29 @@ public partial class UnionTypesGenerator : IIncrementalGenerator
 
     private static StatementSyntax MatchStatement(UnionType unionType, UnionTypeVariant variant, bool isAsync)
     {
+        var argumentExpression = NotNullableArgumentExpression(unionType, variant);
+
         return IfStatement(
             IsPropertyCondition(unionType, variant),
             ReturnStatement(
                 InvocationExpression(IdentifierName($"match{variant.Alias}"))
                     .AddArgumentListArguments(
-                        Argument(IdentifierName(variant.FieldName))
+                        Argument(argumentExpression)
                     )
                     .AddArgumentListArgumentWhen(isAsync, Argument(IdentifierName("ct")))
                     .AwaitWithConfigureAwaitWhen(isAsync)
             )
         );
+    }
+
+    private static ExpressionSyntax NotNullableArgumentExpression(UnionType unionType, UnionTypeVariant variant)
+    {
+        return unionType.UseStructLayout
+            ? IdentifierName(variant.FieldName)
+            : variant.IsValueType
+                ? MemberAccess(variant.FieldName, "Value")
+                : PostfixUnaryExpression(SyntaxKind.SuppressNullableWarningExpression,
+                    IdentifierName(variant.FieldName));
     }
 
     private static MemberDeclarationSyntax SwitchMethod(UnionType unionType, bool isAsync)
@@ -640,13 +655,15 @@ public partial class UnionTypesGenerator : IIncrementalGenerator
 
     private static StatementSyntax SwitchStatement(UnionType unionType, UnionTypeVariant variant, bool isAsync)
     {
+        var argumentExpression = NotNullableArgumentExpression(unionType, variant);
+
         return IfStatement(
             IsPropertyCondition(unionType, variant),
             Block(
                 ExpressionStatement(
                     InvocationExpression(IdentifierName($"switch{variant.Alias}"))
                         .AddArgumentListArguments(
-                            Argument(IdentifierName(variant.FieldName))
+                            Argument(argumentExpression)
                         )
                         .AddArgumentListArgumentWhen(isAsync, Argument(IdentifierName("ct")))
                         .AwaitWithConfigureAwaitWhen(isAsync)),
