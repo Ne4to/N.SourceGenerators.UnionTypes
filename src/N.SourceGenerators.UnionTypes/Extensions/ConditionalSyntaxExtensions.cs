@@ -95,4 +95,24 @@ internal static class ConditionalSyntaxExtensions
             ? syntax.AddBodyStatements(items)
             : syntax;
     }
+    
+    public static TypeDeclarationSyntax AddModifiersWhen(
+        this TypeDeclarationSyntax syntax,
+        bool condition,
+        params SyntaxToken[] items)
+    {
+        return condition
+            ? syntax.AddModifiers(items)
+            : syntax;
+    }
+
+    public static ParameterSyntax AddModifiersWhen(
+        this ParameterSyntax syntax,
+        bool condition,
+        params SyntaxToken[] items)
+    {
+        return condition
+            ? syntax.AddModifiers(items)
+            : syntax;
+    }
 }

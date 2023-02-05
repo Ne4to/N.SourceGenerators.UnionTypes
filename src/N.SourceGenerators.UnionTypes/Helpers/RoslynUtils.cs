@@ -2,7 +2,10 @@
 
 internal static class RoslynUtils
 {
+    public const string FuncType = "global::System.Func";
+    public const string ActionType = "global::System.Action";
     public const string TaskType = "global::System.Threading.Tasks.Task";
+    public const string CancellationTokenType = "global::System.Threading.CancellationToken";
 
     private static ObjectCreationExpressionSyntax NewInvalidOperationException(ExpressionSyntax expression)
     {

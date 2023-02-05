@@ -40,7 +40,7 @@ public static class TestHelper
         {
             if (diagnostic.DefaultSeverity == DiagnosticSeverity.Error)
             {
-                throw new InvalidOperationException(diagnostic.ToString());
+                throw new InvalidOperationException($"Compilation error: {diagnostic}");
             }
         }
 

@@ -36,73 +36,76 @@ public partial class UnionTypesGenerator
         category: "UnionTypesGenerator",
         DiagnosticSeverity.Warning,
         isEnabledByDefault: true);
+    
+    private static readonly DiagnosticDescriptor CantConvertWarning = new(
+        id: "UTGEN005",
+        title: "Union type cannot be converted to another",
+        messageFormat: "Union type '{0}' cannot be converter to '{1}' because target type doesn't have '{2}' variation",
+        category: "UnionTypesGenerator",
+        DiagnosticSeverity.Warning,
+        isEnabledByDefault: true);
 
-    private static IncrementalValuesProvider<UnionTypeDiagnostics> GetUnionTypeDiagnostics(
-        IncrementalValuesProvider<UnionTypeReference> unionTypeReferences)
+    private static IncrementalValuesProvider<ValueDiagnostics<UnionType>> GetUnionTypeDiagnostics(
+        IncrementalValuesProvider<UnionType> unionTypes)
     {
-        return unionTypeReferences
-            .Select((utr, ct) =>
+        return unionTypes
+            .Select((unionType, ct) =>
             {
                 ct.ThrowIfCancellationRequested();
 
                 List<Diagnostic> diagnostics = new();
 
-                AddTypeIsNotPartialDiagnostic(utr, diagnostics);
+                AddTypeIsNotPartialDiagnostic(unionType, diagnostics);
 
-                diagnostics.AddRange(GetDiagnostics(utr, v => v.TypeFullName, VariantDuplicateTypeWarning));
-                diagnostics.AddRange(GetDiagnostics(utr, v => v.Alias, VariantDuplicateAliasWarning));
-                diagnostics.AddRange(GetDiagnostics(utr, v => v.Order, VariantDuplicateOrderWarning));
+                var duplicateDiagnostics =
+                    GetDiagnostics(unionType, v => v.TypeFullName, VariantDuplicateTypeWarning)
+                        .Concat(GetDiagnostics(unionType, v => v.Alias, VariantDuplicateAliasWarning))
+                        .Concat(GetDiagnostics(unionType, v => v.Order, VariantDuplicateOrderWarning));
 
-                return new UnionTypeDiagnostics(utr.Type, diagnostics);
+                diagnostics.AddRange(duplicateDiagnostics);
+
+                return new ValueDiagnostics<UnionType>(unionType, diagnostics);
             });
 
-        void AddTypeIsNotPartialDiagnostic(UnionTypeReference utr, List<Diagnostic> diagnostics)
+        void AddTypeIsNotPartialDiagnostic(UnionType unionType, List<Diagnostic> diagnostics)
         {
-            if (utr.Reference.Syntax.IsPartial())
+            if (unionType.IsPartial)
             {
                 return;
             }
 
-            Diagnostic typeIsNotPartialDiagnostic = Diagnostic.Create(
+            Diagnostic typeIsNotPartialDiagnostic = unionType.CreateDiagnostic(
                 TypeIsNotPartialWarning,
-                GetLocation(utr.Reference),
-                utr.Reference.Symbol.Name);
+                unionType.Name);
 
             diagnostics.Add(typeIsNotPartialDiagnostic);
         }
     }
 
     private static IEnumerable<Diagnostic> GetDiagnostics<T>(
-        UnionTypeReference utr,
+        UnionType unionType,
         Func<UnionTypeVariant, T> selector,
         DiagnosticDescriptor descriptor)
     {
-        return utr
-            .Type
+        return unionType
             .Variants
             .GroupBy(selector)
             .Where(grp => grp.Count() > 1)
-            .Select(grp => Diagnostic.Create(
+            .Select(grp => unionType.CreateDiagnostic(
                 descriptor,
-                GetLocation(utr.Reference),
-                utr.Reference.Symbol.Name,
+                unionType.Name,
                 grp.Key
             ));
     }
 
-    private static void ReportDiagnostics(
+    private static void ReportDiagnostics<T>(
         IncrementalGeneratorInitializationContext context,
-        IncrementalValuesProvider<UnionTypeDiagnostics> unionTypeDiagnostics)
+        IncrementalValuesProvider<ValueDiagnostics<T>> valueDiagnostics)
     {
         context.ReportDiagnostics(
-            unionTypeDiagnostics
+            valueDiagnostics
                 .Where(utd => utd.Diagnostics.Count != 0)
                 .SelectMany((utd, _) => utd.Diagnostics)
         );
-    }
-
-    private static Location GetLocation(UnionReference r)
-    {
-        return Location.Create(r.Syntax.SyntaxTree, r.Syntax.GetLocation().SourceSpan);
     }
 }

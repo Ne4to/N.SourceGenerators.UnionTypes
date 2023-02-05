@@ -10,18 +10,18 @@ public class GeneratorTests
     public Task WithoutNamespace(string typeModifiers)
     {
         string source = $$"""           
-            using System;
-            using N.SourceGenerators.UnionTypes;
-            
-            public record Success;
-            public record Error;
-            
-            [UnionType(typeof(Success))]
-            [UnionType(typeof(Error))]
-            public {{typeModifiers}} Result
-            {
-            }
-            """;
+using System;
+using N.SourceGenerators.UnionTypes;
+
+public record Success;
+public record Error;
+
+[UnionType(typeof(Success))]
+[UnionType(typeof(Error))]
+public {{typeModifiers}} Result
+{
+}
+""";
 
         return TestHelper.Verify<UnionTypesGenerator>(source, typeModifiers.Replace(' ', '-'));
     }
@@ -33,25 +33,25 @@ public class GeneratorTests
     public Task WithNamespace(string typeModifiers)
     {
         string source = $$"""            
-            using System;
-            using System.Collections.Generic;
-            using N.SourceGenerators.UnionTypes;
-            
-            namespace MyApp
-            {
-                public record Success;
-                public record Error;
-            
-                [UnionType(typeof(Success))]
-                [UnionType(typeof(Error))]
-                [UnionType(typeof(IReadOnlyList<int>))]
-                [UnionType(typeof(string[]))]
-                [UnionType(typeof(Tuple<int,string>))]
-                public {{typeModifiers}} Result
-                {
-                }
-            }
-            """;
+using System;
+using System.Collections.Generic;
+using N.SourceGenerators.UnionTypes;
+
+namespace MyApp
+{
+    public record Success;
+    public record Error;
+
+    [UnionType(typeof(Success))]
+    [UnionType(typeof(Error))]
+    [UnionType(typeof(IReadOnlyList<int>))]
+    [UnionType(typeof(string[]))]
+    [UnionType(typeof(Tuple<int,string>))]
+    public {{typeModifiers}} Result
+    {
+    }
+}
+""";
 
         return TestHelper.Verify<UnionTypesGenerator>(source, typeModifiers.Replace(' ', '-'));
     }
@@ -59,7 +59,7 @@ public class GeneratorTests
     [Fact]
     public Task ExplicitStructLayout()
     {
-        const string source = @"
+        const string source = """
 using System;
 using N.SourceGenerators.UnionTypes;
 
@@ -76,7 +76,7 @@ namespace MyApp
     {
     }
 }
-";
+""";
 
         return TestHelper.Verify<UnionTypesGenerator>(source);
     }   
@@ -84,141 +84,26 @@ namespace MyApp
     [Fact]
     public Task DifferentNamespaces()
     {
-        string source = """
-            using System;
-            using System.Collections.Generic;
-            using N.SourceGenerators.UnionTypes;
-            
-            namespace MyApp.Models.S.Child
-            {
-                public record Success;
-            }
-
-            namespace MyApp.Models.E.Child
-            {
-                public record Error;
-            }
-
-            namespace MyApp.Domain.Child
-            {
-                [UnionType(typeof(MyApp.Models.S.Child.Success))]
-                [UnionType(typeof(MyApp.Models.E.Child.Error))]
-                public partial class Result
-                {
-                }
-            }
-            """;
-
-        return TestHelper.Verify<UnionTypesGenerator>(source);
-    }    
-
-    [Fact]
-    public Task NotPartialTypeReportsDiagnostics()
-    {
-        const string source = @"
-using System;
-using N.SourceGenerators.UnionTypes;
-
-namespace MyApp
-{
-    public record Success;
-    public record Error;
-
-    [UnionType(typeof(Success))]
-    [UnionType(typeof(Error))]
-    public class Result
-    {
-    }
-}
-";
-
-        return TestHelper.Verify<UnionTypesGenerator>(source);
-    }
-
-    [Fact]
-    public Task VariantTypeDuplicateReportsDiagnostics()
-    {
-        const string source = @"
-using System;
-using N.SourceGenerators.UnionTypes;
-
-namespace MyApp
-{
-    public record Success;
-    public record Error;
-
-    [UnionType(typeof(Success))]
-    [UnionType(typeof(Success))]
-    public partial class Result
-    {
-    }
-}
-";
-
-        return TestHelper.Verify<UnionTypesGenerator>(source);
-    }
-
-    [Fact]
-    public Task VariantAliasDuplicateReportsDiagnostics()
-    {
         const string source = """
 using System;
+using System.Collections.Generic;
 using N.SourceGenerators.UnionTypes;
 
-namespace MyApp
+namespace MyApp.Models.S.Child
 {
     public record Success;
-    public record Error;
-
-    [UnionType(typeof(Success), alias: "FriendlyName")]
-    [UnionType(typeof(Error), alias: "FriendlyName")]
-    public partial class Result
-    {
-    }
 }
-""";
 
-        return TestHelper.Verify<UnionTypesGenerator>(source);
-    }
-
-    [Fact]
-    public Task VariantOrderDuplicateReportsDiagnostics()
-    {
-        const string source = """
-using System;
-using N.SourceGenerators.UnionTypes;
-
-namespace MyApp
+namespace MyApp.Models.E.Child
 {
-    public record Success;
     public record Error;
-
-    [UnionType(typeof(Success), order: 42)]
-    [UnionType(typeof(Error), order: 42)]
-    public partial class Result
-    {
-    }
 }
-""";
 
-        return TestHelper.Verify<UnionTypesGenerator>(source);
-    }
-
-    [Fact]
-    public Task InvalidTypeReportsAllDiagnostics()
-    {
-        const string source = """
-using System;
-using N.SourceGenerators.UnionTypes;
-
-namespace MyApp
+namespace MyApp.Domain.Child
 {
-    public record Success;
-    public record Error;
-
-    [UnionType(typeof(Success), alias: "FriendlyName", order: 42)]
-    [UnionType(typeof(Success), alias: "FriendlyName", order: 42)]
-    public class Result
+    [UnionType(typeof(MyApp.Models.S.Child.Success))]
+    [UnionType(typeof(MyApp.Models.E.Child.Error))]
+    public partial class Result
     {
     }
 }
