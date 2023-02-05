@@ -50,6 +50,56 @@ public partial class AliasResult
 {
 }
 
+[UnionType(typeof(Success))]
+[UnionType(typeof(NotFoundError))]
+[UnionType(typeof(ValidationError))]
+// [UnionConverterFrom(typeof(DataAccessResult))]
+public partial class BusinessLogicResult
+{
+}
+
+[UnionType(typeof(Success))]
+[UnionType(typeof(NotFoundError))]
+[UnionConverterTo(typeof(BusinessLogicResult))]
+public partial class DataAccessResult
+{
+}
+
+[UnionConverter(typeof(DataAccessResult), typeof(BusinessLogicResult))]
+public static partial class Converters
+{
+}
+
+public class Repository
+{
+    public DataAccessResult UpdateItem()
+    {
+        return new NotFoundError();
+    }
+}
+
+public class Service
+{
+    private readonly Repository _repository;
+
+    public BusinessLogicResult Update()
+    {
+        var isValid = IsValid();
+        if (!isValid)
+        {
+            return new ValidationError("the item is not valid");
+        }
+        
+        var repositoryResult = _repository.UpdateItem();
+        // implicit conversion DataAccessResult to BusinessLogicResult
+        return repositoryResult;
+        // OR extension method when UnionConverter Attribute is used
+        return repositoryResult.Convert();
+    }
+
+    private bool IsValid() => throw new NotImplementedException();
+}
+
 class Bar
 {
     public FooResult ImplicitReturn()

@@ -45,6 +45,8 @@ public partial class FooResult
 
 All examples can be found in [examples project](https://github.com/Ne4to/N.SourceGenerators.UnionTypes/blob/main/examples/N.SourceGenerators.UnionTypes.Examples/Program.cs)
 
+### Basic
+
 Implicit conversion
 ```csharp
 public FooResult ImplicitReturn()
@@ -99,6 +101,60 @@ public partial class AliasResult
 {
 }
 ```
+
+### Union to union converter
+
+When one union type's variants is subset of another union type's variants use one of the following attributes to convert one type to another: `UnionConverterTo`, `UnionConverterFrom`, or `UnionConverter`.
+
+```csharp
+[UnionConverterFrom(typeof(DataAccessResult))] // use this attribute
+public partial class BusinessLogicResult
+{
+}
+
+[UnionConverterTo(typeof(BusinessLogicResult))] // OR this
+public partial class DataAccessResult
+{
+}
+
+[UnionConverter(typeof(DataAccessResult), typeof(BusinessLogicResult))] // OR this
+public static partial class Converters
+{
+}
+
+public class Repository
+{
+    public DataAccessResult UpdateItem()
+    {
+        return new NotFoundError();
+    }
+}
+
+public class Service
+{
+    private readonly Repository _repository;
+
+    public BusinessLogicResult Update()
+    {
+        var isValid = IsValid();
+        if (!isValid)
+        {
+            return new ValidationError("the item is not valid");
+        }
+
+        var repositoryResult = _repository.UpdateItem();
+        // implicit conversion DataAccessResult to BusinessLogicResult when `UnionConverterTo` or `UnionConverterFrom` attribute is used
+        return repositoryResult;
+        // OR extension method when UnionConverter attribute is used
+        return repositoryResult.Convert();
+    }
+
+    private bool IsValid() => throw new NotImplementedException();
+}
+```
+
+### Handle all variants
+
 Match and MatchAsync methods are used to convert union type to another type. These methods force you to handle all possible variations.
 ```csharp
 public IActionResult MatchMethod(FooResult result)

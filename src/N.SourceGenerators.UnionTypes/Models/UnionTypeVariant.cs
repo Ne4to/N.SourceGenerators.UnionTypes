@@ -27,8 +27,8 @@ internal class UnionTypeVariant
         Order = order;
 
         TypeFullName = typeSymbol.GetFullyQualifiedName();
-        FieldName = $"_{ToStartLowerCase(Alias)}";
-        ParameterName = ToStartLowerCase(Alias);
+        FieldName = $"_{Alias.ToStartLowerCase()}";
+        ParameterName = Alias.ToStartLowerCase();
         if (Keywords.Contains(ParameterName))
         {
             ParameterName = '@' + ParameterName;
@@ -80,35 +80,16 @@ internal class UnionTypeVariant
 
         for (int argumentIndex = 0; argumentIndex < type.TypeArguments.Length; argumentIndex++)
         {
-            ITypeSymbol argument = type.TypeArguments[argumentIndex];
+            ITypeSymbol argumentType = type.TypeArguments[argumentIndex];
             if (argumentIndex > 0)
             {
                 sb.Append("And");
             }
 
-            sb.Append(ToStartUpperCase(argument.ToDisplayString(SymbolDisplayFormat.MinimallyQualifiedFormat)));
+            string argumentTypeName = argumentType.ToDisplayString(SymbolDisplayFormat.MinimallyQualifiedFormat);
+            sb.Append(argumentTypeName.ToStartUpperCase());
         }
 
         return sb.ToString();
-    }
-
-    private static string ToStartLowerCase(string value)
-    {
-        if (char.IsLower(value[0]))
-        {
-            return value;
-        }
-
-        return char.ToLower(value[0]) + value.Substring(1);
-    }
-
-    private static string ToStartUpperCase(string value)
-    {
-        if (char.IsUpper(value[0]))
-        {
-            return value;
-        }
-
-        return char.ToUpper(value[0]) + value.Substring(1);
     }
 }

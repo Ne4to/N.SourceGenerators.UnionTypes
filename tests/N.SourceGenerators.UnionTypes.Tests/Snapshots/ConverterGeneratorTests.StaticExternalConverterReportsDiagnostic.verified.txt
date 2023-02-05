@@ -1,0 +1,16 @@
+﻿{
+  Diagnostics: [
+    {
+      Id: UTGEN005,
+      Title: Union type cannot be converted to another,
+      Severity: Warning,
+      WarningLevel: 1,
+      Location: : (21,4)-(24,5),
+      Description: ,
+      HelpLink: ,
+      MessageFormat: Union type '{0}' cannot be converter to '{1}' because target type doesn't have '{2}' variation,
+      Message: Union type 'DataAccessResult' cannot be converter to 'BusinessLogicResult' because target type doesn't have 'NotFoundError' variation,
+      Category: UnionTypesGenerator
+    }
+  ]
+}
