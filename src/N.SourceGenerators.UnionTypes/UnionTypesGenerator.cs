@@ -115,9 +115,9 @@ public sealed partial class UnionTypesGenerator : IIncrementalGenerator
                 GetHashCodeMethod(unionType),
                 EqualsOperator(unionType, equal: true),
                 EqualsOperator(unionType, equal: false),
-                GenericEqualsMethod(unionType),
-                ToStringMethod(unionType)
+                GenericEqualsMethod(unionType)
             )
+            .AddMembersWhen(!unionType.HasToStringMethod, ToStringMethod(unionType))
             .AddMembersWhen(unionType.IsReferenceType, ClassEqualsMethod(unionType))
             .AddMembersWhen(!unionType.IsReferenceType, StructEqualsMethod(unionType))
             .WithBaseList(
