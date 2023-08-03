@@ -8,6 +8,7 @@ internal class UnionType
     public bool IsPartial { get; }
     public bool IsReferenceType { get; }
     public bool IsValueType { get; }
+    public bool HasToStringMethod { get; }
     public string TypeFullName { get; }
     public string Name { get; }
     public string? Namespace { get; }
@@ -33,6 +34,7 @@ internal class UnionType
 
         IsReferenceType = containerType.IsReferenceType;
         IsValueType = containerType.IsValueType;
+        HasToStringMethod = containerType.GetMembers().Any(IsToStringMethod);
         TypeFullName = containerType.ToDisplayString(SymbolDisplayFormat.FullyQualifiedFormat);
         Name = containerType.Name;
         Namespace = containerType.ContainingNamespace.IsGlobalNamespace
@@ -45,6 +47,16 @@ internal class UnionType
             UnionTypeVariant variant = variants[variantIndex];
             variant.IdConstValue = variantIndex + 1;
         }
+    }
+
+    private static bool IsToStringMethod(ISymbol symbol)
+    {
+        return symbol is IMethodSymbol
+        {
+            Name: nameof(ToString),
+            Parameters.Length: 0,
+            ReturnType.SpecialType: SpecialType.System_String
+        };
     }
 
     public Diagnostic CreateDiagnostic(DiagnosticDescriptor descriptor, params object?[]? messageArgs)

@@ -111,4 +111,43 @@ namespace MyApp.Domain.Child
 
         return TestHelper.Verify<UnionTypesGenerator>(source);
     }
+    
+    [Theory]
+    [InlineData("partial class")]
+    [InlineData("partial struct")]
+    [InlineData("readonly partial struct")]
+    public Task DoNotOverrideToString(string typeModifiers)
+    {
+        string source = $$"""            
+using System;
+using System.Collections.Generic;
+using N.SourceGenerators.UnionTypes;
+
+namespace MyApp
+{
+    public record Success;
+    public record Error;
+
+    [UnionType(typeof(Success))]
+    [UnionType(typeof(Error))]
+    [UnionType(typeof(IReadOnlyList<int>))]
+    [UnionType(typeof(string[]))]
+    [UnionType(typeof(Tuple<int,string>))]
+    public {{typeModifiers}} Result
+    {
+        public override string ToString()
+        {
+            return "MyCustomToString";
+        }
+    }
+}
+""";
+
+        return TestHelper.Verify<UnionTypesGenerator>(source, typeModifiers.Replace(' ', '-'));
+    }
+
+    public int ToString(int a)
+    {
+        return 0;
+    }
 }
