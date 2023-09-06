@@ -82,6 +82,12 @@ public class Service
 {
     private readonly Repository _repository;
 
+    public Service(Repository repository)
+    {
+        _repository = repository;
+    }
+
+
     public BusinessLogicResult Update()
     {
         var isValid = IsValid();
@@ -89,12 +95,14 @@ public class Service
         {
             return new ValidationError("the item is not valid");
         }
-        
+
         var repositoryResult = _repository.UpdateItem();
         // implicit conversion DataAccessResult to BusinessLogicResult
         return repositoryResult;
         // OR extension method when UnionConverter Attribute is used
+#pragma warning disable CS0162 // Unreachable code detected
         return repositoryResult.Convert();
+#pragma warning restore CS0162 // Unreachable code detected
     }
 
     private bool IsValid() => throw new NotImplementedException();
@@ -112,7 +120,7 @@ class Bar
     {
         return (ValidationError)result;
     }
-    
+
     public void ValueTypeProperty()
     {
         FooResult foo = GetFoo();
@@ -123,7 +131,7 @@ class Bar
             return new NotFoundError();
         }
     }
-    
+
     public void TryGetValue()
     {
         FooResult foo = GetFoo();
