@@ -2,7 +2,7 @@ name: Push NuGet package
 
 on:
   push:
-    branches: [ main ]
+#    branches: [ main ]
 
 jobs:
   build:
@@ -19,7 +19,11 @@ jobs:
       run: dotnet build --configuration Release --no-restore
     - name: Test
       run: dotnet test --configuration Release --no-build --verbosity normal
-    - name: Pack
-      run: dotnet pack --configuration Release --no-build
+    - name: Pack release
+      if: env.GITHUB_REF_NAME == 'main'
+      run: dotnet pack --configuration Release --no-build      
+    - name: Pack RC
+      if: env.GITHUB_REF_NAME != 'main'
+      run: dotnet pack --configuration Release --no-build --version-suffix "rc.${GITHUB_RUN_NUMBER}"
     - name: Push
       run: dotnet nuget push ./src/N.SourceGenerators.UnionTypes/nupkg/*.nupkg -k ${{ secrets.NUGET_ORG_API_KEY }} -s https://api.nuget.org/v3/index.json --skip-duplicate

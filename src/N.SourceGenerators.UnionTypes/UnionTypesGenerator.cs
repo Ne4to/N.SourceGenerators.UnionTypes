@@ -32,9 +32,13 @@ public sealed partial class UnionTypesGenerator : IIncrementalGenerator
     private static UnionType? GetUnionType(TypedConstant typedConstant)
     {
         var fromTypeSymbol = typedConstant.Value as INamedTypeSymbol;
-        var fromTypeDeclaration = fromTypeSymbol?.DeclaringSyntaxReferences[0].GetSyntax() as TypeDeclarationSyntax;
+        TypeDeclarationSyntax? fromTypeDeclaration = null;
+        if (fromTypeSymbol is { DeclaringSyntaxReferences.IsEmpty: false })
+        {
+            fromTypeDeclaration = fromTypeSymbol.DeclaringSyntaxReferences[0].GetSyntax() as TypeDeclarationSyntax;
+        }
 
-        return fromTypeSymbol != null && fromTypeDeclaration != null
+        return fromTypeSymbol != null
             ? GetUnionType(fromTypeSymbol, fromTypeDeclaration)
             : null;
     }
@@ -58,7 +62,7 @@ public sealed partial class UnionTypesGenerator : IIncrementalGenerator
             .Where(static u => u is not null)!;
     }
 
-    private static UnionType? GetUnionType(INamedTypeSymbol targetSymbol, TypeDeclarationSyntax typeDeclaration)
+    private static UnionType? GetUnionType(INamedTypeSymbol targetSymbol, TypeDeclarationSyntax? typeDeclaration)
     {
         List<UnionTypeVariant>? variants = null;
         foreach (AttributeData attribute in targetSymbol.GetAttributes())

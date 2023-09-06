@@ -1,0 +1,8 @@
+{
+    "profiles": {
+      "Debug Generators": {
+        "commandName": "DebugRoslynComponent",
+        "targetProject": "N.SourceGenerators.UnionTypes.Examples.csproj"
+      }
+    }
+  }

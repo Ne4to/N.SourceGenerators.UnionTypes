@@ -4,7 +4,7 @@ namespace N.SourceGenerators.UnionTypes.Models;
 
 internal class UnionType
 {
-    public Location Location { get; }
+    public Location? Location { get; }
     public bool IsPartial { get; }
     public bool IsReferenceType { get; }
     public bool IsValueType { get; }
@@ -26,11 +26,14 @@ internal class UnionType
     }
 
     public UnionType(INamedTypeSymbol containerType,
-        TypeDeclarationSyntax syntax,
+        TypeDeclarationSyntax? syntax,
         IReadOnlyList<UnionTypeVariant> variants)
     {
-        Location = syntax.GetLocation();
-        IsPartial = syntax.IsPartial();
+        if (syntax != null)
+        {
+            Location = syntax.GetLocation();
+            IsPartial = syntax.IsPartial();
+        }
 
         IsReferenceType = containerType.IsReferenceType;
         IsValueType = containerType.IsValueType;

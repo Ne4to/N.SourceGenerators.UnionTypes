@@ -36,7 +36,7 @@ public partial class UnionTypesGenerator
         category: "UnionTypesGenerator",
         DiagnosticSeverity.Warning,
         isEnabledByDefault: true);
-    
+
     private static readonly DiagnosticDescriptor CantConvertWarning = new(
         id: "UTGEN005",
         title: "Union type cannot be converted to another",
@@ -67,7 +67,7 @@ public partial class UnionTypesGenerator
                 return new ValueDiagnostics<UnionType>(unionType, diagnostics);
             });
 
-        void AddTypeIsNotPartialDiagnostic(UnionType unionType, List<Diagnostic> diagnostics)
+        static void AddTypeIsNotPartialDiagnostic(UnionType unionType, List<Diagnostic> diagnostics)
         {
             if (unionType.IsPartial)
             {

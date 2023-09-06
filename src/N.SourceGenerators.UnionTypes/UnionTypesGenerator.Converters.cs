@@ -209,7 +209,7 @@ public sealed partial class UnionTypesGenerator
     private static bool CanConvert(
         UnionType fromType,
         UnionType toType,
-        Location location,
+        Location? location,
         out Diagnostic? diagnostic)
     {
         foreach (UnionTypeVariant fromVariant in fromType.Variants)
