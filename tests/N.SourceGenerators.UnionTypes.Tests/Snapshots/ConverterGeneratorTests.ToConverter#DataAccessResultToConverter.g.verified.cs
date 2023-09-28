@@ -11,7 +11,7 @@ namespace MyApp
     {
         public static implicit operator BusinessLogicResult(global::MyApp.DataAccessResult value)
         {
-            return value.Match<BusinessLogicResult>(x => x, x => x);
+            return value.Match<BusinessLogicResult>((global::MyApp.Success x) => (BusinessLogicResult)new BusinessLogicResult(x), (global::MyApp.NotFoundError x) => (BusinessLogicResult)new BusinessLogicResult(x));
         }
     }
 }
