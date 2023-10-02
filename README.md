@@ -40,6 +40,19 @@ public partial class FooResult
 {
 }
 ```
+Or you can use generic type.
+```csharp
+[GenericUnionType]
+public partial class OperationDataResult<TResult, TError>
+{
+}
+
+// extend generic type union with additional Int32 type
+[UnionType(typeof(int))]
+public partial class ExtendedOperationDataResult<TResult, TError>
+{
+}
+```
 
 ## Examples
 

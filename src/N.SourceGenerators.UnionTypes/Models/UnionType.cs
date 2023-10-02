@@ -1,4 +1,7 @@
-﻿using N.SourceGenerators.UnionTypes.Extensions;
+﻿using System.Collections.Immutable;
+using System.Text;
+
+using N.SourceGenerators.UnionTypes.Extensions;
 
 namespace N.SourceGenerators.UnionTypes.Models;
 
@@ -11,6 +14,8 @@ internal class UnionType
     public bool HasToStringMethod { get; }
     public string TypeFullName { get; }
     public string Name { get; }
+    public string NameNoGenerics { get; }
+    public string SourceCodeFileName { get; }
     public string? Namespace { get; }
     public IReadOnlyList<UnionTypeVariant> Variants { get; }
 
@@ -35,11 +40,41 @@ internal class UnionType
             IsPartial = syntax.IsPartial();
         }
 
+        // TODO convert to simple model?
+        TypeArguments = containerType.TypeArguments;
+
         IsReferenceType = containerType.IsReferenceType;
         IsValueType = containerType.IsValueType;
         HasToStringMethod = containerType.GetMembers().Any(IsToStringMethod);
         TypeFullName = containerType.ToDisplayString(SymbolDisplayFormat.FullyQualifiedFormat);
-        Name = containerType.Name;
+
+        var nameBuilder = new StringBuilder(containerType.Name);
+        var sourceCodeFileNameBuilder = new StringBuilder(containerType.Name);
+        if (!containerType.TypeArguments.IsEmpty)
+        {
+            nameBuilder.Append('<');
+            sourceCodeFileNameBuilder.Append("Of");
+            int index = 0;
+            foreach (ITypeSymbol typeArgument in containerType.TypeArguments)
+            {
+                if (index > 0)
+                {
+                    nameBuilder.Append(", ");
+                    sourceCodeFileNameBuilder.Append("And");
+                }
+
+                nameBuilder.Append(typeArgument.Name);
+                sourceCodeFileNameBuilder.Append(typeArgument.Name);
+                index++;
+            }
+
+            nameBuilder.Append('>');
+        }
+
+        Name = nameBuilder.ToString();
+        NameNoGenerics = containerType.Name;
+        SourceCodeFileName = sourceCodeFileNameBuilder.ToString();
+
         Namespace = containerType.ContainingNamespace.IsGlobalNamespace
             ? null
             : containerType.ContainingNamespace.ToString();
@@ -51,6 +86,8 @@ internal class UnionType
             variant.IdConstValue = variantIndex + 1;
         }
     }
+
+    public ImmutableArray<ITypeSymbol> TypeArguments { get; set; }
 
     private static bool IsToStringMethod(ISymbol symbol)
     {
