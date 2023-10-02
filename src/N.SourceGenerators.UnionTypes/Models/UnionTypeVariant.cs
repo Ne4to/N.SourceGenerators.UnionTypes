@@ -86,7 +86,7 @@ internal class UnionTypeVariant
                 sb.Append("And");
             }
 
-            string argumentTypeName = argumentType.ToDisplayString(SymbolDisplayFormat.MinimallyQualifiedFormat);
+            string argumentTypeName = GetAlias(argumentType);
             sb.Append(argumentTypeName.ToStartUpperCase());
         }
 
