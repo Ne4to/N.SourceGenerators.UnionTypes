@@ -11,13 +11,16 @@ public class GeneratorTests
     {
         string source = $$"""           
 using System;
+using System.Collections.Generic;
 using N.SourceGenerators.UnionTypes;
 
 public record Success;
 public record Error;
+public record Wrapped<TItem>(TItem Item);
 
 [UnionType(typeof(Success))]
 [UnionType(typeof(Error))]
+[UnionType(typeof(Wrapped<IReadOnlyList<string>>))]
 public {{typeModifiers}} Result
 {
 }

@@ -59,20 +59,20 @@ namespace MyApp
             }
         }
 
-        private readonly global::System.Collections.Generic.IReadOnlyList<int>? _iReadOnlyListOfInt;
-        public bool IsIReadOnlyListOfInt => _iReadOnlyListOfInt != null;
-        public global::System.Collections.Generic.IReadOnlyList<int> AsIReadOnlyListOfInt => _iReadOnlyListOfInt ?? throw new System.InvalidOperationException("Inner value is not IReadOnlyListOfInt");
-        public Result(global::System.Collections.Generic.IReadOnlyList<int> iReadOnlyListOfInt)
+        private readonly global::System.Collections.Generic.IReadOnlyList<int>? _iReadOnlyListOfInt32;
+        public bool IsIReadOnlyListOfInt32 => _iReadOnlyListOfInt32 != null;
+        public global::System.Collections.Generic.IReadOnlyList<int> AsIReadOnlyListOfInt32 => _iReadOnlyListOfInt32 ?? throw new System.InvalidOperationException("Inner value is not IReadOnlyListOfInt32");
+        public Result(global::System.Collections.Generic.IReadOnlyList<int> iReadOnlyListOfInt32)
         {
-            System.ArgumentNullException.ThrowIfNull(iReadOnlyListOfInt);
-            _iReadOnlyListOfInt = iReadOnlyListOfInt;
+            System.ArgumentNullException.ThrowIfNull(iReadOnlyListOfInt32);
+            _iReadOnlyListOfInt32 = iReadOnlyListOfInt32;
         }
 
-        public bool TryGetIReadOnlyListOfInt([System.Diagnostics.CodeAnalysis.NotNullWhen(true)] out global::System.Collections.Generic.IReadOnlyList<int>? value)
+        public bool TryGetIReadOnlyListOfInt32([System.Diagnostics.CodeAnalysis.NotNullWhen(true)] out global::System.Collections.Generic.IReadOnlyList<int>? value)
         {
-            if (_iReadOnlyListOfInt != null)
+            if (_iReadOnlyListOfInt32 != null)
             {
-                value = _iReadOnlyListOfInt;
+                value = _iReadOnlyListOfInt32;
                 return true;
             }
             else
@@ -107,22 +107,22 @@ namespace MyApp
             }
         }
 
-        private readonly global::System.Tuple<int, string>? _tupleOfIntAndString;
-        public bool IsTupleOfIntAndString => _tupleOfIntAndString != null;
-        public global::System.Tuple<int, string> AsTupleOfIntAndString => _tupleOfIntAndString ?? throw new System.InvalidOperationException("Inner value is not TupleOfIntAndString");
-        public Result(global::System.Tuple<int, string> tupleOfIntAndString)
+        private readonly global::System.Tuple<int, string>? _tupleOfInt32AndString;
+        public bool IsTupleOfInt32AndString => _tupleOfInt32AndString != null;
+        public global::System.Tuple<int, string> AsTupleOfInt32AndString => _tupleOfInt32AndString ?? throw new System.InvalidOperationException("Inner value is not TupleOfInt32AndString");
+        public Result(global::System.Tuple<int, string> tupleOfInt32AndString)
         {
-            System.ArgumentNullException.ThrowIfNull(tupleOfIntAndString);
-            _tupleOfIntAndString = tupleOfIntAndString;
+            System.ArgumentNullException.ThrowIfNull(tupleOfInt32AndString);
+            _tupleOfInt32AndString = tupleOfInt32AndString;
         }
 
-        public static implicit operator Result(global::System.Tuple<int, string> tupleOfIntAndString) => new Result(tupleOfIntAndString);
-        public static explicit operator global::System.Tuple<int, string>(Result value) => value._tupleOfIntAndString ?? throw new System.InvalidOperationException("Inner value is not TupleOfIntAndString");
-        public bool TryGetTupleOfIntAndString([System.Diagnostics.CodeAnalysis.NotNullWhen(true)] out global::System.Tuple<int, string>? value)
+        public static implicit operator Result(global::System.Tuple<int, string> tupleOfInt32AndString) => new Result(tupleOfInt32AndString);
+        public static explicit operator global::System.Tuple<int, string>(Result value) => value._tupleOfInt32AndString ?? throw new System.InvalidOperationException("Inner value is not TupleOfInt32AndString");
+        public bool TryGetTupleOfInt32AndString([System.Diagnostics.CodeAnalysis.NotNullWhen(true)] out global::System.Tuple<int, string>? value)
         {
-            if (_tupleOfIntAndString != null)
+            if (_tupleOfInt32AndString != null)
             {
-                value = _tupleOfIntAndString;
+                value = _tupleOfInt32AndString;
                 return true;
             }
             else
@@ -132,37 +132,37 @@ namespace MyApp
             }
         }
 
-        public TOut Match<TOut>(global::System.Func<global::MyApp.Success, TOut> matchSuccess, global::System.Func<global::MyApp.Error, TOut> matchError, global::System.Func<global::System.Collections.Generic.IReadOnlyList<int>, TOut> matchIReadOnlyListOfInt, global::System.Func<string[], TOut> matchArrayOfString, global::System.Func<global::System.Tuple<int, string>, TOut> matchTupleOfIntAndString)
+        public TOut Match<TOut>(global::System.Func<global::MyApp.Success, TOut> matchSuccess, global::System.Func<global::MyApp.Error, TOut> matchError, global::System.Func<global::System.Collections.Generic.IReadOnlyList<int>, TOut> matchIReadOnlyListOfInt32, global::System.Func<string[], TOut> matchArrayOfString, global::System.Func<global::System.Tuple<int, string>, TOut> matchTupleOfInt32AndString)
         {
             if (_success != null)
                 return matchSuccess(_success!);
             if (_error != null)
                 return matchError(_error!);
-            if (_iReadOnlyListOfInt != null)
-                return matchIReadOnlyListOfInt(_iReadOnlyListOfInt!);
+            if (_iReadOnlyListOfInt32 != null)
+                return matchIReadOnlyListOfInt32(_iReadOnlyListOfInt32!);
             if (_arrayOfString != null)
                 return matchArrayOfString(_arrayOfString!);
-            if (_tupleOfIntAndString != null)
-                return matchTupleOfIntAndString(_tupleOfIntAndString!);
+            if (_tupleOfInt32AndString != null)
+                return matchTupleOfInt32AndString(_tupleOfInt32AndString!);
             throw new System.InvalidOperationException("Inner type is unknown");
         }
 
-        public async global::System.Threading.Tasks.Task<TOut> MatchAsync<TOut>(global::System.Func<global::MyApp.Success, global::System.Threading.CancellationToken, global::System.Threading.Tasks.Task<TOut>> matchSuccess, global::System.Func<global::MyApp.Error, global::System.Threading.CancellationToken, global::System.Threading.Tasks.Task<TOut>> matchError, global::System.Func<global::System.Collections.Generic.IReadOnlyList<int>, global::System.Threading.CancellationToken, global::System.Threading.Tasks.Task<TOut>> matchIReadOnlyListOfInt, global::System.Func<string[], global::System.Threading.CancellationToken, global::System.Threading.Tasks.Task<TOut>> matchArrayOfString, global::System.Func<global::System.Tuple<int, string>, global::System.Threading.CancellationToken, global::System.Threading.Tasks.Task<TOut>> matchTupleOfIntAndString, global::System.Threading.CancellationToken ct)
+        public async global::System.Threading.Tasks.Task<TOut> MatchAsync<TOut>(global::System.Func<global::MyApp.Success, global::System.Threading.CancellationToken, global::System.Threading.Tasks.Task<TOut>> matchSuccess, global::System.Func<global::MyApp.Error, global::System.Threading.CancellationToken, global::System.Threading.Tasks.Task<TOut>> matchError, global::System.Func<global::System.Collections.Generic.IReadOnlyList<int>, global::System.Threading.CancellationToken, global::System.Threading.Tasks.Task<TOut>> matchIReadOnlyListOfInt32, global::System.Func<string[], global::System.Threading.CancellationToken, global::System.Threading.Tasks.Task<TOut>> matchArrayOfString, global::System.Func<global::System.Tuple<int, string>, global::System.Threading.CancellationToken, global::System.Threading.Tasks.Task<TOut>> matchTupleOfInt32AndString, global::System.Threading.CancellationToken ct)
         {
             if (_success != null)
                 return await matchSuccess(_success!, ct).ConfigureAwait(false);
             if (_error != null)
                 return await matchError(_error!, ct).ConfigureAwait(false);
-            if (_iReadOnlyListOfInt != null)
-                return await matchIReadOnlyListOfInt(_iReadOnlyListOfInt!, ct).ConfigureAwait(false);
+            if (_iReadOnlyListOfInt32 != null)
+                return await matchIReadOnlyListOfInt32(_iReadOnlyListOfInt32!, ct).ConfigureAwait(false);
             if (_arrayOfString != null)
                 return await matchArrayOfString(_arrayOfString!, ct).ConfigureAwait(false);
-            if (_tupleOfIntAndString != null)
-                return await matchTupleOfIntAndString(_tupleOfIntAndString!, ct).ConfigureAwait(false);
+            if (_tupleOfInt32AndString != null)
+                return await matchTupleOfInt32AndString(_tupleOfInt32AndString!, ct).ConfigureAwait(false);
             throw new System.InvalidOperationException("Inner type is unknown");
         }
 
-        public void Switch(global::System.Action<global::MyApp.Success> switchSuccess, global::System.Action<global::MyApp.Error> switchError, global::System.Action<global::System.Collections.Generic.IReadOnlyList<int>> switchIReadOnlyListOfInt, global::System.Action<string[]> switchArrayOfString, global::System.Action<global::System.Tuple<int, string>> switchTupleOfIntAndString)
+        public void Switch(global::System.Action<global::MyApp.Success> switchSuccess, global::System.Action<global::MyApp.Error> switchError, global::System.Action<global::System.Collections.Generic.IReadOnlyList<int>> switchIReadOnlyListOfInt32, global::System.Action<string[]> switchArrayOfString, global::System.Action<global::System.Tuple<int, string>> switchTupleOfInt32AndString)
         {
             if (_success != null)
             {
@@ -176,9 +176,9 @@ namespace MyApp
                 return;
             }
 
-            if (_iReadOnlyListOfInt != null)
+            if (_iReadOnlyListOfInt32 != null)
             {
-                switchIReadOnlyListOfInt(_iReadOnlyListOfInt!);
+                switchIReadOnlyListOfInt32(_iReadOnlyListOfInt32!);
                 return;
             }
 
@@ -188,16 +188,16 @@ namespace MyApp
                 return;
             }
 
-            if (_tupleOfIntAndString != null)
+            if (_tupleOfInt32AndString != null)
             {
-                switchTupleOfIntAndString(_tupleOfIntAndString!);
+                switchTupleOfInt32AndString(_tupleOfInt32AndString!);
                 return;
             }
 
             throw new System.InvalidOperationException("Inner type is unknown");
         }
 
-        public async global::System.Threading.Tasks.Task SwitchAsync(global::System.Func<global::MyApp.Success, global::System.Threading.CancellationToken, global::System.Threading.Tasks.Task> switchSuccess, global::System.Func<global::MyApp.Error, global::System.Threading.CancellationToken, global::System.Threading.Tasks.Task> switchError, global::System.Func<global::System.Collections.Generic.IReadOnlyList<int>, global::System.Threading.CancellationToken, global::System.Threading.Tasks.Task> switchIReadOnlyListOfInt, global::System.Func<string[], global::System.Threading.CancellationToken, global::System.Threading.Tasks.Task> switchArrayOfString, global::System.Func<global::System.Tuple<int, string>, global::System.Threading.CancellationToken, global::System.Threading.Tasks.Task> switchTupleOfIntAndString, global::System.Threading.CancellationToken ct)
+        public async global::System.Threading.Tasks.Task SwitchAsync(global::System.Func<global::MyApp.Success, global::System.Threading.CancellationToken, global::System.Threading.Tasks.Task> switchSuccess, global::System.Func<global::MyApp.Error, global::System.Threading.CancellationToken, global::System.Threading.Tasks.Task> switchError, global::System.Func<global::System.Collections.Generic.IReadOnlyList<int>, global::System.Threading.CancellationToken, global::System.Threading.Tasks.Task> switchIReadOnlyListOfInt32, global::System.Func<string[], global::System.Threading.CancellationToken, global::System.Threading.Tasks.Task> switchArrayOfString, global::System.Func<global::System.Tuple<int, string>, global::System.Threading.CancellationToken, global::System.Threading.Tasks.Task> switchTupleOfInt32AndString, global::System.Threading.CancellationToken ct)
         {
             if (_success != null)
             {
@@ -211,9 +211,9 @@ namespace MyApp
                 return;
             }
 
-            if (_iReadOnlyListOfInt != null)
+            if (_iReadOnlyListOfInt32 != null)
             {
-                await switchIReadOnlyListOfInt(_iReadOnlyListOfInt!, ct).ConfigureAwait(false);
+                await switchIReadOnlyListOfInt32(_iReadOnlyListOfInt32!, ct).ConfigureAwait(false);
                 return;
             }
 
@@ -223,9 +223,9 @@ namespace MyApp
                 return;
             }
 
-            if (_tupleOfIntAndString != null)
+            if (_tupleOfInt32AndString != null)
             {
-                await switchTupleOfIntAndString(_tupleOfIntAndString!, ct).ConfigureAwait(false);
+                await switchTupleOfInt32AndString(_tupleOfInt32AndString!, ct).ConfigureAwait(false);
                 return;
             }
 
@@ -240,11 +240,11 @@ namespace MyApp
                     return typeof(global::MyApp.Success);
                 if (_error != null)
                     return typeof(global::MyApp.Error);
-                if (_iReadOnlyListOfInt != null)
+                if (_iReadOnlyListOfInt32 != null)
                     return typeof(global::System.Collections.Generic.IReadOnlyList<int>);
                 if (_arrayOfString != null)
                     return typeof(string[]);
-                if (_tupleOfIntAndString != null)
+                if (_tupleOfInt32AndString != null)
                     return typeof(global::System.Tuple<int, string>);
                 throw new System.InvalidOperationException("Inner type is unknown");
             }
@@ -256,12 +256,12 @@ namespace MyApp
                 return _success.GetHashCode();
             if (_error != null)
                 return _error.GetHashCode();
-            if (_iReadOnlyListOfInt != null)
-                return _iReadOnlyListOfInt.GetHashCode();
+            if (_iReadOnlyListOfInt32 != null)
+                return _iReadOnlyListOfInt32.GetHashCode();
             if (_arrayOfString != null)
                 return _arrayOfString.GetHashCode();
-            if (_tupleOfIntAndString != null)
-                return _tupleOfIntAndString.GetHashCode();
+            if (_tupleOfInt32AndString != null)
+                return _tupleOfInt32AndString.GetHashCode();
             throw new System.InvalidOperationException("Inner type is unknown");
         }
 
@@ -296,12 +296,12 @@ namespace MyApp
                 return System.Collections.Generic.EqualityComparer<global::MyApp.Success>.Default.Equals(_success!, other._success);
             if (_error != null)
                 return System.Collections.Generic.EqualityComparer<global::MyApp.Error>.Default.Equals(_error!, other._error);
-            if (_iReadOnlyListOfInt != null)
-                return System.Collections.Generic.EqualityComparer<global::System.Collections.Generic.IReadOnlyList<int>>.Default.Equals(_iReadOnlyListOfInt!, other._iReadOnlyListOfInt);
+            if (_iReadOnlyListOfInt32 != null)
+                return System.Collections.Generic.EqualityComparer<global::System.Collections.Generic.IReadOnlyList<int>>.Default.Equals(_iReadOnlyListOfInt32!, other._iReadOnlyListOfInt32);
             if (_arrayOfString != null)
                 return System.Collections.Generic.EqualityComparer<string[]>.Default.Equals(_arrayOfString!, other._arrayOfString);
-            if (_tupleOfIntAndString != null)
-                return System.Collections.Generic.EqualityComparer<global::System.Tuple<int, string>>.Default.Equals(_tupleOfIntAndString!, other._tupleOfIntAndString);
+            if (_tupleOfInt32AndString != null)
+                return System.Collections.Generic.EqualityComparer<global::System.Tuple<int, string>>.Default.Equals(_tupleOfInt32AndString!, other._tupleOfInt32AndString);
             throw new System.InvalidOperationException("Inner type is unknown");
         }
 

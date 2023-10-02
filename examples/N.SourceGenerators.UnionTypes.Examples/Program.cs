@@ -65,6 +65,23 @@ public partial class DataAccessResult
 {
 }
 
+
+public record Wrapped<TItem>(TItem Item);
+
+[UnionType(typeof(int))]
+[UnionType(typeof(Wrapped<IReadOnlyList<ISet<Guid>>>))]
+public partial class Result1
+{
+}
+
+[UnionType(typeof(int))]
+[UnionType(typeof(Wrapped<IReadOnlyList<ISet<Guid>>>))]
+[UnionConverterFrom(typeof(Result1))]
+public partial class Result2
+{
+}
+
+
 [UnionConverter(typeof(DataAccessResult), typeof(BusinessLogicResult))]
 public static partial class Converters
 {

@@ -57,25 +57,54 @@ partial class Result : System.IEquatable<Result>
         }
     }
 
-    public TOut Match<TOut>(global::System.Func<global::Success, TOut> matchSuccess, global::System.Func<global::Error, TOut> matchError)
+    private readonly global::Wrapped<global::System.Collections.Generic.IReadOnlyList<string>>? _wrappedOfIReadOnlyListOfString;
+    public bool IsWrappedOfIReadOnlyListOfString => _wrappedOfIReadOnlyListOfString != null;
+    public global::Wrapped<global::System.Collections.Generic.IReadOnlyList<string>> AsWrappedOfIReadOnlyListOfString => _wrappedOfIReadOnlyListOfString ?? throw new System.InvalidOperationException("Inner value is not WrappedOfIReadOnlyListOfString");
+    public Result(global::Wrapped<global::System.Collections.Generic.IReadOnlyList<string>> wrappedOfIReadOnlyListOfString)
+    {
+        System.ArgumentNullException.ThrowIfNull(wrappedOfIReadOnlyListOfString);
+        _wrappedOfIReadOnlyListOfString = wrappedOfIReadOnlyListOfString;
+    }
+
+    public static implicit operator Result(global::Wrapped<global::System.Collections.Generic.IReadOnlyList<string>> wrappedOfIReadOnlyListOfString) => new Result(wrappedOfIReadOnlyListOfString);
+    public static explicit operator global::Wrapped<global::System.Collections.Generic.IReadOnlyList<string>>(Result value) => value._wrappedOfIReadOnlyListOfString ?? throw new System.InvalidOperationException("Inner value is not WrappedOfIReadOnlyListOfString");
+    public bool TryGetWrappedOfIReadOnlyListOfString([System.Diagnostics.CodeAnalysis.NotNullWhen(true)] out global::Wrapped<global::System.Collections.Generic.IReadOnlyList<string>>? value)
+    {
+        if (_wrappedOfIReadOnlyListOfString != null)
+        {
+            value = _wrappedOfIReadOnlyListOfString;
+            return true;
+        }
+        else
+        {
+            value = default;
+            return false;
+        }
+    }
+
+    public TOut Match<TOut>(global::System.Func<global::Success, TOut> matchSuccess, global::System.Func<global::Error, TOut> matchError, global::System.Func<global::Wrapped<global::System.Collections.Generic.IReadOnlyList<string>>, TOut> matchWrappedOfIReadOnlyListOfString)
     {
         if (_success != null)
             return matchSuccess(_success!);
         if (_error != null)
             return matchError(_error!);
+        if (_wrappedOfIReadOnlyListOfString != null)
+            return matchWrappedOfIReadOnlyListOfString(_wrappedOfIReadOnlyListOfString!);
         throw new System.InvalidOperationException("Inner type is unknown");
     }
 
-    public async global::System.Threading.Tasks.Task<TOut> MatchAsync<TOut>(global::System.Func<global::Success, global::System.Threading.CancellationToken, global::System.Threading.Tasks.Task<TOut>> matchSuccess, global::System.Func<global::Error, global::System.Threading.CancellationToken, global::System.Threading.Tasks.Task<TOut>> matchError, global::System.Threading.CancellationToken ct)
+    public async global::System.Threading.Tasks.Task<TOut> MatchAsync<TOut>(global::System.Func<global::Success, global::System.Threading.CancellationToken, global::System.Threading.Tasks.Task<TOut>> matchSuccess, global::System.Func<global::Error, global::System.Threading.CancellationToken, global::System.Threading.Tasks.Task<TOut>> matchError, global::System.Func<global::Wrapped<global::System.Collections.Generic.IReadOnlyList<string>>, global::System.Threading.CancellationToken, global::System.Threading.Tasks.Task<TOut>> matchWrappedOfIReadOnlyListOfString, global::System.Threading.CancellationToken ct)
     {
         if (_success != null)
             return await matchSuccess(_success!, ct).ConfigureAwait(false);
         if (_error != null)
             return await matchError(_error!, ct).ConfigureAwait(false);
+        if (_wrappedOfIReadOnlyListOfString != null)
+            return await matchWrappedOfIReadOnlyListOfString(_wrappedOfIReadOnlyListOfString!, ct).ConfigureAwait(false);
         throw new System.InvalidOperationException("Inner type is unknown");
     }
 
-    public void Switch(global::System.Action<global::Success> switchSuccess, global::System.Action<global::Error> switchError)
+    public void Switch(global::System.Action<global::Success> switchSuccess, global::System.Action<global::Error> switchError, global::System.Action<global::Wrapped<global::System.Collections.Generic.IReadOnlyList<string>>> switchWrappedOfIReadOnlyListOfString)
     {
         if (_success != null)
         {
@@ -89,10 +118,16 @@ partial class Result : System.IEquatable<Result>
             return;
         }
 
+        if (_wrappedOfIReadOnlyListOfString != null)
+        {
+            switchWrappedOfIReadOnlyListOfString(_wrappedOfIReadOnlyListOfString!);
+            return;
+        }
+
         throw new System.InvalidOperationException("Inner type is unknown");
     }
 
-    public async global::System.Threading.Tasks.Task SwitchAsync(global::System.Func<global::Success, global::System.Threading.CancellationToken, global::System.Threading.Tasks.Task> switchSuccess, global::System.Func<global::Error, global::System.Threading.CancellationToken, global::System.Threading.Tasks.Task> switchError, global::System.Threading.CancellationToken ct)
+    public async global::System.Threading.Tasks.Task SwitchAsync(global::System.Func<global::Success, global::System.Threading.CancellationToken, global::System.Threading.Tasks.Task> switchSuccess, global::System.Func<global::Error, global::System.Threading.CancellationToken, global::System.Threading.Tasks.Task> switchError, global::System.Func<global::Wrapped<global::System.Collections.Generic.IReadOnlyList<string>>, global::System.Threading.CancellationToken, global::System.Threading.Tasks.Task> switchWrappedOfIReadOnlyListOfString, global::System.Threading.CancellationToken ct)
     {
         if (_success != null)
         {
@@ -103,6 +138,12 @@ partial class Result : System.IEquatable<Result>
         if (_error != null)
         {
             await switchError(_error!, ct).ConfigureAwait(false);
+            return;
+        }
+
+        if (_wrappedOfIReadOnlyListOfString != null)
+        {
+            await switchWrappedOfIReadOnlyListOfString(_wrappedOfIReadOnlyListOfString!, ct).ConfigureAwait(false);
             return;
         }
 
@@ -117,6 +158,8 @@ partial class Result : System.IEquatable<Result>
                 return typeof(global::Success);
             if (_error != null)
                 return typeof(global::Error);
+            if (_wrappedOfIReadOnlyListOfString != null)
+                return typeof(global::Wrapped<global::System.Collections.Generic.IReadOnlyList<string>>);
             throw new System.InvalidOperationException("Inner type is unknown");
         }
     }
@@ -127,6 +170,8 @@ partial class Result : System.IEquatable<Result>
             return _success.GetHashCode();
         if (_error != null)
             return _error.GetHashCode();
+        if (_wrappedOfIReadOnlyListOfString != null)
+            return _wrappedOfIReadOnlyListOfString.GetHashCode();
         throw new System.InvalidOperationException("Inner type is unknown");
     }
 
@@ -161,6 +206,8 @@ partial class Result : System.IEquatable<Result>
             return System.Collections.Generic.EqualityComparer<global::Success>.Default.Equals(_success!, other._success);
         if (_error != null)
             return System.Collections.Generic.EqualityComparer<global::Error>.Default.Equals(_error!, other._error);
+        if (_wrappedOfIReadOnlyListOfString != null)
+            return System.Collections.Generic.EqualityComparer<global::Wrapped<global::System.Collections.Generic.IReadOnlyList<string>>>.Default.Equals(_wrappedOfIReadOnlyListOfString!, other._wrappedOfIReadOnlyListOfString);
         throw new System.InvalidOperationException("Inner type is unknown");
     }
 
@@ -170,6 +217,8 @@ partial class Result : System.IEquatable<Result>
             return _success.ToString();
         if (_error != null)
             return _error.ToString();
+        if (_wrappedOfIReadOnlyListOfString != null)
+            return _wrappedOfIReadOnlyListOfString.ToString();
         throw new System.InvalidOperationException("Inner type is unknown");
     }
 
