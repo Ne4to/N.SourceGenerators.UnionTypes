@@ -9,6 +9,7 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution 
 		global.json = global.json
 		README.md = README.md
 		Directory.Build.props = Directory.Build.props
+		.gitignore = .gitignore
 	EndProjectSection
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "src", "src", "{A838F419-B488-4482-A0ED-C017B92A7D29}"
@@ -26,6 +27,7 @@ EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "workflows", "workflows", "{CAD9CCB8-F691-4535-9A5E-30F4FB551EF9}"
 	ProjectSection(SolutionItems) = preProject
 		.github\workflows\push-package.yml = .github\workflows\push-package.yml
+		.github\workflows\run-tests.yml = .github\workflows\run-tests.yml
 	EndProjectSection
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "N.SourceGenerators.UnionTypes.Benchmark", "src\N.SourceGenerators.UnionTypes.Benchmark\N.SourceGenerators.UnionTypes.Benchmark.csproj", "{6A0EBB25-94B5-45E7-B2C7-F137E25E5850}"

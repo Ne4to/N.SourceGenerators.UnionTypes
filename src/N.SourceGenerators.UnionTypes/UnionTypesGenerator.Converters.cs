@@ -37,7 +37,9 @@ public sealed partial class UnionTypesGenerator
                 TypeDeclarationSyntax typeDeclaration = ClassDeclaration(item.Name);
 
                 typeDeclaration = typeDeclaration
-                    .AddModifiersWhen(item.IsStatic, Token(SyntaxKind.StaticKeyword)
+                    .AddModifiersWhen(
+                        item.IsStatic,
+                        Token(SyntaxKind.StaticKeyword)
                     ).AddModifiers(Token(SyntaxKind.PartialKeyword));
 
                 bool saveSource = false;
@@ -260,14 +262,34 @@ public sealed partial class UnionTypesGenerator
 
     private static ReturnStatementSyntax ReturnMatchConversion(UnionType fromType, UnionType toType)
     {
+        const string lambdaParamName = "x";
+
         var arguments = fromType
             .Variants
-            .Select(_ => Argument(
-                    SimpleLambdaExpression(
-                        Parameter(Identifier("x"))
-                    ).WithExpressionBody(IdentifierName("x"))
-                )
-            ).ToArray();
+            .Select(variant => Argument(
+                ParenthesizedLambdaExpression().AddParameterListParameters(
+                        Parameter(Identifier(lambdaParamName)).WithType(IdentifierName(variant.TypeFullName))
+                    )
+
+                    // SimpleLambdaExpression(
+                    //     // BracketedParameterList(
+                    //         // new SeparatedSyntaxList<ParameterSyntax>()
+                    //         
+                    //         Parameter(Identifier(lambdaParamName)).WithType(IdentifierName(variant.TypeFullName))
+                    //         
+                    //         
+                    //         // )
+                    //     
+                    // )
+                    .WithExpressionBody(
+                        CastExpression(IdentifierName(toType.Name),
+                            ObjectCreationExpression(
+                                IdentifierName(toType.Name)
+                            ).AddArgumentListArguments(
+                                Argument(IdentifierName(lambdaParamName))
+                            ))
+                    )
+            )).ToArray();
 
         return ReturnStatement(
             InvocationExpression(

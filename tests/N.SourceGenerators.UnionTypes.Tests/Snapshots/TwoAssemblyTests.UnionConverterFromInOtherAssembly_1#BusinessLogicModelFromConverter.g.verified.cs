@@ -11,7 +11,7 @@ namespace BusinessLogic
     {
         public static implicit operator BusinessLogicModel(global::DataAccess.DataAccessModel value)
         {
-            return value.Match<BusinessLogicModel>(x => x, x => x);
+            return value.Match<BusinessLogicModel>((global::DataAccess.DataAccessModel1 x) => (BusinessLogicModel)new BusinessLogicModel(x), (global::DataAccess.DataAccessModel2 x) => (BusinessLogicModel)new BusinessLogicModel(x));
         }
     }
 }
