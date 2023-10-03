@@ -19,5 +19,5 @@ internal record UnionToConverter(UnionType ContainerType, ImmutableArray<UnionTy
         return GetEnumerator();
     }
 
-    public string SourceHintName { get; } = $"{ContainerType.Name}ToConverter.g.cs";
+    public string SourceHintName { get; } = $"{ContainerType.SourceCodeFileName}ToConverter.g.cs";
 }

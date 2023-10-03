@@ -81,6 +81,16 @@ public partial class Result2
 {
 }
 
+[GenericUnionType]
+public partial class OperationDataResult<TResult, TError>
+{
+}
+
+// extend generic type union with additional Int32 type 
+[UnionType(typeof(int))]
+public partial class ExtendedOperationDataResult<TResult, TError>
+{
+}
 
 [UnionConverter(typeof(DataAccessResult), typeof(BusinessLogicResult))]
 public static partial class Converters
