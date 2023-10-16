@@ -9,20 +9,38 @@ namespace MyApp.Domain.Child
 {
     partial class Result : System.IEquatable<Result>
     {
+        private readonly int _variantId;
+        private const int SuccessId = 1;
         private readonly global::MyApp.Models.S.Child.Success? _success;
-        public bool IsSuccess => _success != null;
-        public global::MyApp.Models.S.Child.Success AsSuccess => _success ?? throw new System.InvalidOperationException("Inner value is not Success");
+        public bool IsSuccess => _variantId == SuccessId;
+        public global::MyApp.Models.S.Child.Success AsSuccess
+        {
+            get
+            {
+                if (_variantId == SuccessId)
+                    return _success!;
+                throw new System.InvalidOperationException("Inner value is not Success");
+            }
+        }
+
         public Result(global::MyApp.Models.S.Child.Success success)
         {
             System.ArgumentNullException.ThrowIfNull(success);
+            _variantId = SuccessId;
             _success = success;
         }
 
         public static implicit operator Result(global::MyApp.Models.S.Child.Success success) => new Result(success);
-        public static explicit operator global::MyApp.Models.S.Child.Success(Result value) => value._success ?? throw new System.InvalidOperationException("Inner value is not Success");
+        public static explicit operator global::MyApp.Models.S.Child.Success(Result value)
+        {
+            if (value._variantId == SuccessId)
+                return value._success!;
+            throw new System.InvalidOperationException("Inner value is not Success");
+        }
+
         public bool TryGetSuccess([System.Diagnostics.CodeAnalysis.NotNullWhen(true)] out global::MyApp.Models.S.Child.Success? value)
         {
-            if (_success != null)
+            if (_variantId == SuccessId)
             {
                 value = _success;
                 return true;
@@ -34,20 +52,37 @@ namespace MyApp.Domain.Child
             }
         }
 
+        private const int ErrorId = 2;
         private readonly global::MyApp.Models.E.Child.Error? _error;
-        public bool IsError => _error != null;
-        public global::MyApp.Models.E.Child.Error AsError => _error ?? throw new System.InvalidOperationException("Inner value is not Error");
+        public bool IsError => _variantId == ErrorId;
+        public global::MyApp.Models.E.Child.Error AsError
+        {
+            get
+            {
+                if (_variantId == ErrorId)
+                    return _error!;
+                throw new System.InvalidOperationException("Inner value is not Error");
+            }
+        }
+
         public Result(global::MyApp.Models.E.Child.Error @error)
         {
             System.ArgumentNullException.ThrowIfNull(@error);
+            _variantId = ErrorId;
             _error = @error;
         }
 
         public static implicit operator Result(global::MyApp.Models.E.Child.Error @error) => new Result(@error);
-        public static explicit operator global::MyApp.Models.E.Child.Error(Result value) => value._error ?? throw new System.InvalidOperationException("Inner value is not Error");
+        public static explicit operator global::MyApp.Models.E.Child.Error(Result value)
+        {
+            if (value._variantId == ErrorId)
+                return value._error!;
+            throw new System.InvalidOperationException("Inner value is not Error");
+        }
+
         public bool TryGetError([System.Diagnostics.CodeAnalysis.NotNullWhen(true)] out global::MyApp.Models.E.Child.Error? value)
         {
-            if (_error != null)
+            if (_variantId == ErrorId)
             {
                 value = _error;
                 return true;
@@ -61,31 +96,31 @@ namespace MyApp.Domain.Child
 
         public TOut Match<TOut>(global::System.Func<global::MyApp.Models.S.Child.Success, TOut> matchSuccess, global::System.Func<global::MyApp.Models.E.Child.Error, TOut> matchError)
         {
-            if (_success != null)
+            if (_variantId == SuccessId)
                 return matchSuccess(_success!);
-            if (_error != null)
+            if (_variantId == ErrorId)
                 return matchError(_error!);
             throw new System.InvalidOperationException("Inner type is unknown");
         }
 
         public async global::System.Threading.Tasks.Task<TOut> MatchAsync<TOut>(global::System.Func<global::MyApp.Models.S.Child.Success, global::System.Threading.CancellationToken, global::System.Threading.Tasks.Task<TOut>> matchSuccess, global::System.Func<global::MyApp.Models.E.Child.Error, global::System.Threading.CancellationToken, global::System.Threading.Tasks.Task<TOut>> matchError, global::System.Threading.CancellationToken ct)
         {
-            if (_success != null)
+            if (_variantId == SuccessId)
                 return await matchSuccess(_success!, ct).ConfigureAwait(false);
-            if (_error != null)
+            if (_variantId == ErrorId)
                 return await matchError(_error!, ct).ConfigureAwait(false);
             throw new System.InvalidOperationException("Inner type is unknown");
         }
 
         public void Switch(global::System.Action<global::MyApp.Models.S.Child.Success> switchSuccess, global::System.Action<global::MyApp.Models.E.Child.Error> switchError)
         {
-            if (_success != null)
+            if (_variantId == SuccessId)
             {
                 switchSuccess(_success!);
                 return;
             }
 
-            if (_error != null)
+            if (_variantId == ErrorId)
             {
                 switchError(_error!);
                 return;
@@ -96,13 +131,13 @@ namespace MyApp.Domain.Child
 
         public async global::System.Threading.Tasks.Task SwitchAsync(global::System.Func<global::MyApp.Models.S.Child.Success, global::System.Threading.CancellationToken, global::System.Threading.Tasks.Task> switchSuccess, global::System.Func<global::MyApp.Models.E.Child.Error, global::System.Threading.CancellationToken, global::System.Threading.Tasks.Task> switchError, global::System.Threading.CancellationToken ct)
         {
-            if (_success != null)
+            if (_variantId == SuccessId)
             {
                 await switchSuccess(_success!, ct).ConfigureAwait(false);
                 return;
             }
 
-            if (_error != null)
+            if (_variantId == ErrorId)
             {
                 await switchError(_error!, ct).ConfigureAwait(false);
                 return;
@@ -115,9 +150,9 @@ namespace MyApp.Domain.Child
         {
             get
             {
-                if (_success != null)
+                if (_variantId == SuccessId)
                     return typeof(global::MyApp.Models.S.Child.Success);
-                if (_error != null)
+                if (_variantId == ErrorId)
                     return typeof(global::MyApp.Models.E.Child.Error);
                 throw new System.InvalidOperationException("Inner type is unknown");
             }
@@ -125,9 +160,9 @@ namespace MyApp.Domain.Child
 
         public override int GetHashCode()
         {
-            if (_success != null)
+            if (_variantId == SuccessId)
                 return _success.GetHashCode();
-            if (_error != null)
+            if (_variantId == ErrorId)
                 return _error.GetHashCode();
             throw new System.InvalidOperationException("Inner type is unknown");
         }
@@ -159,18 +194,18 @@ namespace MyApp.Domain.Child
                 return false;
             }
 
-            if (_success != null)
+            if (_variantId == SuccessId)
                 return System.Collections.Generic.EqualityComparer<global::MyApp.Models.S.Child.Success>.Default.Equals(_success!, other._success);
-            if (_error != null)
+            if (_variantId == ErrorId)
                 return System.Collections.Generic.EqualityComparer<global::MyApp.Models.E.Child.Error>.Default.Equals(_error!, other._error);
             throw new System.InvalidOperationException("Inner type is unknown");
         }
 
         public override string ToString()
         {
-            if (_success != null)
+            if (_variantId == SuccessId)
                 return _success.ToString();
-            if (_error != null)
+            if (_variantId == ErrorId)
                 return _error.ToString();
             throw new System.InvalidOperationException("Inner type is unknown");
         }

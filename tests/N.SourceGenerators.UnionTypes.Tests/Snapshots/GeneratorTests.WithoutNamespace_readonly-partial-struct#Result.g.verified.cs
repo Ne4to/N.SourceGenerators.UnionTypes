@@ -7,20 +7,38 @@
 #nullable enable
 partial struct Result : System.IEquatable<Result>
 {
+    private readonly int _variantId;
+    private const int SuccessId = 1;
     private readonly global::Success? _success;
-    public bool IsSuccess => _success != null;
-    public global::Success AsSuccess => _success ?? throw new System.InvalidOperationException("Inner value is not Success");
+    public bool IsSuccess => _variantId == SuccessId;
+    public global::Success AsSuccess
+    {
+        get
+        {
+            if (_variantId == SuccessId)
+                return _success!;
+            throw new System.InvalidOperationException("Inner value is not Success");
+        }
+    }
+
     public Result(global::Success success)
     {
         System.ArgumentNullException.ThrowIfNull(success);
+        _variantId = SuccessId;
         _success = success;
     }
 
     public static implicit operator Result(global::Success success) => new Result(success);
-    public static explicit operator global::Success(Result value) => value._success ?? throw new System.InvalidOperationException("Inner value is not Success");
+    public static explicit operator global::Success(Result value)
+    {
+        if (value._variantId == SuccessId)
+            return value._success!;
+        throw new System.InvalidOperationException("Inner value is not Success");
+    }
+
     public bool TryGetSuccess([System.Diagnostics.CodeAnalysis.NotNullWhen(true)] out global::Success? value)
     {
-        if (_success != null)
+        if (_variantId == SuccessId)
         {
             value = _success;
             return true;
@@ -32,20 +50,37 @@ partial struct Result : System.IEquatable<Result>
         }
     }
 
+    private const int ErrorId = 2;
     private readonly global::Error? _error;
-    public bool IsError => _error != null;
-    public global::Error AsError => _error ?? throw new System.InvalidOperationException("Inner value is not Error");
+    public bool IsError => _variantId == ErrorId;
+    public global::Error AsError
+    {
+        get
+        {
+            if (_variantId == ErrorId)
+                return _error!;
+            throw new System.InvalidOperationException("Inner value is not Error");
+        }
+    }
+
     public Result(global::Error @error)
     {
         System.ArgumentNullException.ThrowIfNull(@error);
+        _variantId = ErrorId;
         _error = @error;
     }
 
     public static implicit operator Result(global::Error @error) => new Result(@error);
-    public static explicit operator global::Error(Result value) => value._error ?? throw new System.InvalidOperationException("Inner value is not Error");
+    public static explicit operator global::Error(Result value)
+    {
+        if (value._variantId == ErrorId)
+            return value._error!;
+        throw new System.InvalidOperationException("Inner value is not Error");
+    }
+
     public bool TryGetError([System.Diagnostics.CodeAnalysis.NotNullWhen(true)] out global::Error? value)
     {
-        if (_error != null)
+        if (_variantId == ErrorId)
         {
             value = _error;
             return true;
@@ -57,20 +92,37 @@ partial struct Result : System.IEquatable<Result>
         }
     }
 
+    private const int WrappedOfIReadOnlyListOfStringId = 3;
     private readonly global::Wrapped<global::System.Collections.Generic.IReadOnlyList<string>>? _wrappedOfIReadOnlyListOfString;
-    public bool IsWrappedOfIReadOnlyListOfString => _wrappedOfIReadOnlyListOfString != null;
-    public global::Wrapped<global::System.Collections.Generic.IReadOnlyList<string>> AsWrappedOfIReadOnlyListOfString => _wrappedOfIReadOnlyListOfString ?? throw new System.InvalidOperationException("Inner value is not WrappedOfIReadOnlyListOfString");
+    public bool IsWrappedOfIReadOnlyListOfString => _variantId == WrappedOfIReadOnlyListOfStringId;
+    public global::Wrapped<global::System.Collections.Generic.IReadOnlyList<string>> AsWrappedOfIReadOnlyListOfString
+    {
+        get
+        {
+            if (_variantId == WrappedOfIReadOnlyListOfStringId)
+                return _wrappedOfIReadOnlyListOfString!;
+            throw new System.InvalidOperationException("Inner value is not WrappedOfIReadOnlyListOfString");
+        }
+    }
+
     public Result(global::Wrapped<global::System.Collections.Generic.IReadOnlyList<string>> wrappedOfIReadOnlyListOfString)
     {
         System.ArgumentNullException.ThrowIfNull(wrappedOfIReadOnlyListOfString);
+        _variantId = WrappedOfIReadOnlyListOfStringId;
         _wrappedOfIReadOnlyListOfString = wrappedOfIReadOnlyListOfString;
     }
 
     public static implicit operator Result(global::Wrapped<global::System.Collections.Generic.IReadOnlyList<string>> wrappedOfIReadOnlyListOfString) => new Result(wrappedOfIReadOnlyListOfString);
-    public static explicit operator global::Wrapped<global::System.Collections.Generic.IReadOnlyList<string>>(Result value) => value._wrappedOfIReadOnlyListOfString ?? throw new System.InvalidOperationException("Inner value is not WrappedOfIReadOnlyListOfString");
+    public static explicit operator global::Wrapped<global::System.Collections.Generic.IReadOnlyList<string>>(Result value)
+    {
+        if (value._variantId == WrappedOfIReadOnlyListOfStringId)
+            return value._wrappedOfIReadOnlyListOfString!;
+        throw new System.InvalidOperationException("Inner value is not WrappedOfIReadOnlyListOfString");
+    }
+
     public bool TryGetWrappedOfIReadOnlyListOfString([System.Diagnostics.CodeAnalysis.NotNullWhen(true)] out global::Wrapped<global::System.Collections.Generic.IReadOnlyList<string>>? value)
     {
-        if (_wrappedOfIReadOnlyListOfString != null)
+        if (_variantId == WrappedOfIReadOnlyListOfStringId)
         {
             value = _wrappedOfIReadOnlyListOfString;
             return true;
@@ -84,41 +136,41 @@ partial struct Result : System.IEquatable<Result>
 
     public TOut Match<TOut>(global::System.Func<global::Success, TOut> matchSuccess, global::System.Func<global::Error, TOut> matchError, global::System.Func<global::Wrapped<global::System.Collections.Generic.IReadOnlyList<string>>, TOut> matchWrappedOfIReadOnlyListOfString)
     {
-        if (_success != null)
+        if (_variantId == SuccessId)
             return matchSuccess(_success!);
-        if (_error != null)
+        if (_variantId == ErrorId)
             return matchError(_error!);
-        if (_wrappedOfIReadOnlyListOfString != null)
+        if (_variantId == WrappedOfIReadOnlyListOfStringId)
             return matchWrappedOfIReadOnlyListOfString(_wrappedOfIReadOnlyListOfString!);
         throw new System.InvalidOperationException("Inner type is unknown");
     }
 
     public async global::System.Threading.Tasks.Task<TOut> MatchAsync<TOut>(global::System.Func<global::Success, global::System.Threading.CancellationToken, global::System.Threading.Tasks.Task<TOut>> matchSuccess, global::System.Func<global::Error, global::System.Threading.CancellationToken, global::System.Threading.Tasks.Task<TOut>> matchError, global::System.Func<global::Wrapped<global::System.Collections.Generic.IReadOnlyList<string>>, global::System.Threading.CancellationToken, global::System.Threading.Tasks.Task<TOut>> matchWrappedOfIReadOnlyListOfString, global::System.Threading.CancellationToken ct)
     {
-        if (_success != null)
+        if (_variantId == SuccessId)
             return await matchSuccess(_success!, ct).ConfigureAwait(false);
-        if (_error != null)
+        if (_variantId == ErrorId)
             return await matchError(_error!, ct).ConfigureAwait(false);
-        if (_wrappedOfIReadOnlyListOfString != null)
+        if (_variantId == WrappedOfIReadOnlyListOfStringId)
             return await matchWrappedOfIReadOnlyListOfString(_wrappedOfIReadOnlyListOfString!, ct).ConfigureAwait(false);
         throw new System.InvalidOperationException("Inner type is unknown");
     }
 
     public void Switch(global::System.Action<global::Success> switchSuccess, global::System.Action<global::Error> switchError, global::System.Action<global::Wrapped<global::System.Collections.Generic.IReadOnlyList<string>>> switchWrappedOfIReadOnlyListOfString)
     {
-        if (_success != null)
+        if (_variantId == SuccessId)
         {
             switchSuccess(_success!);
             return;
         }
 
-        if (_error != null)
+        if (_variantId == ErrorId)
         {
             switchError(_error!);
             return;
         }
 
-        if (_wrappedOfIReadOnlyListOfString != null)
+        if (_variantId == WrappedOfIReadOnlyListOfStringId)
         {
             switchWrappedOfIReadOnlyListOfString(_wrappedOfIReadOnlyListOfString!);
             return;
@@ -129,19 +181,19 @@ partial struct Result : System.IEquatable<Result>
 
     public async global::System.Threading.Tasks.Task SwitchAsync(global::System.Func<global::Success, global::System.Threading.CancellationToken, global::System.Threading.Tasks.Task> switchSuccess, global::System.Func<global::Error, global::System.Threading.CancellationToken, global::System.Threading.Tasks.Task> switchError, global::System.Func<global::Wrapped<global::System.Collections.Generic.IReadOnlyList<string>>, global::System.Threading.CancellationToken, global::System.Threading.Tasks.Task> switchWrappedOfIReadOnlyListOfString, global::System.Threading.CancellationToken ct)
     {
-        if (_success != null)
+        if (_variantId == SuccessId)
         {
             await switchSuccess(_success!, ct).ConfigureAwait(false);
             return;
         }
 
-        if (_error != null)
+        if (_variantId == ErrorId)
         {
             await switchError(_error!, ct).ConfigureAwait(false);
             return;
         }
 
-        if (_wrappedOfIReadOnlyListOfString != null)
+        if (_variantId == WrappedOfIReadOnlyListOfStringId)
         {
             await switchWrappedOfIReadOnlyListOfString(_wrappedOfIReadOnlyListOfString!, ct).ConfigureAwait(false);
             return;
@@ -154,11 +206,11 @@ partial struct Result : System.IEquatable<Result>
     {
         get
         {
-            if (_success != null)
+            if (_variantId == SuccessId)
                 return typeof(global::Success);
-            if (_error != null)
+            if (_variantId == ErrorId)
                 return typeof(global::Error);
-            if (_wrappedOfIReadOnlyListOfString != null)
+            if (_variantId == WrappedOfIReadOnlyListOfStringId)
                 return typeof(global::Wrapped<global::System.Collections.Generic.IReadOnlyList<string>>);
             throw new System.InvalidOperationException("Inner type is unknown");
         }
@@ -166,11 +218,11 @@ partial struct Result : System.IEquatable<Result>
 
     public override int GetHashCode()
     {
-        if (_success != null)
+        if (_variantId == SuccessId)
             return _success.GetHashCode();
-        if (_error != null)
+        if (_variantId == ErrorId)
             return _error.GetHashCode();
-        if (_wrappedOfIReadOnlyListOfString != null)
+        if (_variantId == WrappedOfIReadOnlyListOfStringId)
             return _wrappedOfIReadOnlyListOfString.GetHashCode();
         throw new System.InvalidOperationException("Inner type is unknown");
     }
@@ -192,22 +244,22 @@ partial struct Result : System.IEquatable<Result>
             return false;
         }
 
-        if (_success != null)
+        if (_variantId == SuccessId)
             return System.Collections.Generic.EqualityComparer<global::Success>.Default.Equals(_success!, other._success);
-        if (_error != null)
+        if (_variantId == ErrorId)
             return System.Collections.Generic.EqualityComparer<global::Error>.Default.Equals(_error!, other._error);
-        if (_wrappedOfIReadOnlyListOfString != null)
+        if (_variantId == WrappedOfIReadOnlyListOfStringId)
             return System.Collections.Generic.EqualityComparer<global::Wrapped<global::System.Collections.Generic.IReadOnlyList<string>>>.Default.Equals(_wrappedOfIReadOnlyListOfString!, other._wrappedOfIReadOnlyListOfString);
         throw new System.InvalidOperationException("Inner type is unknown");
     }
 
     public override string ToString()
     {
-        if (_success != null)
+        if (_variantId == SuccessId)
             return _success.ToString();
-        if (_error != null)
+        if (_variantId == ErrorId)
             return _error.ToString();
-        if (_wrappedOfIReadOnlyListOfString != null)
+        if (_variantId == WrappedOfIReadOnlyListOfStringId)
             return _wrappedOfIReadOnlyListOfString.ToString();
         throw new System.InvalidOperationException("Inner type is unknown");
     }

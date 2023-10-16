@@ -9,20 +9,38 @@ namespace MyApp
 {
     partial class BusinessLogicResult : System.IEquatable<BusinessLogicResult>
     {
+        private readonly int _variantId;
+        private const int NotFoundErrorId = 1;
         private readonly global::MyApp.NotFoundError? _notFoundError;
-        public bool IsNotFoundError => _notFoundError != null;
-        public global::MyApp.NotFoundError AsNotFoundError => _notFoundError ?? throw new System.InvalidOperationException("Inner value is not NotFoundError");
+        public bool IsNotFoundError => _variantId == NotFoundErrorId;
+        public global::MyApp.NotFoundError AsNotFoundError
+        {
+            get
+            {
+                if (_variantId == NotFoundErrorId)
+                    return _notFoundError!;
+                throw new System.InvalidOperationException("Inner value is not NotFoundError");
+            }
+        }
+
         public BusinessLogicResult(global::MyApp.NotFoundError notFoundError)
         {
             System.ArgumentNullException.ThrowIfNull(notFoundError);
+            _variantId = NotFoundErrorId;
             _notFoundError = notFoundError;
         }
 
         public static implicit operator BusinessLogicResult(global::MyApp.NotFoundError notFoundError) => new BusinessLogicResult(notFoundError);
-        public static explicit operator global::MyApp.NotFoundError(BusinessLogicResult value) => value._notFoundError ?? throw new System.InvalidOperationException("Inner value is not NotFoundError");
+        public static explicit operator global::MyApp.NotFoundError(BusinessLogicResult value)
+        {
+            if (value._variantId == NotFoundErrorId)
+                return value._notFoundError!;
+            throw new System.InvalidOperationException("Inner value is not NotFoundError");
+        }
+
         public bool TryGetNotFoundError([System.Diagnostics.CodeAnalysis.NotNullWhen(true)] out global::MyApp.NotFoundError? value)
         {
-            if (_notFoundError != null)
+            if (_variantId == NotFoundErrorId)
             {
                 value = _notFoundError;
                 return true;
@@ -34,20 +52,37 @@ namespace MyApp
             }
         }
 
+        private const int ValidationErrorId = 2;
         private readonly global::MyApp.ValidationError? _validationError;
-        public bool IsValidationError => _validationError != null;
-        public global::MyApp.ValidationError AsValidationError => _validationError ?? throw new System.InvalidOperationException("Inner value is not ValidationError");
+        public bool IsValidationError => _variantId == ValidationErrorId;
+        public global::MyApp.ValidationError AsValidationError
+        {
+            get
+            {
+                if (_variantId == ValidationErrorId)
+                    return _validationError!;
+                throw new System.InvalidOperationException("Inner value is not ValidationError");
+            }
+        }
+
         public BusinessLogicResult(global::MyApp.ValidationError validationError)
         {
             System.ArgumentNullException.ThrowIfNull(validationError);
+            _variantId = ValidationErrorId;
             _validationError = validationError;
         }
 
         public static implicit operator BusinessLogicResult(global::MyApp.ValidationError validationError) => new BusinessLogicResult(validationError);
-        public static explicit operator global::MyApp.ValidationError(BusinessLogicResult value) => value._validationError ?? throw new System.InvalidOperationException("Inner value is not ValidationError");
+        public static explicit operator global::MyApp.ValidationError(BusinessLogicResult value)
+        {
+            if (value._variantId == ValidationErrorId)
+                return value._validationError!;
+            throw new System.InvalidOperationException("Inner value is not ValidationError");
+        }
+
         public bool TryGetValidationError([System.Diagnostics.CodeAnalysis.NotNullWhen(true)] out global::MyApp.ValidationError? value)
         {
-            if (_validationError != null)
+            if (_variantId == ValidationErrorId)
             {
                 value = _validationError;
                 return true;
@@ -61,31 +96,31 @@ namespace MyApp
 
         public TOut Match<TOut>(global::System.Func<global::MyApp.NotFoundError, TOut> matchNotFoundError, global::System.Func<global::MyApp.ValidationError, TOut> matchValidationError)
         {
-            if (_notFoundError != null)
+            if (_variantId == NotFoundErrorId)
                 return matchNotFoundError(_notFoundError!);
-            if (_validationError != null)
+            if (_variantId == ValidationErrorId)
                 return matchValidationError(_validationError!);
             throw new System.InvalidOperationException("Inner type is unknown");
         }
 
         public async global::System.Threading.Tasks.Task<TOut> MatchAsync<TOut>(global::System.Func<global::MyApp.NotFoundError, global::System.Threading.CancellationToken, global::System.Threading.Tasks.Task<TOut>> matchNotFoundError, global::System.Func<global::MyApp.ValidationError, global::System.Threading.CancellationToken, global::System.Threading.Tasks.Task<TOut>> matchValidationError, global::System.Threading.CancellationToken ct)
         {
-            if (_notFoundError != null)
+            if (_variantId == NotFoundErrorId)
                 return await matchNotFoundError(_notFoundError!, ct).ConfigureAwait(false);
-            if (_validationError != null)
+            if (_variantId == ValidationErrorId)
                 return await matchValidationError(_validationError!, ct).ConfigureAwait(false);
             throw new System.InvalidOperationException("Inner type is unknown");
         }
 
         public void Switch(global::System.Action<global::MyApp.NotFoundError> switchNotFoundError, global::System.Action<global::MyApp.ValidationError> switchValidationError)
         {
-            if (_notFoundError != null)
+            if (_variantId == NotFoundErrorId)
             {
                 switchNotFoundError(_notFoundError!);
                 return;
             }
 
-            if (_validationError != null)
+            if (_variantId == ValidationErrorId)
             {
                 switchValidationError(_validationError!);
                 return;
@@ -96,13 +131,13 @@ namespace MyApp
 
         public async global::System.Threading.Tasks.Task SwitchAsync(global::System.Func<global::MyApp.NotFoundError, global::System.Threading.CancellationToken, global::System.Threading.Tasks.Task> switchNotFoundError, global::System.Func<global::MyApp.ValidationError, global::System.Threading.CancellationToken, global::System.Threading.Tasks.Task> switchValidationError, global::System.Threading.CancellationToken ct)
         {
-            if (_notFoundError != null)
+            if (_variantId == NotFoundErrorId)
             {
                 await switchNotFoundError(_notFoundError!, ct).ConfigureAwait(false);
                 return;
             }
 
-            if (_validationError != null)
+            if (_variantId == ValidationErrorId)
             {
                 await switchValidationError(_validationError!, ct).ConfigureAwait(false);
                 return;
@@ -115,9 +150,9 @@ namespace MyApp
         {
             get
             {
-                if (_notFoundError != null)
+                if (_variantId == NotFoundErrorId)
                     return typeof(global::MyApp.NotFoundError);
-                if (_validationError != null)
+                if (_variantId == ValidationErrorId)
                     return typeof(global::MyApp.ValidationError);
                 throw new System.InvalidOperationException("Inner type is unknown");
             }
@@ -125,9 +160,9 @@ namespace MyApp
 
         public override int GetHashCode()
         {
-            if (_notFoundError != null)
+            if (_variantId == NotFoundErrorId)
                 return _notFoundError.GetHashCode();
-            if (_validationError != null)
+            if (_variantId == ValidationErrorId)
                 return _validationError.GetHashCode();
             throw new System.InvalidOperationException("Inner type is unknown");
         }
@@ -159,18 +194,18 @@ namespace MyApp
                 return false;
             }
 
-            if (_notFoundError != null)
+            if (_variantId == NotFoundErrorId)
                 return System.Collections.Generic.EqualityComparer<global::MyApp.NotFoundError>.Default.Equals(_notFoundError!, other._notFoundError);
-            if (_validationError != null)
+            if (_variantId == ValidationErrorId)
                 return System.Collections.Generic.EqualityComparer<global::MyApp.ValidationError>.Default.Equals(_validationError!, other._validationError);
             throw new System.InvalidOperationException("Inner type is unknown");
         }
 
         public override string ToString()
         {
-            if (_notFoundError != null)
+            if (_variantId == NotFoundErrorId)
                 return _notFoundError.ToString();
-            if (_validationError != null)
+            if (_variantId == ValidationErrorId)
                 return _validationError.ToString();
             throw new System.InvalidOperationException("Inner type is unknown");
         }
