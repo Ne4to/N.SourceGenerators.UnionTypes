@@ -20,7 +20,7 @@ public partial class UnionTypesGenerator
         static StatementSyntax AliasStatement(UnionType unionType, UnionTypeVariant variant)
         {
             return IfStatement(
-                IsPropertyCondition(unionType, variant),
+                IsPropertyCondition(variant),
                 ReturnStatement(
                     InvocationExpression(
                         MemberAccess(variant.FieldName, "GetHashCode")
@@ -116,7 +116,7 @@ public partial class UnionTypesGenerator
                 }
                 
                 yield return IfStatement(
-                    IsPropertyCondition(unionType, variant),
+                    IsPropertyCondition(variant),
                     ReturnStatement(
                         InvocationExpression(
                             MemberAccessExpression(

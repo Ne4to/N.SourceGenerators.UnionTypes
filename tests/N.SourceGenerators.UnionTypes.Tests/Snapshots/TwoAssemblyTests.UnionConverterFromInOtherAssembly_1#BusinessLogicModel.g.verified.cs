@@ -9,20 +9,38 @@ namespace BusinessLogic
 {
     partial class BusinessLogicModel : System.IEquatable<BusinessLogicModel>
     {
+        private readonly int _variantId;
+        private const int DataAccessModel1Id = 1;
         private readonly global::DataAccess.DataAccessModel1? _dataAccessModel1;
-        public bool IsDataAccessModel1 => _dataAccessModel1 != null;
-        public global::DataAccess.DataAccessModel1 AsDataAccessModel1 => _dataAccessModel1 ?? throw new System.InvalidOperationException("Inner value is not DataAccessModel1");
+        public bool IsDataAccessModel1 => _variantId == DataAccessModel1Id;
+        public global::DataAccess.DataAccessModel1 AsDataAccessModel1
+        {
+            get
+            {
+                if (_variantId == DataAccessModel1Id)
+                    return _dataAccessModel1!;
+                throw new System.InvalidOperationException("Inner value is not DataAccessModel1");
+            }
+        }
+
         public BusinessLogicModel(global::DataAccess.DataAccessModel1 dataAccessModel1)
         {
             System.ArgumentNullException.ThrowIfNull(dataAccessModel1);
+            _variantId = DataAccessModel1Id;
             _dataAccessModel1 = dataAccessModel1;
         }
 
         public static implicit operator BusinessLogicModel(global::DataAccess.DataAccessModel1 dataAccessModel1) => new BusinessLogicModel(dataAccessModel1);
-        public static explicit operator global::DataAccess.DataAccessModel1(BusinessLogicModel value) => value._dataAccessModel1 ?? throw new System.InvalidOperationException("Inner value is not DataAccessModel1");
+        public static explicit operator global::DataAccess.DataAccessModel1(BusinessLogicModel value)
+        {
+            if (value._variantId == DataAccessModel1Id)
+                return value._dataAccessModel1!;
+            throw new System.InvalidOperationException("Inner value is not DataAccessModel1");
+        }
+
         public bool TryGetDataAccessModel1([System.Diagnostics.CodeAnalysis.NotNullWhen(true)] out global::DataAccess.DataAccessModel1? value)
         {
-            if (_dataAccessModel1 != null)
+            if (_variantId == DataAccessModel1Id)
             {
                 value = _dataAccessModel1;
                 return true;
@@ -34,20 +52,37 @@ namespace BusinessLogic
             }
         }
 
+        private const int DataAccessModel2Id = 2;
         private readonly global::DataAccess.DataAccessModel2? _dataAccessModel2;
-        public bool IsDataAccessModel2 => _dataAccessModel2 != null;
-        public global::DataAccess.DataAccessModel2 AsDataAccessModel2 => _dataAccessModel2 ?? throw new System.InvalidOperationException("Inner value is not DataAccessModel2");
+        public bool IsDataAccessModel2 => _variantId == DataAccessModel2Id;
+        public global::DataAccess.DataAccessModel2 AsDataAccessModel2
+        {
+            get
+            {
+                if (_variantId == DataAccessModel2Id)
+                    return _dataAccessModel2!;
+                throw new System.InvalidOperationException("Inner value is not DataAccessModel2");
+            }
+        }
+
         public BusinessLogicModel(global::DataAccess.DataAccessModel2 dataAccessModel2)
         {
             System.ArgumentNullException.ThrowIfNull(dataAccessModel2);
+            _variantId = DataAccessModel2Id;
             _dataAccessModel2 = dataAccessModel2;
         }
 
         public static implicit operator BusinessLogicModel(global::DataAccess.DataAccessModel2 dataAccessModel2) => new BusinessLogicModel(dataAccessModel2);
-        public static explicit operator global::DataAccess.DataAccessModel2(BusinessLogicModel value) => value._dataAccessModel2 ?? throw new System.InvalidOperationException("Inner value is not DataAccessModel2");
+        public static explicit operator global::DataAccess.DataAccessModel2(BusinessLogicModel value)
+        {
+            if (value._variantId == DataAccessModel2Id)
+                return value._dataAccessModel2!;
+            throw new System.InvalidOperationException("Inner value is not DataAccessModel2");
+        }
+
         public bool TryGetDataAccessModel2([System.Diagnostics.CodeAnalysis.NotNullWhen(true)] out global::DataAccess.DataAccessModel2? value)
         {
-            if (_dataAccessModel2 != null)
+            if (_variantId == DataAccessModel2Id)
             {
                 value = _dataAccessModel2;
                 return true;
@@ -59,20 +94,37 @@ namespace BusinessLogic
             }
         }
 
+        private const int BusinessLogicModel1Id = 3;
         private readonly global::BusinessLogic.BusinessLogicModel1? _businessLogicModel1;
-        public bool IsBusinessLogicModel1 => _businessLogicModel1 != null;
-        public global::BusinessLogic.BusinessLogicModel1 AsBusinessLogicModel1 => _businessLogicModel1 ?? throw new System.InvalidOperationException("Inner value is not BusinessLogicModel1");
+        public bool IsBusinessLogicModel1 => _variantId == BusinessLogicModel1Id;
+        public global::BusinessLogic.BusinessLogicModel1 AsBusinessLogicModel1
+        {
+            get
+            {
+                if (_variantId == BusinessLogicModel1Id)
+                    return _businessLogicModel1!;
+                throw new System.InvalidOperationException("Inner value is not BusinessLogicModel1");
+            }
+        }
+
         public BusinessLogicModel(global::BusinessLogic.BusinessLogicModel1 businessLogicModel1)
         {
             System.ArgumentNullException.ThrowIfNull(businessLogicModel1);
+            _variantId = BusinessLogicModel1Id;
             _businessLogicModel1 = businessLogicModel1;
         }
 
         public static implicit operator BusinessLogicModel(global::BusinessLogic.BusinessLogicModel1 businessLogicModel1) => new BusinessLogicModel(businessLogicModel1);
-        public static explicit operator global::BusinessLogic.BusinessLogicModel1(BusinessLogicModel value) => value._businessLogicModel1 ?? throw new System.InvalidOperationException("Inner value is not BusinessLogicModel1");
+        public static explicit operator global::BusinessLogic.BusinessLogicModel1(BusinessLogicModel value)
+        {
+            if (value._variantId == BusinessLogicModel1Id)
+                return value._businessLogicModel1!;
+            throw new System.InvalidOperationException("Inner value is not BusinessLogicModel1");
+        }
+
         public bool TryGetBusinessLogicModel1([System.Diagnostics.CodeAnalysis.NotNullWhen(true)] out global::BusinessLogic.BusinessLogicModel1? value)
         {
-            if (_businessLogicModel1 != null)
+            if (_variantId == BusinessLogicModel1Id)
             {
                 value = _businessLogicModel1;
                 return true;
@@ -86,41 +138,41 @@ namespace BusinessLogic
 
         public TOut Match<TOut>(global::System.Func<global::DataAccess.DataAccessModel1, TOut> matchDataAccessModel1, global::System.Func<global::DataAccess.DataAccessModel2, TOut> matchDataAccessModel2, global::System.Func<global::BusinessLogic.BusinessLogicModel1, TOut> matchBusinessLogicModel1)
         {
-            if (_dataAccessModel1 != null)
+            if (_variantId == DataAccessModel1Id)
                 return matchDataAccessModel1(_dataAccessModel1!);
-            if (_dataAccessModel2 != null)
+            if (_variantId == DataAccessModel2Id)
                 return matchDataAccessModel2(_dataAccessModel2!);
-            if (_businessLogicModel1 != null)
+            if (_variantId == BusinessLogicModel1Id)
                 return matchBusinessLogicModel1(_businessLogicModel1!);
             throw new System.InvalidOperationException("Inner type is unknown");
         }
 
         public async global::System.Threading.Tasks.Task<TOut> MatchAsync<TOut>(global::System.Func<global::DataAccess.DataAccessModel1, global::System.Threading.CancellationToken, global::System.Threading.Tasks.Task<TOut>> matchDataAccessModel1, global::System.Func<global::DataAccess.DataAccessModel2, global::System.Threading.CancellationToken, global::System.Threading.Tasks.Task<TOut>> matchDataAccessModel2, global::System.Func<global::BusinessLogic.BusinessLogicModel1, global::System.Threading.CancellationToken, global::System.Threading.Tasks.Task<TOut>> matchBusinessLogicModel1, global::System.Threading.CancellationToken ct)
         {
-            if (_dataAccessModel1 != null)
+            if (_variantId == DataAccessModel1Id)
                 return await matchDataAccessModel1(_dataAccessModel1!, ct).ConfigureAwait(false);
-            if (_dataAccessModel2 != null)
+            if (_variantId == DataAccessModel2Id)
                 return await matchDataAccessModel2(_dataAccessModel2!, ct).ConfigureAwait(false);
-            if (_businessLogicModel1 != null)
+            if (_variantId == BusinessLogicModel1Id)
                 return await matchBusinessLogicModel1(_businessLogicModel1!, ct).ConfigureAwait(false);
             throw new System.InvalidOperationException("Inner type is unknown");
         }
 
         public void Switch(global::System.Action<global::DataAccess.DataAccessModel1> switchDataAccessModel1, global::System.Action<global::DataAccess.DataAccessModel2> switchDataAccessModel2, global::System.Action<global::BusinessLogic.BusinessLogicModel1> switchBusinessLogicModel1)
         {
-            if (_dataAccessModel1 != null)
+            if (_variantId == DataAccessModel1Id)
             {
                 switchDataAccessModel1(_dataAccessModel1!);
                 return;
             }
 
-            if (_dataAccessModel2 != null)
+            if (_variantId == DataAccessModel2Id)
             {
                 switchDataAccessModel2(_dataAccessModel2!);
                 return;
             }
 
-            if (_businessLogicModel1 != null)
+            if (_variantId == BusinessLogicModel1Id)
             {
                 switchBusinessLogicModel1(_businessLogicModel1!);
                 return;
@@ -131,19 +183,19 @@ namespace BusinessLogic
 
         public async global::System.Threading.Tasks.Task SwitchAsync(global::System.Func<global::DataAccess.DataAccessModel1, global::System.Threading.CancellationToken, global::System.Threading.Tasks.Task> switchDataAccessModel1, global::System.Func<global::DataAccess.DataAccessModel2, global::System.Threading.CancellationToken, global::System.Threading.Tasks.Task> switchDataAccessModel2, global::System.Func<global::BusinessLogic.BusinessLogicModel1, global::System.Threading.CancellationToken, global::System.Threading.Tasks.Task> switchBusinessLogicModel1, global::System.Threading.CancellationToken ct)
         {
-            if (_dataAccessModel1 != null)
+            if (_variantId == DataAccessModel1Id)
             {
                 await switchDataAccessModel1(_dataAccessModel1!, ct).ConfigureAwait(false);
                 return;
             }
 
-            if (_dataAccessModel2 != null)
+            if (_variantId == DataAccessModel2Id)
             {
                 await switchDataAccessModel2(_dataAccessModel2!, ct).ConfigureAwait(false);
                 return;
             }
 
-            if (_businessLogicModel1 != null)
+            if (_variantId == BusinessLogicModel1Id)
             {
                 await switchBusinessLogicModel1(_businessLogicModel1!, ct).ConfigureAwait(false);
                 return;
@@ -156,11 +208,11 @@ namespace BusinessLogic
         {
             get
             {
-                if (_dataAccessModel1 != null)
+                if (_variantId == DataAccessModel1Id)
                     return typeof(global::DataAccess.DataAccessModel1);
-                if (_dataAccessModel2 != null)
+                if (_variantId == DataAccessModel2Id)
                     return typeof(global::DataAccess.DataAccessModel2);
-                if (_businessLogicModel1 != null)
+                if (_variantId == BusinessLogicModel1Id)
                     return typeof(global::BusinessLogic.BusinessLogicModel1);
                 throw new System.InvalidOperationException("Inner type is unknown");
             }
@@ -168,11 +220,11 @@ namespace BusinessLogic
 
         public override int GetHashCode()
         {
-            if (_dataAccessModel1 != null)
+            if (_variantId == DataAccessModel1Id)
                 return _dataAccessModel1.GetHashCode();
-            if (_dataAccessModel2 != null)
+            if (_variantId == DataAccessModel2Id)
                 return _dataAccessModel2.GetHashCode();
-            if (_businessLogicModel1 != null)
+            if (_variantId == BusinessLogicModel1Id)
                 return _businessLogicModel1.GetHashCode();
             throw new System.InvalidOperationException("Inner type is unknown");
         }
@@ -204,22 +256,22 @@ namespace BusinessLogic
                 return false;
             }
 
-            if (_dataAccessModel1 != null)
+            if (_variantId == DataAccessModel1Id)
                 return System.Collections.Generic.EqualityComparer<global::DataAccess.DataAccessModel1>.Default.Equals(_dataAccessModel1!, other._dataAccessModel1);
-            if (_dataAccessModel2 != null)
+            if (_variantId == DataAccessModel2Id)
                 return System.Collections.Generic.EqualityComparer<global::DataAccess.DataAccessModel2>.Default.Equals(_dataAccessModel2!, other._dataAccessModel2);
-            if (_businessLogicModel1 != null)
+            if (_variantId == BusinessLogicModel1Id)
                 return System.Collections.Generic.EqualityComparer<global::BusinessLogic.BusinessLogicModel1>.Default.Equals(_businessLogicModel1!, other._businessLogicModel1);
             throw new System.InvalidOperationException("Inner type is unknown");
         }
 
         public override string ToString()
         {
-            if (_dataAccessModel1 != null)
+            if (_variantId == DataAccessModel1Id)
                 return _dataAccessModel1.ToString();
-            if (_dataAccessModel2 != null)
+            if (_variantId == DataAccessModel2Id)
                 return _dataAccessModel2.ToString();
-            if (_businessLogicModel1 != null)
+            if (_variantId == BusinessLogicModel1Id)
                 return _businessLogicModel1.ToString();
             throw new System.InvalidOperationException("Inner type is unknown");
         }

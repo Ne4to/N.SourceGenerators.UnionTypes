@@ -1,0 +1,114 @@
+namespace N.SourceGenerators.UnionTypes.BehaviorTests;
+
+[UnionType(typeof(ValueNotSet))]
+[UnionType(typeof(string))]
+[UnionType(typeof(UserStatus))]
+partial struct StructUnion
+{
+}
+
+public class StructUnionTests
+{
+    [Fact]
+    public void AllOperations()
+    {
+        StructUnion unionValue = "42";
+
+        // IsProperty
+        Assert.False(unionValue.IsValueNotSet);
+        Assert.True(unionValue.IsString);
+        Assert.False(unionValue.IsUserStatus);
+
+        // AsProperty
+        Assert.Throws<InvalidOperationException>(() => _ = unionValue.AsValueNotSet);
+        Assert.Equal("42", unionValue.AsString);
+        Assert.Throws<InvalidOperationException>(() => _ = unionValue.AsUserStatus);
+        
+        // .ctor
+        StructUnion ctorValueNotSet = new StructUnion(new ValueNotSet());
+        Assert.Equal(new ValueNotSet(), ctorValueNotSet);
+        
+        StructUnion ctorString = new StructUnion("42");
+        Assert.Equal("42", ctorString);
+        
+        StructUnion ctorUserStatus = new StructUnion(UserStatus.Active);
+        Assert.Equal(UserStatus.Active, ctorUserStatus);
+        
+        // implicit operator
+        StructUnion implicitValueNotSet = new ValueNotSet();
+        Assert.Equal(new ValueNotSet(), implicitValueNotSet);
+        
+        StructUnion implicitUserStatus = UserStatus.Active;
+        Assert.Equal(UserStatus.Active, implicitUserStatus);
+        
+        // explicit operator
+        Assert.Throws<InvalidOperationException>(() => _ = (ValueNotSet)unionValue);
+        Assert.Equal("42", (string)unionValue);
+        Assert.Throws<InvalidOperationException>(() => _ = (UserStatus)unionValue);
+        
+        // TryGet
+        Assert.False(unionValue.TryGetValueNotSet(out var tryGetValueNotSetValue));
+        Assert.Null(tryGetValueNotSetValue);
+        
+        Assert.True(unionValue.TryGetString(out var tryGetStringValue));
+        Assert.Equal("42", tryGetStringValue);
+
+        Assert.False(unionValue.TryGetUserStatus(out var tryGetUserStatusValue));
+        Assert.Null(tryGetUserStatusValue);
+
+        // Match
+        var matchResult = unionValue.Match<string>(
+            matchValueNotSet: _ =>
+            {
+                Assert.Fail("should not be called");
+                return "ValueNotSet";
+            },
+            matchString: s =>
+            {
+                Assert.Equal("42", s);
+                return "String";
+            },
+            matchUserStatus: _ =>
+            {
+                Assert.Fail("should not be called");
+                return "UserStatus";
+            });
+        Assert.Equal("String", matchResult);
+
+        // Switch
+        bool switchWasExecuted = false;
+        unionValue.Switch(
+            switchValueNotSet: _ => Assert.Fail("should not be called"),
+            switchString: x =>
+            {
+                Assert.Equal("42", x);
+                switchWasExecuted = true;
+            },
+            switchUserStatus: _ => Assert.Fail("should not be called"));
+        Assert.True(switchWasExecuted);
+
+        // ValueType
+        Assert.Equal(typeof(string), unionValue.ValueType);
+        
+        // operator ==
+        Assert.False(unionValue == new ValueNotSet());
+        Assert.True(unionValue == "42");
+        Assert.False(unionValue == UserStatus.Active);
+        
+        // operator !=
+        Assert.True(unionValue != new ValueNotSet());
+        Assert.False(unionValue != "42");
+        Assert.True(unionValue != UserStatus.Active);
+        
+        // Equals
+        Assert.False(unionValue.Equals(new ValueNotSet()));
+        Assert.True(unionValue.Equals( "42"));
+        Assert.False(unionValue.Equals( UserStatus.Active));
+        
+        // ToString
+        Assert.Equal("42", unionValue.ToString());
+        
+        // GetHashCode
+        Assert.Equal("42".GetHashCode(), unionValue.GetHashCode());
+    }
+}
