@@ -11,14 +11,14 @@ namespace DataAccess
     {
         private readonly int _variantId;
         private const int DataAccessModel1Id = 1;
-        private readonly global::DataAccess.DataAccessModel1? _dataAccessModel1;
+        private readonly global::DataAccess.DataAccessModel1 _dataAccessModel1;
         public bool IsDataAccessModel1 => _variantId == DataAccessModel1Id;
         public global::DataAccess.DataAccessModel1 AsDataAccessModel1
         {
             get
             {
                 if (_variantId == DataAccessModel1Id)
-                    return _dataAccessModel1!;
+                    return _dataAccessModel1;
                 throw new System.InvalidOperationException("Inner value is not DataAccessModel1");
             }
         }
@@ -34,11 +34,11 @@ namespace DataAccess
         public static explicit operator global::DataAccess.DataAccessModel1(DataAccessModel value)
         {
             if (value._variantId == DataAccessModel1Id)
-                return value._dataAccessModel1!;
+                return value._dataAccessModel1;
             throw new System.InvalidOperationException("Inner value is not DataAccessModel1");
         }
 
-        public bool TryGetDataAccessModel1([System.Diagnostics.CodeAnalysis.NotNullWhen(true)] out global::DataAccess.DataAccessModel1? value)
+        public bool TryGetDataAccessModel1([System.Diagnostics.CodeAnalysis.NotNullWhen(true)] out global::DataAccess.DataAccessModel1 value)
         {
             if (_variantId == DataAccessModel1Id)
             {
@@ -53,14 +53,14 @@ namespace DataAccess
         }
 
         private const int DataAccessModel2Id = 2;
-        private readonly global::DataAccess.DataAccessModel2? _dataAccessModel2;
+        private readonly global::DataAccess.DataAccessModel2 _dataAccessModel2;
         public bool IsDataAccessModel2 => _variantId == DataAccessModel2Id;
         public global::DataAccess.DataAccessModel2 AsDataAccessModel2
         {
             get
             {
                 if (_variantId == DataAccessModel2Id)
-                    return _dataAccessModel2!;
+                    return _dataAccessModel2;
                 throw new System.InvalidOperationException("Inner value is not DataAccessModel2");
             }
         }
@@ -76,11 +76,11 @@ namespace DataAccess
         public static explicit operator global::DataAccess.DataAccessModel2(DataAccessModel value)
         {
             if (value._variantId == DataAccessModel2Id)
-                return value._dataAccessModel2!;
+                return value._dataAccessModel2;
             throw new System.InvalidOperationException("Inner value is not DataAccessModel2");
         }
 
-        public bool TryGetDataAccessModel2([System.Diagnostics.CodeAnalysis.NotNullWhen(true)] out global::DataAccess.DataAccessModel2? value)
+        public bool TryGetDataAccessModel2([System.Diagnostics.CodeAnalysis.NotNullWhen(true)] out global::DataAccess.DataAccessModel2 value)
         {
             if (_variantId == DataAccessModel2Id)
             {
@@ -97,18 +97,18 @@ namespace DataAccess
         public TOut Match<TOut>(global::System.Func<global::DataAccess.DataAccessModel1, TOut> matchDataAccessModel1, global::System.Func<global::DataAccess.DataAccessModel2, TOut> matchDataAccessModel2)
         {
             if (_variantId == DataAccessModel1Id)
-                return matchDataAccessModel1(_dataAccessModel1!);
+                return matchDataAccessModel1(_dataAccessModel1);
             if (_variantId == DataAccessModel2Id)
-                return matchDataAccessModel2(_dataAccessModel2!);
+                return matchDataAccessModel2(_dataAccessModel2);
             throw new System.InvalidOperationException("Inner type is unknown");
         }
 
         public async global::System.Threading.Tasks.Task<TOut> MatchAsync<TOut>(global::System.Func<global::DataAccess.DataAccessModel1, global::System.Threading.CancellationToken, global::System.Threading.Tasks.Task<TOut>> matchDataAccessModel1, global::System.Func<global::DataAccess.DataAccessModel2, global::System.Threading.CancellationToken, global::System.Threading.Tasks.Task<TOut>> matchDataAccessModel2, global::System.Threading.CancellationToken ct)
         {
             if (_variantId == DataAccessModel1Id)
-                return await matchDataAccessModel1(_dataAccessModel1!, ct).ConfigureAwait(false);
+                return await matchDataAccessModel1(_dataAccessModel1, ct).ConfigureAwait(false);
             if (_variantId == DataAccessModel2Id)
-                return await matchDataAccessModel2(_dataAccessModel2!, ct).ConfigureAwait(false);
+                return await matchDataAccessModel2(_dataAccessModel2, ct).ConfigureAwait(false);
             throw new System.InvalidOperationException("Inner type is unknown");
         }
 
@@ -116,13 +116,13 @@ namespace DataAccess
         {
             if (_variantId == DataAccessModel1Id)
             {
-                switchDataAccessModel1(_dataAccessModel1!);
+                switchDataAccessModel1(_dataAccessModel1);
                 return;
             }
 
             if (_variantId == DataAccessModel2Id)
             {
-                switchDataAccessModel2(_dataAccessModel2!);
+                switchDataAccessModel2(_dataAccessModel2);
                 return;
             }
 
@@ -133,13 +133,13 @@ namespace DataAccess
         {
             if (_variantId == DataAccessModel1Id)
             {
-                await switchDataAccessModel1(_dataAccessModel1!, ct).ConfigureAwait(false);
+                await switchDataAccessModel1(_dataAccessModel1, ct).ConfigureAwait(false);
                 return;
             }
 
             if (_variantId == DataAccessModel2Id)
             {
-                await switchDataAccessModel2(_dataAccessModel2!, ct).ConfigureAwait(false);
+                await switchDataAccessModel2(_dataAccessModel2, ct).ConfigureAwait(false);
                 return;
             }
 
@@ -195,9 +195,9 @@ namespace DataAccess
             }
 
             if (_variantId == DataAccessModel1Id)
-                return System.Collections.Generic.EqualityComparer<global::DataAccess.DataAccessModel1>.Default.Equals(_dataAccessModel1!, other._dataAccessModel1);
+                return System.Collections.Generic.EqualityComparer<global::DataAccess.DataAccessModel1>.Default.Equals(_dataAccessModel1, other._dataAccessModel1);
             if (_variantId == DataAccessModel2Id)
-                return System.Collections.Generic.EqualityComparer<global::DataAccess.DataAccessModel2>.Default.Equals(_dataAccessModel2!, other._dataAccessModel2);
+                return System.Collections.Generic.EqualityComparer<global::DataAccess.DataAccessModel2>.Default.Equals(_dataAccessModel2, other._dataAccessModel2);
             throw new System.InvalidOperationException("Inner type is unknown");
         }
 

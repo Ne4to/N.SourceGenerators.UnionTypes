@@ -9,14 +9,14 @@ partial class OperationDataResult<TResult, TError> : System.IEquatable<Operation
 {
     private readonly int _variantId;
     private const int ResultId = 1;
-    private readonly TResult? _result;
+    private readonly TResult _result;
     public bool IsResult => _variantId == ResultId;
     public TResult AsResult
     {
         get
         {
             if (_variantId == ResultId)
-                return _result!;
+                return _result;
             throw new System.InvalidOperationException("Inner value is not Result");
         }
     }
@@ -32,11 +32,11 @@ partial class OperationDataResult<TResult, TError> : System.IEquatable<Operation
     public static explicit operator TResult(OperationDataResult<TResult, TError> value)
     {
         if (value._variantId == ResultId)
-            return value._result!;
+            return value._result;
         throw new System.InvalidOperationException("Inner value is not Result");
     }
 
-    public bool TryGetResult([System.Diagnostics.CodeAnalysis.NotNullWhen(true)] out TResult? value)
+    public bool TryGetResult([System.Diagnostics.CodeAnalysis.NotNullWhen(true)] out TResult value)
     {
         if (_variantId == ResultId)
         {
@@ -51,14 +51,14 @@ partial class OperationDataResult<TResult, TError> : System.IEquatable<Operation
     }
 
     private const int ErrorId = 2;
-    private readonly TError? _error;
+    private readonly TError _error;
     public bool IsError => _variantId == ErrorId;
     public TError AsError
     {
         get
         {
             if (_variantId == ErrorId)
-                return _error!;
+                return _error;
             throw new System.InvalidOperationException("Inner value is not Error");
         }
     }
@@ -74,11 +74,11 @@ partial class OperationDataResult<TResult, TError> : System.IEquatable<Operation
     public static explicit operator TError(OperationDataResult<TResult, TError> value)
     {
         if (value._variantId == ErrorId)
-            return value._error!;
+            return value._error;
         throw new System.InvalidOperationException("Inner value is not Error");
     }
 
-    public bool TryGetError([System.Diagnostics.CodeAnalysis.NotNullWhen(true)] out TError? value)
+    public bool TryGetError([System.Diagnostics.CodeAnalysis.NotNullWhen(true)] out TError value)
     {
         if (_variantId == ErrorId)
         {
@@ -93,14 +93,14 @@ partial class OperationDataResult<TResult, TError> : System.IEquatable<Operation
     }
 
     private const int Int32Id = 3;
-    private readonly int? _int32;
+    private readonly int _int32;
     public bool IsInt32 => _variantId == Int32Id;
     public int AsInt32
     {
         get
         {
             if (_variantId == Int32Id)
-                return _int32.Value;
+                return _int32;
             throw new System.InvalidOperationException("Inner value is not Int32");
         }
     }
@@ -116,11 +116,11 @@ partial class OperationDataResult<TResult, TError> : System.IEquatable<Operation
     public static explicit operator int(OperationDataResult<TResult, TError> value)
     {
         if (value._variantId == Int32Id)
-            return value._int32.Value;
+            return value._int32;
         throw new System.InvalidOperationException("Inner value is not Int32");
     }
 
-    public bool TryGetInt32([System.Diagnostics.CodeAnalysis.NotNullWhen(true)] out int? value)
+    public bool TryGetInt32([System.Diagnostics.CodeAnalysis.NotNullWhen(true)] out int value)
     {
         if (_variantId == Int32Id)
         {
@@ -137,22 +137,22 @@ partial class OperationDataResult<TResult, TError> : System.IEquatable<Operation
     public TOut Match<TOut>(global::System.Func<TResult, TOut> matchResult, global::System.Func<TError, TOut> matchError, global::System.Func<int, TOut> matchInt32)
     {
         if (_variantId == ResultId)
-            return matchResult(_result!);
+            return matchResult(_result);
         if (_variantId == ErrorId)
-            return matchError(_error!);
+            return matchError(_error);
         if (_variantId == Int32Id)
-            return matchInt32(_int32.Value);
+            return matchInt32(_int32);
         throw new System.InvalidOperationException("Inner type is unknown");
     }
 
     public async global::System.Threading.Tasks.Task<TOut> MatchAsync<TOut>(global::System.Func<TResult, global::System.Threading.CancellationToken, global::System.Threading.Tasks.Task<TOut>> matchResult, global::System.Func<TError, global::System.Threading.CancellationToken, global::System.Threading.Tasks.Task<TOut>> matchError, global::System.Func<int, global::System.Threading.CancellationToken, global::System.Threading.Tasks.Task<TOut>> matchInt32, global::System.Threading.CancellationToken ct)
     {
         if (_variantId == ResultId)
-            return await matchResult(_result!, ct).ConfigureAwait(false);
+            return await matchResult(_result, ct).ConfigureAwait(false);
         if (_variantId == ErrorId)
-            return await matchError(_error!, ct).ConfigureAwait(false);
+            return await matchError(_error, ct).ConfigureAwait(false);
         if (_variantId == Int32Id)
-            return await matchInt32(_int32.Value, ct).ConfigureAwait(false);
+            return await matchInt32(_int32, ct).ConfigureAwait(false);
         throw new System.InvalidOperationException("Inner type is unknown");
     }
 
@@ -160,19 +160,19 @@ partial class OperationDataResult<TResult, TError> : System.IEquatable<Operation
     {
         if (_variantId == ResultId)
         {
-            switchResult(_result!);
+            switchResult(_result);
             return;
         }
 
         if (_variantId == ErrorId)
         {
-            switchError(_error!);
+            switchError(_error);
             return;
         }
 
         if (_variantId == Int32Id)
         {
-            switchInt32(_int32.Value);
+            switchInt32(_int32);
             return;
         }
 
@@ -183,19 +183,19 @@ partial class OperationDataResult<TResult, TError> : System.IEquatable<Operation
     {
         if (_variantId == ResultId)
         {
-            await switchResult(_result!, ct).ConfigureAwait(false);
+            await switchResult(_result, ct).ConfigureAwait(false);
             return;
         }
 
         if (_variantId == ErrorId)
         {
-            await switchError(_error!, ct).ConfigureAwait(false);
+            await switchError(_error, ct).ConfigureAwait(false);
             return;
         }
 
         if (_variantId == Int32Id)
         {
-            await switchInt32(_int32.Value, ct).ConfigureAwait(false);
+            await switchInt32(_int32, ct).ConfigureAwait(false);
             return;
         }
 
@@ -255,11 +255,11 @@ partial class OperationDataResult<TResult, TError> : System.IEquatable<Operation
         }
 
         if (_variantId == ResultId)
-            return System.Collections.Generic.EqualityComparer<TResult>.Default.Equals(_result!, other._result);
+            return System.Collections.Generic.EqualityComparer<TResult>.Default.Equals(_result, other._result);
         if (_variantId == ErrorId)
-            return System.Collections.Generic.EqualityComparer<TError>.Default.Equals(_error!, other._error);
+            return System.Collections.Generic.EqualityComparer<TError>.Default.Equals(_error, other._error);
         if (_variantId == Int32Id)
-            return System.Collections.Generic.EqualityComparer<int>.Default.Equals(_int32.Value, other._int32.Value);
+            return System.Collections.Generic.EqualityComparer<int>.Default.Equals(_int32, other._int32);
         throw new System.InvalidOperationException("Inner type is unknown");
     }
 

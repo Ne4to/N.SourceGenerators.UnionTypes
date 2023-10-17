@@ -11,14 +11,14 @@ namespace MyApp
     {
         private readonly int _variantId;
         private const int SuccessId = 1;
-        private readonly global::MyApp.Success? _success;
+        private readonly global::MyApp.Success _success;
         public bool IsSuccess => _variantId == SuccessId;
         public global::MyApp.Success AsSuccess
         {
             get
             {
                 if (_variantId == SuccessId)
-                    return _success!;
+                    return _success;
                 throw new System.InvalidOperationException("Inner value is not Success");
             }
         }
@@ -34,11 +34,11 @@ namespace MyApp
         public static explicit operator global::MyApp.Success(Result value)
         {
             if (value._variantId == SuccessId)
-                return value._success!;
+                return value._success;
             throw new System.InvalidOperationException("Inner value is not Success");
         }
 
-        public bool TryGetSuccess([System.Diagnostics.CodeAnalysis.NotNullWhen(true)] out global::MyApp.Success? value)
+        public bool TryGetSuccess([System.Diagnostics.CodeAnalysis.NotNullWhen(true)] out global::MyApp.Success value)
         {
             if (_variantId == SuccessId)
             {
@@ -53,14 +53,14 @@ namespace MyApp
         }
 
         private const int ErrorId = 2;
-        private readonly global::MyApp.Error? _error;
+        private readonly global::MyApp.Error _error;
         public bool IsError => _variantId == ErrorId;
         public global::MyApp.Error AsError
         {
             get
             {
                 if (_variantId == ErrorId)
-                    return _error!;
+                    return _error;
                 throw new System.InvalidOperationException("Inner value is not Error");
             }
         }
@@ -76,11 +76,11 @@ namespace MyApp
         public static explicit operator global::MyApp.Error(Result value)
         {
             if (value._variantId == ErrorId)
-                return value._error!;
+                return value._error;
             throw new System.InvalidOperationException("Inner value is not Error");
         }
 
-        public bool TryGetError([System.Diagnostics.CodeAnalysis.NotNullWhen(true)] out global::MyApp.Error? value)
+        public bool TryGetError([System.Diagnostics.CodeAnalysis.NotNullWhen(true)] out global::MyApp.Error value)
         {
             if (_variantId == ErrorId)
             {
@@ -95,14 +95,14 @@ namespace MyApp
         }
 
         private const int IReadOnlyListOfInt32Id = 3;
-        private readonly global::System.Collections.Generic.IReadOnlyList<int>? _iReadOnlyListOfInt32;
+        private readonly global::System.Collections.Generic.IReadOnlyList<int> _iReadOnlyListOfInt32;
         public bool IsIReadOnlyListOfInt32 => _variantId == IReadOnlyListOfInt32Id;
         public global::System.Collections.Generic.IReadOnlyList<int> AsIReadOnlyListOfInt32
         {
             get
             {
                 if (_variantId == IReadOnlyListOfInt32Id)
-                    return _iReadOnlyListOfInt32!;
+                    return _iReadOnlyListOfInt32;
                 throw new System.InvalidOperationException("Inner value is not IReadOnlyListOfInt32");
             }
         }
@@ -114,7 +114,7 @@ namespace MyApp
             _iReadOnlyListOfInt32 = iReadOnlyListOfInt32;
         }
 
-        public bool TryGetIReadOnlyListOfInt32([System.Diagnostics.CodeAnalysis.NotNullWhen(true)] out global::System.Collections.Generic.IReadOnlyList<int>? value)
+        public bool TryGetIReadOnlyListOfInt32([System.Diagnostics.CodeAnalysis.NotNullWhen(true)] out global::System.Collections.Generic.IReadOnlyList<int> value)
         {
             if (_variantId == IReadOnlyListOfInt32Id)
             {
@@ -129,14 +129,14 @@ namespace MyApp
         }
 
         private const int ArrayOfStringId = 4;
-        private readonly string[]? _arrayOfString;
+        private readonly string[] _arrayOfString;
         public bool IsArrayOfString => _variantId == ArrayOfStringId;
         public string[] AsArrayOfString
         {
             get
             {
                 if (_variantId == ArrayOfStringId)
-                    return _arrayOfString!;
+                    return _arrayOfString;
                 throw new System.InvalidOperationException("Inner value is not ArrayOfString");
             }
         }
@@ -152,11 +152,11 @@ namespace MyApp
         public static explicit operator string[](Result value)
         {
             if (value._variantId == ArrayOfStringId)
-                return value._arrayOfString!;
+                return value._arrayOfString;
             throw new System.InvalidOperationException("Inner value is not ArrayOfString");
         }
 
-        public bool TryGetArrayOfString([System.Diagnostics.CodeAnalysis.NotNullWhen(true)] out string[]? value)
+        public bool TryGetArrayOfString([System.Diagnostics.CodeAnalysis.NotNullWhen(true)] out string[] value)
         {
             if (_variantId == ArrayOfStringId)
             {
@@ -171,14 +171,14 @@ namespace MyApp
         }
 
         private const int TupleOfInt32AndStringId = 5;
-        private readonly global::System.Tuple<int, string>? _tupleOfInt32AndString;
+        private readonly global::System.Tuple<int, string> _tupleOfInt32AndString;
         public bool IsTupleOfInt32AndString => _variantId == TupleOfInt32AndStringId;
         public global::System.Tuple<int, string> AsTupleOfInt32AndString
         {
             get
             {
                 if (_variantId == TupleOfInt32AndStringId)
-                    return _tupleOfInt32AndString!;
+                    return _tupleOfInt32AndString;
                 throw new System.InvalidOperationException("Inner value is not TupleOfInt32AndString");
             }
         }
@@ -194,11 +194,11 @@ namespace MyApp
         public static explicit operator global::System.Tuple<int, string>(Result value)
         {
             if (value._variantId == TupleOfInt32AndStringId)
-                return value._tupleOfInt32AndString!;
+                return value._tupleOfInt32AndString;
             throw new System.InvalidOperationException("Inner value is not TupleOfInt32AndString");
         }
 
-        public bool TryGetTupleOfInt32AndString([System.Diagnostics.CodeAnalysis.NotNullWhen(true)] out global::System.Tuple<int, string>? value)
+        public bool TryGetTupleOfInt32AndString([System.Diagnostics.CodeAnalysis.NotNullWhen(true)] out global::System.Tuple<int, string> value)
         {
             if (_variantId == TupleOfInt32AndStringId)
             {
@@ -215,30 +215,30 @@ namespace MyApp
         public TOut Match<TOut>(global::System.Func<global::MyApp.Success, TOut> matchSuccess, global::System.Func<global::MyApp.Error, TOut> matchError, global::System.Func<global::System.Collections.Generic.IReadOnlyList<int>, TOut> matchIReadOnlyListOfInt32, global::System.Func<string[], TOut> matchArrayOfString, global::System.Func<global::System.Tuple<int, string>, TOut> matchTupleOfInt32AndString)
         {
             if (_variantId == SuccessId)
-                return matchSuccess(_success!);
+                return matchSuccess(_success);
             if (_variantId == ErrorId)
-                return matchError(_error!);
+                return matchError(_error);
             if (_variantId == IReadOnlyListOfInt32Id)
-                return matchIReadOnlyListOfInt32(_iReadOnlyListOfInt32!);
+                return matchIReadOnlyListOfInt32(_iReadOnlyListOfInt32);
             if (_variantId == ArrayOfStringId)
-                return matchArrayOfString(_arrayOfString!);
+                return matchArrayOfString(_arrayOfString);
             if (_variantId == TupleOfInt32AndStringId)
-                return matchTupleOfInt32AndString(_tupleOfInt32AndString!);
+                return matchTupleOfInt32AndString(_tupleOfInt32AndString);
             throw new System.InvalidOperationException("Inner type is unknown");
         }
 
         public async global::System.Threading.Tasks.Task<TOut> MatchAsync<TOut>(global::System.Func<global::MyApp.Success, global::System.Threading.CancellationToken, global::System.Threading.Tasks.Task<TOut>> matchSuccess, global::System.Func<global::MyApp.Error, global::System.Threading.CancellationToken, global::System.Threading.Tasks.Task<TOut>> matchError, global::System.Func<global::System.Collections.Generic.IReadOnlyList<int>, global::System.Threading.CancellationToken, global::System.Threading.Tasks.Task<TOut>> matchIReadOnlyListOfInt32, global::System.Func<string[], global::System.Threading.CancellationToken, global::System.Threading.Tasks.Task<TOut>> matchArrayOfString, global::System.Func<global::System.Tuple<int, string>, global::System.Threading.CancellationToken, global::System.Threading.Tasks.Task<TOut>> matchTupleOfInt32AndString, global::System.Threading.CancellationToken ct)
         {
             if (_variantId == SuccessId)
-                return await matchSuccess(_success!, ct).ConfigureAwait(false);
+                return await matchSuccess(_success, ct).ConfigureAwait(false);
             if (_variantId == ErrorId)
-                return await matchError(_error!, ct).ConfigureAwait(false);
+                return await matchError(_error, ct).ConfigureAwait(false);
             if (_variantId == IReadOnlyListOfInt32Id)
-                return await matchIReadOnlyListOfInt32(_iReadOnlyListOfInt32!, ct).ConfigureAwait(false);
+                return await matchIReadOnlyListOfInt32(_iReadOnlyListOfInt32, ct).ConfigureAwait(false);
             if (_variantId == ArrayOfStringId)
-                return await matchArrayOfString(_arrayOfString!, ct).ConfigureAwait(false);
+                return await matchArrayOfString(_arrayOfString, ct).ConfigureAwait(false);
             if (_variantId == TupleOfInt32AndStringId)
-                return await matchTupleOfInt32AndString(_tupleOfInt32AndString!, ct).ConfigureAwait(false);
+                return await matchTupleOfInt32AndString(_tupleOfInt32AndString, ct).ConfigureAwait(false);
             throw new System.InvalidOperationException("Inner type is unknown");
         }
 
@@ -246,31 +246,31 @@ namespace MyApp
         {
             if (_variantId == SuccessId)
             {
-                switchSuccess(_success!);
+                switchSuccess(_success);
                 return;
             }
 
             if (_variantId == ErrorId)
             {
-                switchError(_error!);
+                switchError(_error);
                 return;
             }
 
             if (_variantId == IReadOnlyListOfInt32Id)
             {
-                switchIReadOnlyListOfInt32(_iReadOnlyListOfInt32!);
+                switchIReadOnlyListOfInt32(_iReadOnlyListOfInt32);
                 return;
             }
 
             if (_variantId == ArrayOfStringId)
             {
-                switchArrayOfString(_arrayOfString!);
+                switchArrayOfString(_arrayOfString);
                 return;
             }
 
             if (_variantId == TupleOfInt32AndStringId)
             {
-                switchTupleOfInt32AndString(_tupleOfInt32AndString!);
+                switchTupleOfInt32AndString(_tupleOfInt32AndString);
                 return;
             }
 
@@ -281,31 +281,31 @@ namespace MyApp
         {
             if (_variantId == SuccessId)
             {
-                await switchSuccess(_success!, ct).ConfigureAwait(false);
+                await switchSuccess(_success, ct).ConfigureAwait(false);
                 return;
             }
 
             if (_variantId == ErrorId)
             {
-                await switchError(_error!, ct).ConfigureAwait(false);
+                await switchError(_error, ct).ConfigureAwait(false);
                 return;
             }
 
             if (_variantId == IReadOnlyListOfInt32Id)
             {
-                await switchIReadOnlyListOfInt32(_iReadOnlyListOfInt32!, ct).ConfigureAwait(false);
+                await switchIReadOnlyListOfInt32(_iReadOnlyListOfInt32, ct).ConfigureAwait(false);
                 return;
             }
 
             if (_variantId == ArrayOfStringId)
             {
-                await switchArrayOfString(_arrayOfString!, ct).ConfigureAwait(false);
+                await switchArrayOfString(_arrayOfString, ct).ConfigureAwait(false);
                 return;
             }
 
             if (_variantId == TupleOfInt32AndStringId)
             {
-                await switchTupleOfInt32AndString(_tupleOfInt32AndString!, ct).ConfigureAwait(false);
+                await switchTupleOfInt32AndString(_tupleOfInt32AndString, ct).ConfigureAwait(false);
                 return;
             }
 
@@ -363,15 +363,15 @@ namespace MyApp
             }
 
             if (_variantId == SuccessId)
-                return System.Collections.Generic.EqualityComparer<global::MyApp.Success>.Default.Equals(_success!, other._success);
+                return System.Collections.Generic.EqualityComparer<global::MyApp.Success>.Default.Equals(_success, other._success);
             if (_variantId == ErrorId)
-                return System.Collections.Generic.EqualityComparer<global::MyApp.Error>.Default.Equals(_error!, other._error);
+                return System.Collections.Generic.EqualityComparer<global::MyApp.Error>.Default.Equals(_error, other._error);
             if (_variantId == IReadOnlyListOfInt32Id)
-                return System.Collections.Generic.EqualityComparer<global::System.Collections.Generic.IReadOnlyList<int>>.Default.Equals(_iReadOnlyListOfInt32!, other._iReadOnlyListOfInt32);
+                return System.Collections.Generic.EqualityComparer<global::System.Collections.Generic.IReadOnlyList<int>>.Default.Equals(_iReadOnlyListOfInt32, other._iReadOnlyListOfInt32);
             if (_variantId == ArrayOfStringId)
-                return System.Collections.Generic.EqualityComparer<string[]>.Default.Equals(_arrayOfString!, other._arrayOfString);
+                return System.Collections.Generic.EqualityComparer<string[]>.Default.Equals(_arrayOfString, other._arrayOfString);
             if (_variantId == TupleOfInt32AndStringId)
-                return System.Collections.Generic.EqualityComparer<global::System.Tuple<int, string>>.Default.Equals(_tupleOfInt32AndString!, other._tupleOfInt32AndString);
+                return System.Collections.Generic.EqualityComparer<global::System.Tuple<int, string>>.Default.Equals(_tupleOfInt32AndString, other._tupleOfInt32AndString);
             throw new System.InvalidOperationException("Inner type is unknown");
         }
 

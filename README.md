@@ -53,6 +53,14 @@ public partial class ExtendedOperationDataResult<TResult, TError>
 {
 }
 ```
+Null values are not allowed by default. This behavior can be overriden by `AllowNull = true` parameter. 
+```csharp
+[UnionType(typeof(int?), AllowNull = true)]
+[UnionType(typeof(string), AllowNull = true)]
+public partial class ResultNullable
+{
+}
+```
 
 ## Examples
 

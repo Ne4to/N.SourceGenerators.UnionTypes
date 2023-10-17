@@ -48,13 +48,13 @@ public class ClassUnionTests
         
         // TryGet
         Assert.False(unionValue.TryGetValueNotSet(out var tryGetValueNotSetValue));
-        Assert.Null(tryGetValueNotSetValue);
+        Assert.Equal(default, tryGetValueNotSetValue);
         
         Assert.True(unionValue.TryGetString(out var tryGetStringValue));
         Assert.Equal("42", tryGetStringValue);
 
         Assert.False(unionValue.TryGetUserStatus(out var tryGetUserStatusValue));
-        Assert.Null(tryGetUserStatusValue);
+        Assert.Equal(default, tryGetUserStatusValue);
 
         // Match
         var matchResult = unionValue.Match<string>(

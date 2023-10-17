@@ -110,10 +110,6 @@ public partial class UnionTypesGenerator
             foreach (UnionTypeVariant variant in unionType.Variants)
             {
                 MemberAccessExpressionSyntax memberAccess = MemberAccess("other", variant.FieldName);
-                if (variant.IsValueType && !unionType.UseStructLayout)
-                {
-                    memberAccess = MemberAccess(memberAccess, "Value");
-                }
                 
                 yield return IfStatement(
                     IsPropertyCondition(variant),
