@@ -10,8 +10,7 @@ public class GenericUnionTests
 using System;
 using N.SourceGenerators.UnionTypes;
 
-[GenericUnionType]
-public partial class OperationDataResult<TResult, TError>
+public partial class OperationDataResult<[GenericUnionType(Alias = "Result")] T, [GenericUnionType] TError>
 {
 }
 """;
@@ -27,7 +26,7 @@ using System;
 using N.SourceGenerators.UnionTypes;
 
 [UnionType(typeof(int))]
-public partial class OperationDataResult<TResult, TError>
+public partial class OperationDataResult<[GenericUnionType] TResult, [GenericUnionType] TError>
 {
 }
 """;

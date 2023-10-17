@@ -14,10 +14,10 @@ public partial class UnionTypesGenerator
             Token(SyntaxKind.PublicKeyword),
             Token(SyntaxKind.OverrideKeyword)
         ).AddBodyStatements(
-            VariantsBodyStatements(unionType, v => AliasStatement(unionType, v))
+            VariantsBodyStatements(unionType, AliasStatement)
         );
 
-        static StatementSyntax AliasStatement(UnionType unionType, UnionTypeVariant variant)
+        static StatementSyntax AliasStatement(UnionTypeVariant variant)
         {
             return IfStatement(
                 IsPropertyCondition(variant),
@@ -125,7 +125,7 @@ public partial class UnionTypesGenerator
                                 IdentifierName("Equals")
                             )
                         ).AddArgumentListArguments(
-                            Argument(NotNullableArgumentExpression(unionType, variant)),
+                            Argument(NotNullableArgumentExpression(variant)),
                             Argument(memberAccess)
                         )
                     )

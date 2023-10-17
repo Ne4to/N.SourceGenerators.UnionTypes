@@ -81,14 +81,13 @@ public partial class Result2
 {
 }
 
-[GenericUnionType]
-public partial class OperationDataResult<TResult, TError>
+public partial class OperationDataResult<[GenericUnionType] TResult, [GenericUnionType] TError>
 {
 }
 
 // extend generic type union with additional Int32 type 
 [UnionType(typeof(int))]
-public partial class ExtendedOperationDataResult<TResult, TError>
+public partial class ExtendedOperationDataResult<[GenericUnionType] TResult, [GenericUnionType] TError>
 {
 }
 

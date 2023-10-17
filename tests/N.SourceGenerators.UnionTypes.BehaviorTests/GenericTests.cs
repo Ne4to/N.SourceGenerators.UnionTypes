@@ -9,7 +9,7 @@ enum UserStatus
 }
 
 [UnionType(typeof(ValueNotSet))]
-partial class GenericUnion<TValue>
+partial class GenericUnion<[GenericUnionType (Alias = "Result")] TValue>
 {
 }
 
@@ -22,11 +22,11 @@ public class GenericTests
 
         // IsProperty
         Assert.True(unionValue.IsValueNotSet);
-        Assert.False(unionValue.IsValue);
+        Assert.False(unionValue.IsResult);
 
         // AsProperty
         Assert.Equal(new ValueNotSet(), unionValue.AsValueNotSet);
-        Assert.Throws<InvalidOperationException>(() => _ = unionValue.AsValue);
+        Assert.Throws<InvalidOperationException>(() => _ = unionValue.AsResult);
 
         // .ctor
         GenericUnion<UserStatus> ctorValueNotSet = new GenericUnion<UserStatus>(new ValueNotSet());
@@ -44,22 +44,22 @@ public class GenericTests
         Assert.Throws<InvalidOperationException>(() => _ = (UserStatus)unionValue);
         
         // TryGet
-        Assert.False(unionValue.TryGetValue(out var tryGetValue));
-        Assert.Equal(default(UserStatus), tryGetValue);
+        Assert.False(unionValue.TryGetResult(out var tryGetResult));
+        Assert.Equal(default(UserStatus), tryGetResult);
 
         Assert.True(unionValue.TryGetValueNotSet(out var tryGetValueNotSet));
         Assert.Equal(new ValueNotSet(), tryGetValueNotSet);
 
         // Match
         var matchResult = unionValue.Match<string>(
-            matchValue: _ => "Value",
+            matchResult: _ => "Result",
             matchValueNotSet: _ => "ValueNotSet");
         Assert.Equal("ValueNotSet", matchResult);
 
         // Switch
         bool switchWasExecuted = false;
         unionValue.Switch(
-            switchValue: _ => Assert.Fail("switchValue should not be executed"),
+            switchResult: _ => Assert.Fail("switchResult should not be executed"),
             switchValueNotSet: x =>
             {
                 Assert.Equal(new ValueNotSet(), x);

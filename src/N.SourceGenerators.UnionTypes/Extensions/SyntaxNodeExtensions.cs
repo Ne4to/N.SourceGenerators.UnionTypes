@@ -9,6 +9,21 @@ internal static class SyntaxNodeExtensions
             AttributeLists.Count: > 0
         };
     }
+    
+    public static bool IsGenericTypeAttribute(this SyntaxNode s)
+    {
+        if (s is not TypeParameterSyntax typeParameter)
+        {
+            return false;
+        }
+
+        if (typeParameter.Parent is not TypeParameterListSyntax typeParameterList)
+        {
+            return false;
+        }
+
+        return typeParameterList.Parent is TypeDeclarationSyntax;
+    }
 
     public static bool IsPartial(this TypeDeclarationSyntax s)
     {

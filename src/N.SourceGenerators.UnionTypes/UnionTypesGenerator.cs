@@ -1,4 +1,5 @@
-﻿using System.Text;
+﻿using System.Collections.Immutable;
+using System.Text;
 
 using N.SourceGenerators.UnionTypes.Extensions;
 using N.SourceGenerators.UnionTypes.Models;
@@ -23,14 +24,37 @@ public sealed partial class UnionTypesGenerator : IIncrementalGenerator
         AddAttributesSource(context);
 
         var unionTypes = GetUnionTypes(context);
-        var unionTypeDiagnostics = GetUnionTypeDiagnostics(unionTypes);
+        var genericUnionTypes = GetGenericUnionTypes(context);
+
+        // TODO comparer does not work
+        var uniqueUnionTypes = unionTypes.WithComparer(UnionTypeComparer.Instance).Collect()
+            .Combine(genericUnionTypes.WithComparer(UnionTypeComparer.Instance).Collect())
+            .SelectMany(ProcessCollections);
+        
+        var unionTypeDiagnostics = GetUnionTypeDiagnostics(uniqueUnionTypes);
         ProcessValues(context, unionTypeDiagnostics, GenerateUnionType);
 
-        var genericUnionTypes = GetGenericUnionTypes(context);
-        var genericUnionTypeDiagnostics = GetUnionTypeDiagnostics(genericUnionTypes);
-        ProcessValues(context, genericUnionTypeDiagnostics, GenerateUnionType);
-
         GenerateConverters(context);
+    }
+
+    private IEnumerable<UnionType> ProcessCollections((ImmutableArray<UnionType> Left, ImmutableArray<UnionType> Right) combination, CancellationToken arg2)
+    {
+        HashSet<string> processedIds = new();
+        foreach (UnionType unionType in combination.Left)
+        {
+            if (processedIds.Add(unionType.TypeFullName))
+            {
+                yield return unionType;
+            }
+        }
+        
+        foreach (UnionType unionType in combination.Right)
+        {
+            if (processedIds.Add(unionType.TypeFullName))
+            {
+                yield return unionType;
+            }
+        }
     }
 
     private static UnionType? GetUnionType(TypedConstant typedConstant)
@@ -72,13 +96,16 @@ public sealed partial class UnionTypesGenerator : IIncrementalGenerator
         return context.SyntaxProvider
             .ForAttributeWithMetadataName(
                 GenericUnionTypeAttributeName,
-                static (s, _) => s.IsTypeWithAttributes(),
+                static (s, _) => s.IsGenericTypeAttribute(),
                 static (context, ct) =>
                 {
                     ct.ThrowIfCancellationRequested();
 
-                    TypeDeclarationSyntax typeDeclaration = (TypeDeclarationSyntax)context.TargetNode;
-                    INamedTypeSymbol targetSymbol = (INamedTypeSymbol)context.TargetSymbol;
+                    var typeParameter = (TypeParameterSyntax)context.TargetNode;
+                    var typeParameterList = (TypeParameterListSyntax)typeParameter.Parent!;
+
+                    TypeDeclarationSyntax typeDeclaration = (TypeDeclarationSyntax)typeParameterList.Parent!;
+                    INamedTypeSymbol targetSymbol = ((ITypeParameterSymbol)context.TargetSymbol).ContainingType;
 
                     UnionType? unionType = GetUnionType(targetSymbol, typeDeclaration);
                     return unionType;
@@ -112,12 +139,34 @@ public sealed partial class UnionTypesGenerator : IIncrementalGenerator
         int typeArgumentIndex = -100;
         foreach (ITypeSymbol typeArgument in targetSymbol.TypeArguments)
         {
-            variants ??= new List<UnionTypeVariant>();
-            string alias = typeArgument.Name.StartsWith("T") && typeArgument.Name.Length > 1
-                ? typeArgument.Name.Substring(1)
-                : typeArgument.Name;
-            variants.Add(new UnionTypeVariant(typeArgument, alias, typeArgumentIndex, false));
-            typeArgumentIndex++;
+            foreach (AttributeData attribute in typeArgument.GetAttributes())
+            {
+                if (attribute.AttributeClass?.ToDisplayString() != GenericUnionTypeAttributeName)
+                {
+                    continue;
+                }
+                
+                variants ??= new List<UnionTypeVariant>();
+                var alias = attribute.NamedArguments
+                    .Where(kvp => kvp.Key == "Alias")
+                    .Select(kvp => (string?)kvp.Value.Value!)
+                    .FirstOrDefault();
+                
+                if (alias == null)
+                {
+                    alias = typeArgument.Name.StartsWith("T") && typeArgument.Name.Length > 1
+                        ? typeArgument.Name.Substring(1)
+                        : typeArgument.Name;
+                }
+                
+                var allowNull = attribute.NamedArguments
+                    .Where(kvp => kvp.Key == "AllowNull")
+                    .Select(kvp => (bool)kvp.Value.Value!)
+                    .FirstOrDefault();
+
+                variants.Add(new UnionTypeVariant(typeArgument, alias, typeArgumentIndex, allowNull));
+                typeArgumentIndex++;
+            }
         }
 
         if (variants == null)
@@ -291,7 +340,7 @@ public sealed partial class UnionTypesGenerator : IIncrementalGenerator
         yield return VariantConstant(variant);
         yield return Field(unionType, variant);
         yield return IsProperty(variant);
-        yield return AsPropertyWithStructLayout(unionType, variant);
+        yield return AsPropertyWithStructLayout(variant);
         yield return Ctor(unionType, variant);
         if (!variant.IsInterface)
         {
@@ -367,24 +416,22 @@ public sealed partial class UnionTypesGenerator : IIncrementalGenerator
             IdentifierName(variant.IdConstName));
     }
 
-    private static PropertyDeclarationSyntax AsPropertyWithStructLayout(UnionType unionType, UnionTypeVariant variant)
+    private static PropertyDeclarationSyntax AsPropertyWithStructLayout(UnionTypeVariant variant)
     {
         return PropertyDeclaration(IdentifierName(variant.TypeFullName), Identifier(variant.AsPropertyName))
             .AddModifiers(Token(SyntaxKind.PublicKeyword))
             .AddAccessorListAccessors(
                 AccessorDeclaration(SyntaxKind.GetAccessorDeclaration)
                     .AddBodyStatements(
-                        AsPropertyWithStructLayoutBody(unionType, variant, null)
+                        AsPropertyWithStructLayoutBody(variant, null)
                     )
             );
     }
 
-    private static StatementSyntax[] AsPropertyWithStructLayoutBody(
-        UnionType unionType,
-        UnionTypeVariant variant,
+    private static StatementSyntax[] AsPropertyWithStructLayoutBody(UnionTypeVariant variant,
         string? memberName)
     {
-        ExpressionSyntax returnSyntax = NotNullableArgumentExpression(unionType, variant, memberName);
+        ExpressionSyntax returnSyntax = NotNullableArgumentExpression(variant, memberName);
         
         return new StatementSyntax[]
         {
@@ -473,7 +520,7 @@ public sealed partial class UnionTypesGenerator : IIncrementalGenerator
             .AddParameterListParameters(parameter);
 
         return operatorDeclaration
-            .AddBodyStatements(AsPropertyWithStructLayoutBody(unionType, variant, "value"));
+            .AddBodyStatements(AsPropertyWithStructLayoutBody(variant, "value"));
     }
 
     private static MemberDeclarationSyntax TryGetMethod(UnionTypeVariant variant)
@@ -550,7 +597,7 @@ public sealed partial class UnionTypesGenerator : IIncrementalGenerator
                         .WithType(IdentifierName(CancellationTokenType))
                 )
                 .AddBodyStatements(
-                    VariantsBodyStatements(unionType, v => MatchStatement(unionType, v, isAsync))
+                    VariantsBodyStatements(unionType, v => MatchStatement(v, isAsync))
                 );
     }
 
@@ -569,9 +616,9 @@ public sealed partial class UnionTypesGenerator : IIncrementalGenerator
         return parameter;
     }
 
-    private static StatementSyntax MatchStatement(UnionType unionType, UnionTypeVariant variant, bool isAsync)
+    private static StatementSyntax MatchStatement(UnionTypeVariant variant, bool isAsync)
     {
-        var argumentExpression = NotNullableArgumentExpression(unionType, variant);
+        var argumentExpression = NotNullableArgumentExpression(variant);
 
         return IfStatement(
             IsPropertyCondition(variant),
@@ -586,7 +633,7 @@ public sealed partial class UnionTypesGenerator : IIncrementalGenerator
         );
     }
 
-    private static ExpressionSyntax NotNullableArgumentExpression(UnionType unionType, UnionTypeVariant variant, string? memberName = null)
+    private static ExpressionSyntax NotNullableArgumentExpression(UnionTypeVariant variant, string? memberName = null)
     {
         return memberName == null 
             ? IdentifierName(variant.FieldName)
@@ -613,7 +660,7 @@ public sealed partial class UnionTypesGenerator : IIncrementalGenerator
                         .WithType(IdentifierName(CancellationTokenType))
                 )
                 .AddBodyStatements(
-                    VariantsBodyStatements(unionType, v => SwitchStatement(unionType, v, isAsync))
+                    VariantsBodyStatements(unionType, v => SwitchStatement(v, isAsync))
                 );
     }
 
@@ -632,9 +679,9 @@ public sealed partial class UnionTypesGenerator : IIncrementalGenerator
         return parameter;
     }
 
-    private static StatementSyntax SwitchStatement(UnionType unionType, UnionTypeVariant variant, bool isAsync)
+    private static StatementSyntax SwitchStatement(UnionTypeVariant variant, bool isAsync)
     {
-        var argumentExpression = NotNullableArgumentExpression(unionType, variant);
+        var argumentExpression = NotNullableArgumentExpression(variant);
 
         return IfStatement(
             IsPropertyCondition(variant),

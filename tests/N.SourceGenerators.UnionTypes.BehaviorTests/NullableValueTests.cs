@@ -1,3 +1,5 @@
+using System.Runtime.CompilerServices;
+
 namespace N.SourceGenerators.UnionTypes.BehaviorTests;
 
 [UnionType(typeof(int?))]

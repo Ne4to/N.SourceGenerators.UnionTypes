@@ -46,9 +46,11 @@ public partial class UnionTypesGenerator
         
         namespace N.SourceGenerators.UnionTypes
         {
-            [AttributeUsage(AttributeTargets.Class | AttributeTargets.Struct, Inherited = false, AllowMultiple = false)]
+            [AttributeUsage(AttributeTargets.GenericParameter, Inherited = false, AllowMultiple = false)]
             internal sealed class GenericUnionTypeAttribute : Attribute
             {
+                public string? Alias { get; set; }
+                public bool AllowNull { get; set; }
             }
         }
         """;
