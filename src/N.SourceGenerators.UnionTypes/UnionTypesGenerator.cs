@@ -128,10 +128,7 @@ public sealed partial class UnionTypesGenerator : IIncrementalGenerator
             var typeSymbol = attribute.ConstructorArguments[0].Value as ITypeSymbol;
             var alias = attribute.ConstructorArguments[1].Value?.ToString();
             var order = (int)attribute.ConstructorArguments[2].Value!;
-            var allowNull = attribute.NamedArguments
-                .Where(kvp => kvp.Key == "AllowNull")
-                .Select(kvp => (bool)kvp.Value.Value!)
-                .FirstOrDefault();
+            var allowNull = GetAllowNullValue(attribute);
 
             variants.Add(new UnionTypeVariant(typeSymbol!, alias, order, allowNull));
         }
@@ -159,10 +156,7 @@ public sealed partial class UnionTypesGenerator : IIncrementalGenerator
                         : typeArgument.Name;
                 }
                 
-                var allowNull = attribute.NamedArguments
-                    .Where(kvp => kvp.Key == "AllowNull")
-                    .Select(kvp => (bool)kvp.Value.Value!)
-                    .FirstOrDefault();
+                var allowNull = GetAllowNullValue(attribute);
 
                 variants.Add(new UnionTypeVariant(typeArgument, alias, typeArgumentIndex, allowNull));
                 typeArgumentIndex++;
@@ -182,6 +176,14 @@ public sealed partial class UnionTypesGenerator : IIncrementalGenerator
             sortedVariants);
 
         return unionType;
+
+        bool GetAllowNullValue(AttributeData attribute)
+        {
+            return attribute.NamedArguments
+                .Where(kvp => kvp.Key == "AllowNull")
+                .Select(kvp => (bool)kvp.Value.Value!)
+                .FirstOrDefault();
+        }
     }
 
     static void GenerateUnionType(UnionType unionType,
@@ -525,8 +527,10 @@ public sealed partial class UnionTypesGenerator : IIncrementalGenerator
 
     private static MemberDeclarationSyntax TryGetMethod(UnionTypeVariant variant)
     {
-        AttributeListSyntax attributeList = AttributeList()
-            .AddAttributes(
+        AttributeListSyntax attributeList = AttributeList();
+        if (!variant.AllowNull)
+        {
+            attributeList = attributeList.AddAttributes(
                 Attribute(IdentifierName("System.Diagnostics.CodeAnalysis.NotNullWhen"),
                     AttributeArgumentList(
                         SeparatedList(
@@ -535,6 +539,7 @@ public sealed partial class UnionTypesGenerator : IIncrementalGenerator
                     )
                 )
             );
+        }
 
         return MethodDeclaration(
                 IdentifierName("bool"),
@@ -547,7 +552,7 @@ public sealed partial class UnionTypesGenerator : IIncrementalGenerator
                 Parameter(Identifier("value"))
                     .WithType(IdentifierName(variant.TypeFullName))
                     .AddModifiers(Token(SyntaxKind.OutKeyword))
-                    .AddAttributeLists(attributeList)
+                    .AddAttributeListsWhen(attributeList.Attributes.Count > 0, attributeList)
             ).AddBodyStatements(
                 IfStatement(
                         IsPropertyCondition(variant),

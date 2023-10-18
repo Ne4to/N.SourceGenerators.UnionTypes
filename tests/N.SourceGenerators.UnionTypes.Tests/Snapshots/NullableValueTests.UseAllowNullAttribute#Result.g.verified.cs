@@ -35,7 +35,7 @@ partial class Result : System.IEquatable<Result>
         throw new System.InvalidOperationException("Inner value is not NullableOfInt32");
     }
 
-    public bool TryGetNullableOfInt32([System.Diagnostics.CodeAnalysis.NotNullWhen(true)] out int? value)
+    public bool TryGetNullableOfInt32(out int? value)
     {
         if (_variantId == NullableOfInt32Id)
         {

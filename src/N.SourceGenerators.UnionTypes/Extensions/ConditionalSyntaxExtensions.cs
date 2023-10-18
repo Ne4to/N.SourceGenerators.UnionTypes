@@ -115,4 +115,14 @@ internal static class ConditionalSyntaxExtensions
             ? syntax.AddModifiers(items)
             : syntax;
     }
+
+    public static ParameterSyntax AddAttributeListsWhen(
+        this ParameterSyntax syntax,
+        bool condition,
+        params AttributeListSyntax[] items)
+    {
+        return condition
+            ? syntax.AddAttributeLists(items)
+            : syntax;
+    }
 }

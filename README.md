@@ -42,22 +42,21 @@ public partial class FooResult
 ```
 Or you can use generic type.
 ```csharp
-[GenericUnionType]
-public partial class OperationDataResult<TResult, TError>
+public partial class OperationDataResult<[GenericUnionType] TResult, [GenericUnionType] TError>
 {
 }
 
 // extend generic type union with additional Int32 type
 [UnionType(typeof(int))]
-public partial class ExtendedOperationDataResult<TResult, TError>
+public partial class ExtendedOperationDataResult<[GenericUnionType] TResult, [GenericUnionType] TError>
 {
 }
 ```
-Null values are not allowed by default. This behavior can be overriden by `AllowNull = true` parameter. 
+Null values are not allowed by default. This behavior can be overriden by `AllowNull = true` parameter.
 ```csharp
 [UnionType(typeof(int?), AllowNull = true)]
 [UnionType(typeof(string), AllowNull = true)]
-public partial class ResultNullable
+public partial class ResultNullable<[GenericUnionType(AllowNull = true)] T>
 {
 }
 ```

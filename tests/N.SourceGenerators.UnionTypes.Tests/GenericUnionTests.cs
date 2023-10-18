@@ -33,4 +33,20 @@ public partial class OperationDataResult<[GenericUnionType] TResult, [GenericUni
 
         return TestHelper.Verify<UnionTypesGenerator>(source);
     }
+    
+    [Fact]
+    public Task WithAlias()
+    {
+        const string source = """
+using System;
+using N.SourceGenerators.UnionTypes;
+
+[UnionType(typeof(string), "Status", AllowNull = true)]
+public partial class GenericResultNullable<[GenericUnionType(AllowNull = true, Alias = "Value")] T>
+{
+}
+""";
+
+        return TestHelper.Verify<UnionTypesGenerator>(source);
+    }
 }

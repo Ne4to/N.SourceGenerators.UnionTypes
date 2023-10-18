@@ -40,9 +40,6 @@ internal class UnionType
             IsPartial = syntax.IsPartial();
         }
 
-        // TODO convert to simple model?
-        // TypeArguments = containerType.TypeArguments;
-
         IsReferenceType = containerType.IsReferenceType;
         IsValueType = containerType.IsValueType;
         HasToStringMethod = containerType.GetMembers().Any(IsToStringMethod);
@@ -86,8 +83,6 @@ internal class UnionType
             variant.IdConstValue = variantIndex + 1;
         }
     }
-
-    // public ImmutableArray<ITypeSymbol> TypeArguments { get; set; }
 
     private static bool IsToStringMethod(ISymbol symbol)
     {
