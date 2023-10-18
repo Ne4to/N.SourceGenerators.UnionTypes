@@ -14,10 +14,10 @@ public partial class UnionTypesGenerator
             Token(SyntaxKind.PublicKeyword),
             Token(SyntaxKind.OverrideKeyword)
         ).AddBodyStatements(
-            VariantsBodyStatements(unionType, v => AliasStatement(unionType, v))
+            VariantsBodyStatements(unionType, AliasStatement)
         );
 
-        static StatementSyntax AliasStatement(UnionType unionType, UnionTypeVariant variant)
+        static StatementSyntax AliasStatement(UnionTypeVariant variant)
         {
             return IfStatement(
                 IsPropertyCondition(variant),
@@ -110,10 +110,6 @@ public partial class UnionTypesGenerator
             foreach (UnionTypeVariant variant in unionType.Variants)
             {
                 MemberAccessExpressionSyntax memberAccess = MemberAccess("other", variant.FieldName);
-                if (variant.IsValueType && !unionType.UseStructLayout)
-                {
-                    memberAccess = MemberAccess(memberAccess, "Value");
-                }
                 
                 yield return IfStatement(
                     IsPropertyCondition(variant),
@@ -129,7 +125,7 @@ public partial class UnionTypesGenerator
                                 IdentifierName("Equals")
                             )
                         ).AddArgumentListArguments(
-                            Argument(NotNullableArgumentExpression(unionType, variant)),
+                            Argument(NotNullableArgumentExpression(variant)),
                             Argument(memberAccess)
                         )
                     )

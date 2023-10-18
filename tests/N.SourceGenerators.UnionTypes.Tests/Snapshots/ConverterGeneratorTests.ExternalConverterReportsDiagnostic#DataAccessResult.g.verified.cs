@@ -11,14 +11,14 @@ namespace MyApp
     {
         private readonly int _variantId;
         private const int SuccessId = 1;
-        private readonly global::MyApp.Success? _success;
+        private readonly global::MyApp.Success _success;
         public bool IsSuccess => _variantId == SuccessId;
         public global::MyApp.Success AsSuccess
         {
             get
             {
                 if (_variantId == SuccessId)
-                    return _success!;
+                    return _success;
                 throw new System.InvalidOperationException("Inner value is not Success");
             }
         }
@@ -34,11 +34,11 @@ namespace MyApp
         public static explicit operator global::MyApp.Success(DataAccessResult value)
         {
             if (value._variantId == SuccessId)
-                return value._success!;
+                return value._success;
             throw new System.InvalidOperationException("Inner value is not Success");
         }
 
-        public bool TryGetSuccess([System.Diagnostics.CodeAnalysis.NotNullWhen(true)] out global::MyApp.Success? value)
+        public bool TryGetSuccess([System.Diagnostics.CodeAnalysis.NotNullWhen(true)] out global::MyApp.Success value)
         {
             if (_variantId == SuccessId)
             {
@@ -53,14 +53,14 @@ namespace MyApp
         }
 
         private const int NotFoundErrorId = 2;
-        private readonly global::MyApp.NotFoundError? _notFoundError;
+        private readonly global::MyApp.NotFoundError _notFoundError;
         public bool IsNotFoundError => _variantId == NotFoundErrorId;
         public global::MyApp.NotFoundError AsNotFoundError
         {
             get
             {
                 if (_variantId == NotFoundErrorId)
-                    return _notFoundError!;
+                    return _notFoundError;
                 throw new System.InvalidOperationException("Inner value is not NotFoundError");
             }
         }
@@ -76,11 +76,11 @@ namespace MyApp
         public static explicit operator global::MyApp.NotFoundError(DataAccessResult value)
         {
             if (value._variantId == NotFoundErrorId)
-                return value._notFoundError!;
+                return value._notFoundError;
             throw new System.InvalidOperationException("Inner value is not NotFoundError");
         }
 
-        public bool TryGetNotFoundError([System.Diagnostics.CodeAnalysis.NotNullWhen(true)] out global::MyApp.NotFoundError? value)
+        public bool TryGetNotFoundError([System.Diagnostics.CodeAnalysis.NotNullWhen(true)] out global::MyApp.NotFoundError value)
         {
             if (_variantId == NotFoundErrorId)
             {
@@ -97,18 +97,18 @@ namespace MyApp
         public TOut Match<TOut>(global::System.Func<global::MyApp.Success, TOut> matchSuccess, global::System.Func<global::MyApp.NotFoundError, TOut> matchNotFoundError)
         {
             if (_variantId == SuccessId)
-                return matchSuccess(_success!);
+                return matchSuccess(_success);
             if (_variantId == NotFoundErrorId)
-                return matchNotFoundError(_notFoundError!);
+                return matchNotFoundError(_notFoundError);
             throw new System.InvalidOperationException("Inner type is unknown");
         }
 
         public async global::System.Threading.Tasks.Task<TOut> MatchAsync<TOut>(global::System.Func<global::MyApp.Success, global::System.Threading.CancellationToken, global::System.Threading.Tasks.Task<TOut>> matchSuccess, global::System.Func<global::MyApp.NotFoundError, global::System.Threading.CancellationToken, global::System.Threading.Tasks.Task<TOut>> matchNotFoundError, global::System.Threading.CancellationToken ct)
         {
             if (_variantId == SuccessId)
-                return await matchSuccess(_success!, ct).ConfigureAwait(false);
+                return await matchSuccess(_success, ct).ConfigureAwait(false);
             if (_variantId == NotFoundErrorId)
-                return await matchNotFoundError(_notFoundError!, ct).ConfigureAwait(false);
+                return await matchNotFoundError(_notFoundError, ct).ConfigureAwait(false);
             throw new System.InvalidOperationException("Inner type is unknown");
         }
 
@@ -116,13 +116,13 @@ namespace MyApp
         {
             if (_variantId == SuccessId)
             {
-                switchSuccess(_success!);
+                switchSuccess(_success);
                 return;
             }
 
             if (_variantId == NotFoundErrorId)
             {
-                switchNotFoundError(_notFoundError!);
+                switchNotFoundError(_notFoundError);
                 return;
             }
 
@@ -133,13 +133,13 @@ namespace MyApp
         {
             if (_variantId == SuccessId)
             {
-                await switchSuccess(_success!, ct).ConfigureAwait(false);
+                await switchSuccess(_success, ct).ConfigureAwait(false);
                 return;
             }
 
             if (_variantId == NotFoundErrorId)
             {
-                await switchNotFoundError(_notFoundError!, ct).ConfigureAwait(false);
+                await switchNotFoundError(_notFoundError, ct).ConfigureAwait(false);
                 return;
             }
 
@@ -195,9 +195,9 @@ namespace MyApp
             }
 
             if (_variantId == SuccessId)
-                return System.Collections.Generic.EqualityComparer<global::MyApp.Success>.Default.Equals(_success!, other._success);
+                return System.Collections.Generic.EqualityComparer<global::MyApp.Success>.Default.Equals(_success, other._success);
             if (_variantId == NotFoundErrorId)
-                return System.Collections.Generic.EqualityComparer<global::MyApp.NotFoundError>.Default.Equals(_notFoundError!, other._notFoundError);
+                return System.Collections.Generic.EqualityComparer<global::MyApp.NotFoundError>.Default.Equals(_notFoundError, other._notFoundError);
             throw new System.InvalidOperationException("Inner type is unknown");
         }
 

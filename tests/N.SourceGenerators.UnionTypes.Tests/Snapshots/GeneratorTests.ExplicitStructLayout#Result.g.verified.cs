@@ -40,7 +40,7 @@ namespace MyApp
             throw new System.InvalidOperationException("Inner value is not SuccessStruct");
         }
 
-        public bool TryGetSuccessStruct([System.Diagnostics.CodeAnalysis.NotNullWhen(true)] out global::MyApp.SuccessStruct? value)
+        public bool TryGetSuccessStruct([System.Diagnostics.CodeAnalysis.NotNullWhen(true)] out global::MyApp.SuccessStruct value)
         {
             if (_variantId == SuccessStructId)
             {
@@ -82,7 +82,7 @@ namespace MyApp
             throw new System.InvalidOperationException("Inner value is not ValidationErrorStruct");
         }
 
-        public bool TryGetValidationErrorStruct([System.Diagnostics.CodeAnalysis.NotNullWhen(true)] out global::MyApp.ValidationErrorStruct? value)
+        public bool TryGetValidationErrorStruct([System.Diagnostics.CodeAnalysis.NotNullWhen(true)] out global::MyApp.ValidationErrorStruct value)
         {
             if (_variantId == ValidationErrorStructId)
             {
@@ -124,7 +124,7 @@ namespace MyApp
             throw new System.InvalidOperationException("Inner value is not NotFoundErrorStruct");
         }
 
-        public bool TryGetNotFoundErrorStruct([System.Diagnostics.CodeAnalysis.NotNullWhen(true)] out global::MyApp.NotFoundErrorStruct? value)
+        public bool TryGetNotFoundErrorStruct([System.Diagnostics.CodeAnalysis.NotNullWhen(true)] out global::MyApp.NotFoundErrorStruct value)
         {
             if (_variantId == NotFoundErrorStructId)
             {

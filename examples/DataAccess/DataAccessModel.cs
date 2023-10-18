@@ -2,9 +2,6 @@
 
 namespace DataAccess;
 
-
-// TODO - uncomment to negative case
-// -->
 public record DataAccessModel1;
 
 public record DataAccessModel2(string Message);
@@ -15,6 +12,5 @@ public partial class DataAccessModel
 {
     
 }
-// <--
 
 public record DataAccessModel3();

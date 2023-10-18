@@ -11,14 +11,14 @@ namespace BusinessLogic
     {
         private readonly int _variantId;
         private const int DataAccessModel1Id = 1;
-        private readonly global::DataAccess.DataAccessModel1? _dataAccessModel1;
+        private readonly global::DataAccess.DataAccessModel1 _dataAccessModel1;
         public bool IsDataAccessModel1 => _variantId == DataAccessModel1Id;
         public global::DataAccess.DataAccessModel1 AsDataAccessModel1
         {
             get
             {
                 if (_variantId == DataAccessModel1Id)
-                    return _dataAccessModel1!;
+                    return _dataAccessModel1;
                 throw new System.InvalidOperationException("Inner value is not DataAccessModel1");
             }
         }
@@ -34,11 +34,11 @@ namespace BusinessLogic
         public static explicit operator global::DataAccess.DataAccessModel1(BusinessLogicModel value)
         {
             if (value._variantId == DataAccessModel1Id)
-                return value._dataAccessModel1!;
+                return value._dataAccessModel1;
             throw new System.InvalidOperationException("Inner value is not DataAccessModel1");
         }
 
-        public bool TryGetDataAccessModel1([System.Diagnostics.CodeAnalysis.NotNullWhen(true)] out global::DataAccess.DataAccessModel1? value)
+        public bool TryGetDataAccessModel1([System.Diagnostics.CodeAnalysis.NotNullWhen(true)] out global::DataAccess.DataAccessModel1 value)
         {
             if (_variantId == DataAccessModel1Id)
             {
@@ -53,14 +53,14 @@ namespace BusinessLogic
         }
 
         private const int DataAccessModel2Id = 2;
-        private readonly global::DataAccess.DataAccessModel2? _dataAccessModel2;
+        private readonly global::DataAccess.DataAccessModel2 _dataAccessModel2;
         public bool IsDataAccessModel2 => _variantId == DataAccessModel2Id;
         public global::DataAccess.DataAccessModel2 AsDataAccessModel2
         {
             get
             {
                 if (_variantId == DataAccessModel2Id)
-                    return _dataAccessModel2!;
+                    return _dataAccessModel2;
                 throw new System.InvalidOperationException("Inner value is not DataAccessModel2");
             }
         }
@@ -76,11 +76,11 @@ namespace BusinessLogic
         public static explicit operator global::DataAccess.DataAccessModel2(BusinessLogicModel value)
         {
             if (value._variantId == DataAccessModel2Id)
-                return value._dataAccessModel2!;
+                return value._dataAccessModel2;
             throw new System.InvalidOperationException("Inner value is not DataAccessModel2");
         }
 
-        public bool TryGetDataAccessModel2([System.Diagnostics.CodeAnalysis.NotNullWhen(true)] out global::DataAccess.DataAccessModel2? value)
+        public bool TryGetDataAccessModel2([System.Diagnostics.CodeAnalysis.NotNullWhen(true)] out global::DataAccess.DataAccessModel2 value)
         {
             if (_variantId == DataAccessModel2Id)
             {
@@ -95,14 +95,14 @@ namespace BusinessLogic
         }
 
         private const int BusinessLogicModel1Id = 3;
-        private readonly global::BusinessLogic.BusinessLogicModel1? _businessLogicModel1;
+        private readonly global::BusinessLogic.BusinessLogicModel1 _businessLogicModel1;
         public bool IsBusinessLogicModel1 => _variantId == BusinessLogicModel1Id;
         public global::BusinessLogic.BusinessLogicModel1 AsBusinessLogicModel1
         {
             get
             {
                 if (_variantId == BusinessLogicModel1Id)
-                    return _businessLogicModel1!;
+                    return _businessLogicModel1;
                 throw new System.InvalidOperationException("Inner value is not BusinessLogicModel1");
             }
         }
@@ -118,11 +118,11 @@ namespace BusinessLogic
         public static explicit operator global::BusinessLogic.BusinessLogicModel1(BusinessLogicModel value)
         {
             if (value._variantId == BusinessLogicModel1Id)
-                return value._businessLogicModel1!;
+                return value._businessLogicModel1;
             throw new System.InvalidOperationException("Inner value is not BusinessLogicModel1");
         }
 
-        public bool TryGetBusinessLogicModel1([System.Diagnostics.CodeAnalysis.NotNullWhen(true)] out global::BusinessLogic.BusinessLogicModel1? value)
+        public bool TryGetBusinessLogicModel1([System.Diagnostics.CodeAnalysis.NotNullWhen(true)] out global::BusinessLogic.BusinessLogicModel1 value)
         {
             if (_variantId == BusinessLogicModel1Id)
             {
@@ -139,22 +139,22 @@ namespace BusinessLogic
         public TOut Match<TOut>(global::System.Func<global::DataAccess.DataAccessModel1, TOut> matchDataAccessModel1, global::System.Func<global::DataAccess.DataAccessModel2, TOut> matchDataAccessModel2, global::System.Func<global::BusinessLogic.BusinessLogicModel1, TOut> matchBusinessLogicModel1)
         {
             if (_variantId == DataAccessModel1Id)
-                return matchDataAccessModel1(_dataAccessModel1!);
+                return matchDataAccessModel1(_dataAccessModel1);
             if (_variantId == DataAccessModel2Id)
-                return matchDataAccessModel2(_dataAccessModel2!);
+                return matchDataAccessModel2(_dataAccessModel2);
             if (_variantId == BusinessLogicModel1Id)
-                return matchBusinessLogicModel1(_businessLogicModel1!);
+                return matchBusinessLogicModel1(_businessLogicModel1);
             throw new System.InvalidOperationException("Inner type is unknown");
         }
 
         public async global::System.Threading.Tasks.Task<TOut> MatchAsync<TOut>(global::System.Func<global::DataAccess.DataAccessModel1, global::System.Threading.CancellationToken, global::System.Threading.Tasks.Task<TOut>> matchDataAccessModel1, global::System.Func<global::DataAccess.DataAccessModel2, global::System.Threading.CancellationToken, global::System.Threading.Tasks.Task<TOut>> matchDataAccessModel2, global::System.Func<global::BusinessLogic.BusinessLogicModel1, global::System.Threading.CancellationToken, global::System.Threading.Tasks.Task<TOut>> matchBusinessLogicModel1, global::System.Threading.CancellationToken ct)
         {
             if (_variantId == DataAccessModel1Id)
-                return await matchDataAccessModel1(_dataAccessModel1!, ct).ConfigureAwait(false);
+                return await matchDataAccessModel1(_dataAccessModel1, ct).ConfigureAwait(false);
             if (_variantId == DataAccessModel2Id)
-                return await matchDataAccessModel2(_dataAccessModel2!, ct).ConfigureAwait(false);
+                return await matchDataAccessModel2(_dataAccessModel2, ct).ConfigureAwait(false);
             if (_variantId == BusinessLogicModel1Id)
-                return await matchBusinessLogicModel1(_businessLogicModel1!, ct).ConfigureAwait(false);
+                return await matchBusinessLogicModel1(_businessLogicModel1, ct).ConfigureAwait(false);
             throw new System.InvalidOperationException("Inner type is unknown");
         }
 
@@ -162,19 +162,19 @@ namespace BusinessLogic
         {
             if (_variantId == DataAccessModel1Id)
             {
-                switchDataAccessModel1(_dataAccessModel1!);
+                switchDataAccessModel1(_dataAccessModel1);
                 return;
             }
 
             if (_variantId == DataAccessModel2Id)
             {
-                switchDataAccessModel2(_dataAccessModel2!);
+                switchDataAccessModel2(_dataAccessModel2);
                 return;
             }
 
             if (_variantId == BusinessLogicModel1Id)
             {
-                switchBusinessLogicModel1(_businessLogicModel1!);
+                switchBusinessLogicModel1(_businessLogicModel1);
                 return;
             }
 
@@ -185,19 +185,19 @@ namespace BusinessLogic
         {
             if (_variantId == DataAccessModel1Id)
             {
-                await switchDataAccessModel1(_dataAccessModel1!, ct).ConfigureAwait(false);
+                await switchDataAccessModel1(_dataAccessModel1, ct).ConfigureAwait(false);
                 return;
             }
 
             if (_variantId == DataAccessModel2Id)
             {
-                await switchDataAccessModel2(_dataAccessModel2!, ct).ConfigureAwait(false);
+                await switchDataAccessModel2(_dataAccessModel2, ct).ConfigureAwait(false);
                 return;
             }
 
             if (_variantId == BusinessLogicModel1Id)
             {
-                await switchBusinessLogicModel1(_businessLogicModel1!, ct).ConfigureAwait(false);
+                await switchBusinessLogicModel1(_businessLogicModel1, ct).ConfigureAwait(false);
                 return;
             }
 
@@ -257,11 +257,11 @@ namespace BusinessLogic
             }
 
             if (_variantId == DataAccessModel1Id)
-                return System.Collections.Generic.EqualityComparer<global::DataAccess.DataAccessModel1>.Default.Equals(_dataAccessModel1!, other._dataAccessModel1);
+                return System.Collections.Generic.EqualityComparer<global::DataAccess.DataAccessModel1>.Default.Equals(_dataAccessModel1, other._dataAccessModel1);
             if (_variantId == DataAccessModel2Id)
-                return System.Collections.Generic.EqualityComparer<global::DataAccess.DataAccessModel2>.Default.Equals(_dataAccessModel2!, other._dataAccessModel2);
+                return System.Collections.Generic.EqualityComparer<global::DataAccess.DataAccessModel2>.Default.Equals(_dataAccessModel2, other._dataAccessModel2);
             if (_variantId == BusinessLogicModel1Id)
-                return System.Collections.Generic.EqualityComparer<global::BusinessLogic.BusinessLogicModel1>.Default.Equals(_businessLogicModel1!, other._businessLogicModel1);
+                return System.Collections.Generic.EqualityComparer<global::BusinessLogic.BusinessLogicModel1>.Default.Equals(_businessLogicModel1, other._businessLogicModel1);
             throw new System.InvalidOperationException("Inner type is unknown");
         }
 

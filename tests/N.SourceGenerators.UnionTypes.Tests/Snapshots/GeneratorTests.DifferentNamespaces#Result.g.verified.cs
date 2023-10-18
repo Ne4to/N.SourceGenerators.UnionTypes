@@ -11,14 +11,14 @@ namespace MyApp.Domain.Child
     {
         private readonly int _variantId;
         private const int SuccessId = 1;
-        private readonly global::MyApp.Models.S.Child.Success? _success;
+        private readonly global::MyApp.Models.S.Child.Success _success;
         public bool IsSuccess => _variantId == SuccessId;
         public global::MyApp.Models.S.Child.Success AsSuccess
         {
             get
             {
                 if (_variantId == SuccessId)
-                    return _success!;
+                    return _success;
                 throw new System.InvalidOperationException("Inner value is not Success");
             }
         }
@@ -34,11 +34,11 @@ namespace MyApp.Domain.Child
         public static explicit operator global::MyApp.Models.S.Child.Success(Result value)
         {
             if (value._variantId == SuccessId)
-                return value._success!;
+                return value._success;
             throw new System.InvalidOperationException("Inner value is not Success");
         }
 
-        public bool TryGetSuccess([System.Diagnostics.CodeAnalysis.NotNullWhen(true)] out global::MyApp.Models.S.Child.Success? value)
+        public bool TryGetSuccess([System.Diagnostics.CodeAnalysis.NotNullWhen(true)] out global::MyApp.Models.S.Child.Success value)
         {
             if (_variantId == SuccessId)
             {
@@ -53,14 +53,14 @@ namespace MyApp.Domain.Child
         }
 
         private const int ErrorId = 2;
-        private readonly global::MyApp.Models.E.Child.Error? _error;
+        private readonly global::MyApp.Models.E.Child.Error _error;
         public bool IsError => _variantId == ErrorId;
         public global::MyApp.Models.E.Child.Error AsError
         {
             get
             {
                 if (_variantId == ErrorId)
-                    return _error!;
+                    return _error;
                 throw new System.InvalidOperationException("Inner value is not Error");
             }
         }
@@ -76,11 +76,11 @@ namespace MyApp.Domain.Child
         public static explicit operator global::MyApp.Models.E.Child.Error(Result value)
         {
             if (value._variantId == ErrorId)
-                return value._error!;
+                return value._error;
             throw new System.InvalidOperationException("Inner value is not Error");
         }
 
-        public bool TryGetError([System.Diagnostics.CodeAnalysis.NotNullWhen(true)] out global::MyApp.Models.E.Child.Error? value)
+        public bool TryGetError([System.Diagnostics.CodeAnalysis.NotNullWhen(true)] out global::MyApp.Models.E.Child.Error value)
         {
             if (_variantId == ErrorId)
             {
@@ -97,18 +97,18 @@ namespace MyApp.Domain.Child
         public TOut Match<TOut>(global::System.Func<global::MyApp.Models.S.Child.Success, TOut> matchSuccess, global::System.Func<global::MyApp.Models.E.Child.Error, TOut> matchError)
         {
             if (_variantId == SuccessId)
-                return matchSuccess(_success!);
+                return matchSuccess(_success);
             if (_variantId == ErrorId)
-                return matchError(_error!);
+                return matchError(_error);
             throw new System.InvalidOperationException("Inner type is unknown");
         }
 
         public async global::System.Threading.Tasks.Task<TOut> MatchAsync<TOut>(global::System.Func<global::MyApp.Models.S.Child.Success, global::System.Threading.CancellationToken, global::System.Threading.Tasks.Task<TOut>> matchSuccess, global::System.Func<global::MyApp.Models.E.Child.Error, global::System.Threading.CancellationToken, global::System.Threading.Tasks.Task<TOut>> matchError, global::System.Threading.CancellationToken ct)
         {
             if (_variantId == SuccessId)
-                return await matchSuccess(_success!, ct).ConfigureAwait(false);
+                return await matchSuccess(_success, ct).ConfigureAwait(false);
             if (_variantId == ErrorId)
-                return await matchError(_error!, ct).ConfigureAwait(false);
+                return await matchError(_error, ct).ConfigureAwait(false);
             throw new System.InvalidOperationException("Inner type is unknown");
         }
 
@@ -116,13 +116,13 @@ namespace MyApp.Domain.Child
         {
             if (_variantId == SuccessId)
             {
-                switchSuccess(_success!);
+                switchSuccess(_success);
                 return;
             }
 
             if (_variantId == ErrorId)
             {
-                switchError(_error!);
+                switchError(_error);
                 return;
             }
 
@@ -133,13 +133,13 @@ namespace MyApp.Domain.Child
         {
             if (_variantId == SuccessId)
             {
-                await switchSuccess(_success!, ct).ConfigureAwait(false);
+                await switchSuccess(_success, ct).ConfigureAwait(false);
                 return;
             }
 
             if (_variantId == ErrorId)
             {
-                await switchError(_error!, ct).ConfigureAwait(false);
+                await switchError(_error, ct).ConfigureAwait(false);
                 return;
             }
 
@@ -195,9 +195,9 @@ namespace MyApp.Domain.Child
             }
 
             if (_variantId == SuccessId)
-                return System.Collections.Generic.EqualityComparer<global::MyApp.Models.S.Child.Success>.Default.Equals(_success!, other._success);
+                return System.Collections.Generic.EqualityComparer<global::MyApp.Models.S.Child.Success>.Default.Equals(_success, other._success);
             if (_variantId == ErrorId)
-                return System.Collections.Generic.EqualityComparer<global::MyApp.Models.E.Child.Error>.Default.Equals(_error!, other._error);
+                return System.Collections.Generic.EqualityComparer<global::MyApp.Models.E.Child.Error>.Default.Equals(_error, other._error);
             throw new System.InvalidOperationException("Inner type is unknown");
         }
 

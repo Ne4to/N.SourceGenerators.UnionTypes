@@ -49,10 +49,10 @@ public class StructLayoutUnionTests
         
         // TryGet
         Assert.False(unionValue.TryGetValueNotSet(out var tryGetValueNotSetValue));
-        Assert.Null(tryGetValueNotSetValue);
+        Assert.Equal(default, tryGetValueNotSetValue);
         
         Assert.False(unionValue.TryGetInt32(out var tryGetInt32Value));
-        Assert.Null(tryGetInt32Value);
+        Assert.Equal(default, tryGetInt32Value);
 
         Assert.True(unionValue.TryGetUserStatus(out var tryGetUserStatusValue));
         Assert.Equal(UserStatus.Active, tryGetUserStatusValue);

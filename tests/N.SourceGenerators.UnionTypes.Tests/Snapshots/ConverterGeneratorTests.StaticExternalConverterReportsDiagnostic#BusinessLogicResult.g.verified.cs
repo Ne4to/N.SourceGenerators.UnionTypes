@@ -11,14 +11,14 @@ namespace MyApp
     {
         private readonly int _variantId;
         private const int SuccessId = 1;
-        private readonly global::MyApp.Success? _success;
+        private readonly global::MyApp.Success _success;
         public bool IsSuccess => _variantId == SuccessId;
         public global::MyApp.Success AsSuccess
         {
             get
             {
                 if (_variantId == SuccessId)
-                    return _success!;
+                    return _success;
                 throw new System.InvalidOperationException("Inner value is not Success");
             }
         }
@@ -34,11 +34,11 @@ namespace MyApp
         public static explicit operator global::MyApp.Success(BusinessLogicResult value)
         {
             if (value._variantId == SuccessId)
-                return value._success!;
+                return value._success;
             throw new System.InvalidOperationException("Inner value is not Success");
         }
 
-        public bool TryGetSuccess([System.Diagnostics.CodeAnalysis.NotNullWhen(true)] out global::MyApp.Success? value)
+        public bool TryGetSuccess([System.Diagnostics.CodeAnalysis.NotNullWhen(true)] out global::MyApp.Success value)
         {
             if (_variantId == SuccessId)
             {
@@ -53,14 +53,14 @@ namespace MyApp
         }
 
         private const int ValidationErrorId = 2;
-        private readonly global::MyApp.ValidationError? _validationError;
+        private readonly global::MyApp.ValidationError _validationError;
         public bool IsValidationError => _variantId == ValidationErrorId;
         public global::MyApp.ValidationError AsValidationError
         {
             get
             {
                 if (_variantId == ValidationErrorId)
-                    return _validationError!;
+                    return _validationError;
                 throw new System.InvalidOperationException("Inner value is not ValidationError");
             }
         }
@@ -76,11 +76,11 @@ namespace MyApp
         public static explicit operator global::MyApp.ValidationError(BusinessLogicResult value)
         {
             if (value._variantId == ValidationErrorId)
-                return value._validationError!;
+                return value._validationError;
             throw new System.InvalidOperationException("Inner value is not ValidationError");
         }
 
-        public bool TryGetValidationError([System.Diagnostics.CodeAnalysis.NotNullWhen(true)] out global::MyApp.ValidationError? value)
+        public bool TryGetValidationError([System.Diagnostics.CodeAnalysis.NotNullWhen(true)] out global::MyApp.ValidationError value)
         {
             if (_variantId == ValidationErrorId)
             {
@@ -97,18 +97,18 @@ namespace MyApp
         public TOut Match<TOut>(global::System.Func<global::MyApp.Success, TOut> matchSuccess, global::System.Func<global::MyApp.ValidationError, TOut> matchValidationError)
         {
             if (_variantId == SuccessId)
-                return matchSuccess(_success!);
+                return matchSuccess(_success);
             if (_variantId == ValidationErrorId)
-                return matchValidationError(_validationError!);
+                return matchValidationError(_validationError);
             throw new System.InvalidOperationException("Inner type is unknown");
         }
 
         public async global::System.Threading.Tasks.Task<TOut> MatchAsync<TOut>(global::System.Func<global::MyApp.Success, global::System.Threading.CancellationToken, global::System.Threading.Tasks.Task<TOut>> matchSuccess, global::System.Func<global::MyApp.ValidationError, global::System.Threading.CancellationToken, global::System.Threading.Tasks.Task<TOut>> matchValidationError, global::System.Threading.CancellationToken ct)
         {
             if (_variantId == SuccessId)
-                return await matchSuccess(_success!, ct).ConfigureAwait(false);
+                return await matchSuccess(_success, ct).ConfigureAwait(false);
             if (_variantId == ValidationErrorId)
-                return await matchValidationError(_validationError!, ct).ConfigureAwait(false);
+                return await matchValidationError(_validationError, ct).ConfigureAwait(false);
             throw new System.InvalidOperationException("Inner type is unknown");
         }
 
@@ -116,13 +116,13 @@ namespace MyApp
         {
             if (_variantId == SuccessId)
             {
-                switchSuccess(_success!);
+                switchSuccess(_success);
                 return;
             }
 
             if (_variantId == ValidationErrorId)
             {
-                switchValidationError(_validationError!);
+                switchValidationError(_validationError);
                 return;
             }
 
@@ -133,13 +133,13 @@ namespace MyApp
         {
             if (_variantId == SuccessId)
             {
-                await switchSuccess(_success!, ct).ConfigureAwait(false);
+                await switchSuccess(_success, ct).ConfigureAwait(false);
                 return;
             }
 
             if (_variantId == ValidationErrorId)
             {
-                await switchValidationError(_validationError!, ct).ConfigureAwait(false);
+                await switchValidationError(_validationError, ct).ConfigureAwait(false);
                 return;
             }
 
@@ -195,9 +195,9 @@ namespace MyApp
             }
 
             if (_variantId == SuccessId)
-                return System.Collections.Generic.EqualityComparer<global::MyApp.Success>.Default.Equals(_success!, other._success);
+                return System.Collections.Generic.EqualityComparer<global::MyApp.Success>.Default.Equals(_success, other._success);
             if (_variantId == ValidationErrorId)
-                return System.Collections.Generic.EqualityComparer<global::MyApp.ValidationError>.Default.Equals(_validationError!, other._validationError);
+                return System.Collections.Generic.EqualityComparer<global::MyApp.ValidationError>.Default.Equals(_validationError, other._validationError);
             throw new System.InvalidOperationException("Inner type is unknown");
         }
 

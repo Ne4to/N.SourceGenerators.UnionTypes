@@ -9,14 +9,14 @@ partial class Result : System.IEquatable<Result>
 {
     private readonly int _variantId;
     private const int SuccessId = 1;
-    private readonly global::Success? _success;
+    private readonly global::Success _success;
     public bool IsSuccess => _variantId == SuccessId;
     public global::Success AsSuccess
     {
         get
         {
             if (_variantId == SuccessId)
-                return _success!;
+                return _success;
             throw new System.InvalidOperationException("Inner value is not Success");
         }
     }
@@ -32,11 +32,11 @@ partial class Result : System.IEquatable<Result>
     public static explicit operator global::Success(Result value)
     {
         if (value._variantId == SuccessId)
-            return value._success!;
+            return value._success;
         throw new System.InvalidOperationException("Inner value is not Success");
     }
 
-    public bool TryGetSuccess([System.Diagnostics.CodeAnalysis.NotNullWhen(true)] out global::Success? value)
+    public bool TryGetSuccess([System.Diagnostics.CodeAnalysis.NotNullWhen(true)] out global::Success value)
     {
         if (_variantId == SuccessId)
         {
@@ -51,14 +51,14 @@ partial class Result : System.IEquatable<Result>
     }
 
     private const int ErrorId = 2;
-    private readonly global::Error? _error;
+    private readonly global::Error _error;
     public bool IsError => _variantId == ErrorId;
     public global::Error AsError
     {
         get
         {
             if (_variantId == ErrorId)
-                return _error!;
+                return _error;
             throw new System.InvalidOperationException("Inner value is not Error");
         }
     }
@@ -74,11 +74,11 @@ partial class Result : System.IEquatable<Result>
     public static explicit operator global::Error(Result value)
     {
         if (value._variantId == ErrorId)
-            return value._error!;
+            return value._error;
         throw new System.InvalidOperationException("Inner value is not Error");
     }
 
-    public bool TryGetError([System.Diagnostics.CodeAnalysis.NotNullWhen(true)] out global::Error? value)
+    public bool TryGetError([System.Diagnostics.CodeAnalysis.NotNullWhen(true)] out global::Error value)
     {
         if (_variantId == ErrorId)
         {
@@ -93,14 +93,14 @@ partial class Result : System.IEquatable<Result>
     }
 
     private const int WrappedOfIReadOnlyListOfStringId = 3;
-    private readonly global::Wrapped<global::System.Collections.Generic.IReadOnlyList<string>>? _wrappedOfIReadOnlyListOfString;
+    private readonly global::Wrapped<global::System.Collections.Generic.IReadOnlyList<string>> _wrappedOfIReadOnlyListOfString;
     public bool IsWrappedOfIReadOnlyListOfString => _variantId == WrappedOfIReadOnlyListOfStringId;
     public global::Wrapped<global::System.Collections.Generic.IReadOnlyList<string>> AsWrappedOfIReadOnlyListOfString
     {
         get
         {
             if (_variantId == WrappedOfIReadOnlyListOfStringId)
-                return _wrappedOfIReadOnlyListOfString!;
+                return _wrappedOfIReadOnlyListOfString;
             throw new System.InvalidOperationException("Inner value is not WrappedOfIReadOnlyListOfString");
         }
     }
@@ -116,11 +116,11 @@ partial class Result : System.IEquatable<Result>
     public static explicit operator global::Wrapped<global::System.Collections.Generic.IReadOnlyList<string>>(Result value)
     {
         if (value._variantId == WrappedOfIReadOnlyListOfStringId)
-            return value._wrappedOfIReadOnlyListOfString!;
+            return value._wrappedOfIReadOnlyListOfString;
         throw new System.InvalidOperationException("Inner value is not WrappedOfIReadOnlyListOfString");
     }
 
-    public bool TryGetWrappedOfIReadOnlyListOfString([System.Diagnostics.CodeAnalysis.NotNullWhen(true)] out global::Wrapped<global::System.Collections.Generic.IReadOnlyList<string>>? value)
+    public bool TryGetWrappedOfIReadOnlyListOfString([System.Diagnostics.CodeAnalysis.NotNullWhen(true)] out global::Wrapped<global::System.Collections.Generic.IReadOnlyList<string>> value)
     {
         if (_variantId == WrappedOfIReadOnlyListOfStringId)
         {
@@ -137,22 +137,22 @@ partial class Result : System.IEquatable<Result>
     public TOut Match<TOut>(global::System.Func<global::Success, TOut> matchSuccess, global::System.Func<global::Error, TOut> matchError, global::System.Func<global::Wrapped<global::System.Collections.Generic.IReadOnlyList<string>>, TOut> matchWrappedOfIReadOnlyListOfString)
     {
         if (_variantId == SuccessId)
-            return matchSuccess(_success!);
+            return matchSuccess(_success);
         if (_variantId == ErrorId)
-            return matchError(_error!);
+            return matchError(_error);
         if (_variantId == WrappedOfIReadOnlyListOfStringId)
-            return matchWrappedOfIReadOnlyListOfString(_wrappedOfIReadOnlyListOfString!);
+            return matchWrappedOfIReadOnlyListOfString(_wrappedOfIReadOnlyListOfString);
         throw new System.InvalidOperationException("Inner type is unknown");
     }
 
     public async global::System.Threading.Tasks.Task<TOut> MatchAsync<TOut>(global::System.Func<global::Success, global::System.Threading.CancellationToken, global::System.Threading.Tasks.Task<TOut>> matchSuccess, global::System.Func<global::Error, global::System.Threading.CancellationToken, global::System.Threading.Tasks.Task<TOut>> matchError, global::System.Func<global::Wrapped<global::System.Collections.Generic.IReadOnlyList<string>>, global::System.Threading.CancellationToken, global::System.Threading.Tasks.Task<TOut>> matchWrappedOfIReadOnlyListOfString, global::System.Threading.CancellationToken ct)
     {
         if (_variantId == SuccessId)
-            return await matchSuccess(_success!, ct).ConfigureAwait(false);
+            return await matchSuccess(_success, ct).ConfigureAwait(false);
         if (_variantId == ErrorId)
-            return await matchError(_error!, ct).ConfigureAwait(false);
+            return await matchError(_error, ct).ConfigureAwait(false);
         if (_variantId == WrappedOfIReadOnlyListOfStringId)
-            return await matchWrappedOfIReadOnlyListOfString(_wrappedOfIReadOnlyListOfString!, ct).ConfigureAwait(false);
+            return await matchWrappedOfIReadOnlyListOfString(_wrappedOfIReadOnlyListOfString, ct).ConfigureAwait(false);
         throw new System.InvalidOperationException("Inner type is unknown");
     }
 
@@ -160,19 +160,19 @@ partial class Result : System.IEquatable<Result>
     {
         if (_variantId == SuccessId)
         {
-            switchSuccess(_success!);
+            switchSuccess(_success);
             return;
         }
 
         if (_variantId == ErrorId)
         {
-            switchError(_error!);
+            switchError(_error);
             return;
         }
 
         if (_variantId == WrappedOfIReadOnlyListOfStringId)
         {
-            switchWrappedOfIReadOnlyListOfString(_wrappedOfIReadOnlyListOfString!);
+            switchWrappedOfIReadOnlyListOfString(_wrappedOfIReadOnlyListOfString);
             return;
         }
 
@@ -183,19 +183,19 @@ partial class Result : System.IEquatable<Result>
     {
         if (_variantId == SuccessId)
         {
-            await switchSuccess(_success!, ct).ConfigureAwait(false);
+            await switchSuccess(_success, ct).ConfigureAwait(false);
             return;
         }
 
         if (_variantId == ErrorId)
         {
-            await switchError(_error!, ct).ConfigureAwait(false);
+            await switchError(_error, ct).ConfigureAwait(false);
             return;
         }
 
         if (_variantId == WrappedOfIReadOnlyListOfStringId)
         {
-            await switchWrappedOfIReadOnlyListOfString(_wrappedOfIReadOnlyListOfString!, ct).ConfigureAwait(false);
+            await switchWrappedOfIReadOnlyListOfString(_wrappedOfIReadOnlyListOfString, ct).ConfigureAwait(false);
             return;
         }
 
@@ -255,11 +255,11 @@ partial class Result : System.IEquatable<Result>
         }
 
         if (_variantId == SuccessId)
-            return System.Collections.Generic.EqualityComparer<global::Success>.Default.Equals(_success!, other._success);
+            return System.Collections.Generic.EqualityComparer<global::Success>.Default.Equals(_success, other._success);
         if (_variantId == ErrorId)
-            return System.Collections.Generic.EqualityComparer<global::Error>.Default.Equals(_error!, other._error);
+            return System.Collections.Generic.EqualityComparer<global::Error>.Default.Equals(_error, other._error);
         if (_variantId == WrappedOfIReadOnlyListOfStringId)
-            return System.Collections.Generic.EqualityComparer<global::Wrapped<global::System.Collections.Generic.IReadOnlyList<string>>>.Default.Equals(_wrappedOfIReadOnlyListOfString!, other._wrappedOfIReadOnlyListOfString);
+            return System.Collections.Generic.EqualityComparer<global::Wrapped<global::System.Collections.Generic.IReadOnlyList<string>>>.Default.Equals(_wrappedOfIReadOnlyListOfString, other._wrappedOfIReadOnlyListOfString);
         throw new System.InvalidOperationException("Inner type is unknown");
     }
 

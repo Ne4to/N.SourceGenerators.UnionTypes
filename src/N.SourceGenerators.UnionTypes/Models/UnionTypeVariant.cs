@@ -20,8 +20,9 @@ internal class UnionTypeVariant
     public bool IsValueType { get; }
     public int IdConstValue { get; internal set; }
     public bool IsInterface { get; }
+    public bool AllowNull { get; }
 
-    public UnionTypeVariant(ITypeSymbol typeSymbol, string? alias, int order)
+    public UnionTypeVariant(ITypeSymbol typeSymbol, string? alias, int order, bool allowNull)
     {
         Alias = alias ?? GetAlias(typeSymbol);
         Order = order;
@@ -39,6 +40,7 @@ internal class UnionTypeVariant
         IdConstName = $"{Alias}Id";
         IsValueType = typeSymbol.IsValueType;
         IsInterface = typeSymbol is { IsReferenceType: true, BaseType: null };
+        AllowNull = allowNull;
     }
 
     private static HashSet<string> GetKeywords()

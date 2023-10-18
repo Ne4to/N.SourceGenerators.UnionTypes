@@ -40,9 +40,6 @@ internal class UnionType
             IsPartial = syntax.IsPartial();
         }
 
-        // TODO convert to simple model?
-        TypeArguments = containerType.TypeArguments;
-
         IsReferenceType = containerType.IsReferenceType;
         IsValueType = containerType.IsValueType;
         HasToStringMethod = containerType.GetMembers().Any(IsToStringMethod);
@@ -87,8 +84,6 @@ internal class UnionType
         }
     }
 
-    public ImmutableArray<ITypeSymbol> TypeArguments { get; set; }
-
     private static bool IsToStringMethod(ISymbol symbol)
     {
         return symbol is IMethodSymbol
@@ -106,5 +101,44 @@ internal class UnionType
             Location,
             messageArgs
         );
+    }
+}
+
+internal class UnionTypeComparer : IEqualityComparer<UnionType>
+{
+    public static UnionTypeComparer Instance { get; } = new();
+
+    private UnionTypeComparer()
+    {
+    }
+
+    public bool Equals(UnionType x, UnionType y)
+    {
+        if (ReferenceEquals(x, y))
+        {
+            return true;
+        }
+
+        if (ReferenceEquals(x, null))
+        {
+            return false;
+        }
+
+        if (ReferenceEquals(y, null))
+        {
+            return false;
+        }
+
+        if (x.GetType() != y.GetType())
+        {
+            return false;
+        }
+
+        return x.TypeFullName == y.TypeFullName;
+    }
+
+    public int GetHashCode(UnionType obj)
+    {
+        return obj.TypeFullName.GetHashCode();
     }
 }
