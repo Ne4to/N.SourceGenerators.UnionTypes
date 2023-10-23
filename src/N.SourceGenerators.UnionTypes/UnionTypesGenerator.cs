@@ -33,6 +33,15 @@ public sealed partial class UnionTypesGenerator : IIncrementalGenerator
         
         var unionTypeDiagnostics = GetUnionTypeDiagnostics(uniqueUnionTypes);
         ProcessValues(context, unionTypeDiagnostics, GenerateUnionType);
+        
+        var jsonTypes = unionTypeDiagnostics
+            .Where(vd => vd.Diagnostics.Count == 0)
+            .Where(vd => vd.Value.GenerateJsonConverter);
+        
+        // TODO test System.Text.Json is available
+        context.RegisterImplementationSourceOutput(
+            jsonTypes,
+            (ctx, item) => { GenerateJsonConverter(item.Value, ctx); });
 
         GenerateConverters(context);
     }
@@ -115,22 +124,34 @@ public sealed partial class UnionTypesGenerator : IIncrementalGenerator
 
     private static UnionType? GetUnionType(INamedTypeSymbol targetSymbol, TypeDeclarationSyntax? typeDeclaration)
     {
+        UnionTypeJsonOptions? jsonOptions = null;
         List<UnionTypeVariant>? variants = null;
         foreach (AttributeData attribute in targetSymbol.GetAttributes())
         {
-            if (attribute.AttributeClass?.ToDisplayString() != UnionTypeAttributeName)
+            if (attribute.AttributeClass?.ToDisplayString() == UnionTypeAttributeName)
             {
+                variants ??= new List<UnionTypeVariant>();
+
+                var typeSymbol = attribute.ConstructorArguments[0].Value as ITypeSymbol;
+                var alias = attribute.ConstructorArguments[1].Value?.ToString();
+                var order = (int)attribute.ConstructorArguments[2].Value!;
+                var allowNull = GetAllowNullValue(attribute);
+                var typeDiscriminator = GetTypeDiscriminatorValue(attribute);
+
+                variants.Add(new UnionTypeVariant(typeSymbol!, alias, order, allowNull, typeDiscriminator));
+                
                 continue;
             }
 
-            variants ??= new List<UnionTypeVariant>();
-
-            var typeSymbol = attribute.ConstructorArguments[0].Value as ITypeSymbol;
-            var alias = attribute.ConstructorArguments[1].Value?.ToString();
-            var order = (int)attribute.ConstructorArguments[2].Value!;
-            var allowNull = GetAllowNullValue(attribute);
-
-            variants.Add(new UnionTypeVariant(typeSymbol!, alias, order, allowNull));
+            if (attribute.AttributeClass?.ToDisplayString() == JsonPolymorphicUnionAttributeName)
+            {
+                var discriminator = attribute.NamedArguments
+                    .Where(kvp => kvp.Key == "TypeDiscriminatorPropertyName")
+                    .Select(kvp => (string?)kvp.Value.Value!)
+                    .FirstOrDefault();
+                
+                jsonOptions = new UnionTypeJsonOptions(discriminator ?? "$type");
+            }
         }
 
         int typeArgumentIndex = -100;
@@ -157,8 +178,9 @@ public sealed partial class UnionTypesGenerator : IIncrementalGenerator
                 }
                 
                 var allowNull = GetAllowNullValue(attribute);
+                var typeDiscriminator = GetTypeDiscriminatorValue(attribute);
 
-                variants.Add(new UnionTypeVariant(typeArgument, alias, typeArgumentIndex, allowNull));
+                variants.Add(new UnionTypeVariant(typeArgument, alias, typeArgumentIndex, allowNull, typeDiscriminator));
                 typeArgumentIndex++;
             }
         }
@@ -173,7 +195,8 @@ public sealed partial class UnionTypesGenerator : IIncrementalGenerator
         UnionType unionType = new(
             targetSymbol,
             typeDeclaration,
-            sortedVariants);
+            sortedVariants,
+            jsonOptions);
 
         return unionType;
 
@@ -182,6 +205,14 @@ public sealed partial class UnionTypesGenerator : IIncrementalGenerator
             return attribute.NamedArguments
                 .Where(kvp => kvp.Key == "AllowNull")
                 .Select(kvp => (bool)kvp.Value.Value!)
+                .FirstOrDefault();
+        }
+        
+        object? GetTypeDiscriminatorValue(AttributeData attribute)
+        {
+            return attribute.NamedArguments
+                .Where(kvp => kvp.Key == "TypeDiscriminator")
+                .Select(kvp => kvp.Value.Value)
                 .FirstOrDefault();
         }
     }

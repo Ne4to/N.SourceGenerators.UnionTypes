@@ -21,8 +21,10 @@ internal class UnionTypeVariant
     public int IdConstValue { get; internal set; }
     public bool IsInterface { get; }
     public bool AllowNull { get; }
+    public object? TypeDiscriminator { get; }
+    public bool HasValidTypeDiscriminator { get; }
 
-    public UnionTypeVariant(ITypeSymbol typeSymbol, string? alias, int order, bool allowNull)
+    public UnionTypeVariant(ITypeSymbol typeSymbol, string? alias, int order, bool allowNull, object? typeDiscriminator)
     {
         Alias = alias ?? GetAlias(typeSymbol);
         Order = order;
@@ -41,6 +43,8 @@ internal class UnionTypeVariant
         IsValueType = typeSymbol.IsValueType;
         IsInterface = typeSymbol is { IsReferenceType: true, BaseType: null };
         AllowNull = allowNull;
+        TypeDiscriminator = typeDiscriminator;
+        HasValidTypeDiscriminator = typeDiscriminator is int or string;
     }
 
     private static HashSet<string> GetKeywords()

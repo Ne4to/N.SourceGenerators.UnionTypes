@@ -1,5 +1,4 @@
-﻿using System.Collections.Immutable;
-using System.Text;
+﻿using System.Text;
 
 using N.SourceGenerators.UnionTypes.Extensions;
 
@@ -30,9 +29,13 @@ internal class UnionType
         }
     }
 
+    public UnionTypeJsonOptions? JsonOptions { get; }
+    public bool GenerateJsonConverter { get; }
+
     public UnionType(INamedTypeSymbol containerType,
         TypeDeclarationSyntax? syntax,
-        IReadOnlyList<UnionTypeVariant> variants)
+        IReadOnlyList<UnionTypeVariant> variants, 
+        UnionTypeJsonOptions? jsonOptions)
     {
         if (syntax != null)
         {
@@ -82,6 +85,10 @@ internal class UnionType
             UnionTypeVariant variant = variants[variantIndex];
             variant.IdConstValue = variantIndex + 1;
         }
+
+        JsonOptions = jsonOptions;
+        GenerateJsonConverter = JsonOptions?.TypeDiscriminatorPropertyName != null
+                                && Variants.Any(v => v.HasValidTypeDiscriminator);
     }
 
     private static bool IsToStringMethod(ISymbol symbol)
@@ -103,6 +110,8 @@ internal class UnionType
         );
     }
 }
+
+internal record UnionTypeJsonOptions(string TypeDiscriminatorPropertyName);
 
 internal class UnionTypeComparer : IEqualityComparer<UnionType>
 {
