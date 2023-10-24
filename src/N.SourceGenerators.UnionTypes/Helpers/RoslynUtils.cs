@@ -61,7 +61,7 @@ internal static class RoslynUtils
     }
 
 
-    private static LiteralExpressionSyntax StringLiteral(string message)
+    public static LiteralExpressionSyntax StringLiteral(string message)
     {
         return LiteralExpression(
             SyntaxKind.StringLiteralExpression,
