@@ -239,6 +239,7 @@ public sealed partial class UnionTypesGenerator : IIncrementalGenerator
                 SwitchMethod(unionType, isAsync: false),
                 SwitchMethod(unionType, isAsync: true),
                 ValueTypeProperty(unionType),
+                ValueAliasProperty(unionType),
                 GetHashCodeMethod(unionType),
                 EqualsOperator(unionType, equal: true),
                 EqualsOperator(unionType, equal: false),
@@ -485,9 +486,14 @@ public sealed partial class UnionTypesGenerator : IIncrementalGenerator
                 ReturnStatement(returnSyntax)
             ),
             ThrowInvalidOperationException(
-                // TODO change message
-                // Unable convert to XXX. Inner value is YYY not XXX.
-                $"Inner value is not {variant.Alias}"
+                InterpolatedString(
+                    InterpolatedText($"Unable convert to {variant.Alias}. Inner value is "),
+                    Interpolation(
+                        memberName != null
+                            ? MemberAccess("value", "ValueAlias")
+                            : IdentifierName("ValueAlias")),
+                    InterpolatedText($" not {variant.Alias}.")
+                )
             )
         };
     }
@@ -746,7 +752,7 @@ public sealed partial class UnionTypesGenerator : IIncrementalGenerator
                     AccessorDeclaration(
                         SyntaxKind.GetAccessorDeclaration,
                         Block(
-                            VariantsBodyStatements(unionType, v => TypeStatement(v))
+                            VariantsBodyStatements(unionType, TypeStatement)
                         )
                     )
                 );
@@ -760,6 +766,36 @@ public sealed partial class UnionTypesGenerator : IIncrementalGenerator
                 TypeOfExpression(
                     IdentifierName(variant.TypeFullName)
                 )
+            )
+        );
+    }
+
+    private static MemberDeclarationSyntax ValueAliasProperty(UnionType unionType)
+    {
+        return
+            PropertyDeclaration(
+                    StringType(),
+                    "ValueAlias"
+                )
+                .AddModifiers(
+                    Token(SyntaxKind.PrivateKeyword)
+                )
+                .AddAccessorListAccessors(
+                    AccessorDeclaration(
+                        SyntaxKind.GetAccessorDeclaration,
+                        Block(
+                            VariantsBodyStatements(unionType, AliasStatement)
+                        )
+                    )
+                );
+    }
+
+    private static StatementSyntax AliasStatement(UnionTypeVariant variant)
+    {
+        return IfStatement(
+            IsPropertyCondition(variant),
+            ReturnStatement(
+                StringLiteral(variant.Alias)
             )
         );
     }

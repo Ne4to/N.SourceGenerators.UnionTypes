@@ -12,14 +12,13 @@ partial class JsonTestsUnion : System.IEquatable<JsonTestsUnion>
     private const int JsonTestsFooJId = 1;
     private readonly global::JsonTestsFooJ _jsonTestsFooJ;
     public bool IsJsonTestsFooJ => _variantId == JsonTestsFooJId;
-
     public global::JsonTestsFooJ AsJsonTestsFooJ
     {
         get
         {
             if (_variantId == JsonTestsFooJId)
                 return _jsonTestsFooJ;
-            throw new System.InvalidOperationException("Inner value is not JsonTestsFooJ");
+            throw new System.InvalidOperationException($"Unable convert to JsonTestsFooJ. Inner value is {ValueAlias} not JsonTestsFooJ.");
         }
     }
 
@@ -35,7 +34,7 @@ partial class JsonTestsUnion : System.IEquatable<JsonTestsUnion>
     {
         if (value._variantId == JsonTestsFooJId)
             return value._jsonTestsFooJ;
-        throw new System.InvalidOperationException("Inner value is not JsonTestsFooJ");
+        throw new System.InvalidOperationException($"Unable convert to JsonTestsFooJ. Inner value is {value.ValueAlias} not JsonTestsFooJ.");
     }
 
     public bool TryGetJsonTestsFooJ([System.Diagnostics.CodeAnalysis.NotNullWhen(true)] out global::JsonTestsFooJ value)
@@ -55,14 +54,13 @@ partial class JsonTestsUnion : System.IEquatable<JsonTestsUnion>
     private const int JsonTestsBarJId = 2;
     private readonly global::JsonTestsBarJ _jsonTestsBarJ;
     public bool IsJsonTestsBarJ => _variantId == JsonTestsBarJId;
-
     public global::JsonTestsBarJ AsJsonTestsBarJ
     {
         get
         {
             if (_variantId == JsonTestsBarJId)
                 return _jsonTestsBarJ;
-            throw new System.InvalidOperationException("Inner value is not JsonTestsBarJ");
+            throw new System.InvalidOperationException($"Unable convert to JsonTestsBarJ. Inner value is {ValueAlias} not JsonTestsBarJ.");
         }
     }
 
@@ -78,7 +76,7 @@ partial class JsonTestsUnion : System.IEquatable<JsonTestsUnion>
     {
         if (value._variantId == JsonTestsBarJId)
             return value._jsonTestsBarJ;
-        throw new System.InvalidOperationException("Inner value is not JsonTestsBarJ");
+        throw new System.InvalidOperationException($"Unable convert to JsonTestsBarJ. Inner value is {value.ValueAlias} not JsonTestsBarJ.");
     }
 
     public bool TryGetJsonTestsBarJ([System.Diagnostics.CodeAnalysis.NotNullWhen(true)] out global::JsonTestsBarJ value)
@@ -155,6 +153,18 @@ partial class JsonTestsUnion : System.IEquatable<JsonTestsUnion>
                 return typeof(global::JsonTestsFooJ);
             if (_variantId == JsonTestsBarJId)
                 return typeof(global::JsonTestsBarJ);
+            throw new System.InvalidOperationException("Inner type is unknown");
+        }
+    }
+
+    private string ValueAlias
+    {
+        get
+        {
+            if (_variantId == JsonTestsFooJId)
+                return "JsonTestsFooJ";
+            if (_variantId == JsonTestsBarJId)
+                return "JsonTestsBarJ";
             throw new System.InvalidOperationException("Inner type is unknown");
         }
     }

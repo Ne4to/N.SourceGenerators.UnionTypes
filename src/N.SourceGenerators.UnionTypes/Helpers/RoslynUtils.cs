@@ -63,7 +63,7 @@ internal static class RoslynUtils
         return ThrowInvalidOperationException(expression);
     }
 
-    private static ThrowStatementSyntax ThrowInvalidOperationException(ExpressionSyntax expression)
+    public static ThrowStatementSyntax ThrowInvalidOperationException(ExpressionSyntax expression)
     {
         return ThrowException(
             "System.InvalidOperationException",

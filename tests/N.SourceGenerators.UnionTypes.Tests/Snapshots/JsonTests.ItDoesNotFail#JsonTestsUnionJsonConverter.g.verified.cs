@@ -59,15 +59,7 @@ internal class JsonTestsUnionJsonConverter : System.Text.Json.Serialization.Json
     public override void Write(System.Text.Json.Utf8JsonWriter writer, global::JsonTestsUnion value, System.Text.Json.JsonSerializerOptions options)
     {
         var customOptions = new System.Text.Json.JsonSerializerOptions(options)
-        {
-            TypeInfoResolver = new System.Text.Json.Serialization.Metadata.DefaultJsonTypeInfoResolver
-            {
-                Modifiers =
-                {
-                    AddDiscriminatorModifier
-                }
-            }
-        };
+        {TypeInfoResolver = new System.Text.Json.Serialization.Metadata.DefaultJsonTypeInfoResolver{Modifiers = {AddDiscriminatorModifier}}};
         value.Switch(x => System.Text.Json.JsonSerializer.Serialize(writer, x, customOptions), x => System.Text.Json.JsonSerializer.Serialize(writer, x, customOptions));
     }
 }
