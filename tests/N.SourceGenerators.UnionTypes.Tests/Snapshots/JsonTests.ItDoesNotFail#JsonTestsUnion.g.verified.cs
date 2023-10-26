@@ -12,6 +12,7 @@ partial class JsonTestsUnion : System.IEquatable<JsonTestsUnion>
     private const int JsonTestsFooJId = 1;
     private readonly global::JsonTestsFooJ _jsonTestsFooJ;
     public bool IsJsonTestsFooJ => _variantId == JsonTestsFooJId;
+
     public global::JsonTestsFooJ AsJsonTestsFooJ
     {
         get
@@ -54,6 +55,7 @@ partial class JsonTestsUnion : System.IEquatable<JsonTestsUnion>
     private const int JsonTestsBarJId = 2;
     private readonly global::JsonTestsBarJ _jsonTestsBarJ;
     public bool IsJsonTestsBarJ => _variantId == JsonTestsBarJId;
+
     public global::JsonTestsBarJ AsJsonTestsBarJ
     {
         get

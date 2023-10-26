@@ -31,6 +31,26 @@ internal class JsonTestsUnionJsonConverter : System.Text.Json.Serialization.Json
         jsonTypeInfo.Properties.Insert(0, jsonPropertyInfo);
     }
 
+    private static System.Type GetSubType(ref System.Text.Json.Utf8JsonReader reader)
+    {
+        if (reader.TokenType != System.Text.Json.JsonTokenType.String)
+        {
+            throw new System.Text.Json.JsonException($"Expected string discriminator value, got {reader.TokenType}");
+        }
+
+        if (reader.ValueTextEquals("Foo"u8))
+        {
+            return typeof(global::JsonTestsFooJ);
+        }
+
+        if (reader.ValueTextEquals("Bar"u8))
+        {
+            return typeof(global::JsonTestsBarJ);
+        }
+
+        throw new System.Text.Json.JsonException($"{reader.GetString()} is not a valid discriminator value");
+    }
+
     public override global::JsonTestsUnion Read(ref System.Text.Json.Utf8JsonReader reader, System.Type typeToConvert, System.Text.Json.JsonSerializerOptions options)
     {
         throw new System.InvalidOperationException("Inner type is unknown");
@@ -39,7 +59,15 @@ internal class JsonTestsUnionJsonConverter : System.Text.Json.Serialization.Json
     public override void Write(System.Text.Json.Utf8JsonWriter writer, global::JsonTestsUnion value, System.Text.Json.JsonSerializerOptions options)
     {
         var customOptions = new System.Text.Json.JsonSerializerOptions(options)
-        {TypeInfoResolver = new System.Text.Json.Serialization.Metadata.DefaultJsonTypeInfoResolver{Modifiers = {AddDiscriminatorModifier}}};
+        {
+            TypeInfoResolver = new System.Text.Json.Serialization.Metadata.DefaultJsonTypeInfoResolver
+            {
+                Modifiers =
+                {
+                    AddDiscriminatorModifier
+                }
+            }
+        };
         value.Switch(x => System.Text.Json.JsonSerializer.Serialize(writer, x, customOptions), x => System.Text.Json.JsonSerializer.Serialize(writer, x, customOptions));
     }
 }

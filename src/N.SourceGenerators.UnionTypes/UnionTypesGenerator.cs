@@ -484,12 +484,10 @@ public sealed partial class UnionTypesGenerator : IIncrementalGenerator
                 IsPropertyCondition(variant, memberName),
                 ReturnStatement(returnSyntax)
             ),
-            ThrowStatement(
-                NewInvalidOperationException(
-                    // TODO change message
-                    // Unable convert to XXX. Inner value is YYY not XXX.
-                    $"Inner value is not {variant.Alias}"
-                )
+            ThrowInvalidOperationException(
+                // TODO change message
+                // Unable convert to XXX. Inner value is YYY not XXX.
+                $"Inner value is not {variant.Alias}"
             )
         };
     }
@@ -816,9 +814,7 @@ public sealed partial class UnionTypesGenerator : IIncrementalGenerator
 
     private static ThrowStatementSyntax ThrowUnknownType()
     {
-        return ThrowStatement(
-            NewInvalidOperationException("Inner type is unknown")
-        );
+        return ThrowInvalidOperationException("Inner type is unknown");
     }
 
     #endregion

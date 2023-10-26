@@ -1,7 +1,5 @@
 ﻿using BenchmarkDotNet.Attributes;
 
-using N.SourceGenerators.UnionTypes.Benchmark.Models;
-
 namespace N.SourceGenerators.UnionTypes.Benchmark.Benchmarks;
 
 [MemoryDiagnoser]

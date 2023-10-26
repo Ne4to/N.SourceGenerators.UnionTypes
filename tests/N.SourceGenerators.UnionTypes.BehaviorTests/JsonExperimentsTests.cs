@@ -215,10 +215,10 @@ internal class JsonUnionJsonConverter : JsonConverter<JsonUnion>
 
         // TODO serialize simple types (int, string, etc.)
         // writer.WriteStartObject();
-        // writer.WriteString("$type"u8, value.ValueType.ToString()); // descriminator
+        // writer.WriteString("$type"u8, value.ValueType.ToString()); // discriminator
         // writer.WritePropertyName("Value"u8);
         // writer.WriteNull();
-        //writer.WriteBoolean();
+        // writer.WriteBoolean();
         // writer.WriteNumber();
         // writer.WriteString();
         // writer.WriteEndObject();

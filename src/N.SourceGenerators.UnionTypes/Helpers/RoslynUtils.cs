@@ -25,7 +25,7 @@ internal static class RoslynUtils
     {
         return IdentifierName(TaskTypeName);
     }
-    
+
     public static TypeSyntax CancellationTokenType()
     {
         return IdentifierName("global::System.Threading.CancellationToken");
@@ -57,20 +57,35 @@ internal static class RoslynUtils
         return SyntaxFactory.Argument(IdentifierName(name));
     }
 
-    private static ObjectCreationExpressionSyntax NewInvalidOperationException(ExpressionSyntax expression)
-    {
-        return ObjectCreationExpression(
-                IdentifierName("System.InvalidOperationException")
-            )
-            .AddArgumentListArguments(
-                SyntaxFactory.Argument(expression)
-            );
-    }
-
-    public static ObjectCreationExpressionSyntax NewInvalidOperationException(string message)
+    public static ThrowStatementSyntax ThrowInvalidOperationException(string message)
     {
         var expression = StringLiteral(message);
-        return NewInvalidOperationException(expression);
+        return ThrowInvalidOperationException(expression);
+    }
+
+    private static ThrowStatementSyntax ThrowInvalidOperationException(ExpressionSyntax expression)
+    {
+        return ThrowException(
+            "System.InvalidOperationException",
+            SyntaxFactory.Argument(expression)
+        );
+    }
+
+    public static ThrowStatementSyntax ThrowException(string type, params ArgumentSyntax[] arguments)
+    {
+        return ThrowException(IdentifierName(type), arguments);
+    }
+
+    private static ThrowStatementSyntax ThrowException(TypeSyntax type, params ArgumentSyntax[] arguments)
+    {
+        return ThrowStatement(
+            ObjectCreationExpression(
+                    type
+                )
+                .AddArgumentListArguments(
+                    arguments
+                )
+        );
     }
 
     public static GenericNameSyntax GenericType(string type, string t1)
@@ -102,7 +117,7 @@ internal static class RoslynUtils
     }
 
     public static MemberAccessExpressionSyntax MemberAccess(
-        ExpressionSyntax expression, 
+        ExpressionSyntax expression,
         string name,
         params string[] pathItems)
     {
@@ -111,12 +126,12 @@ internal static class RoslynUtils
             expression,
             IdentifierName(name)
         );
-        
+
         foreach (var path in pathItems)
         {
             result = MemberAccess(result, path);
         }
-        
+
         return result;
     }
 
@@ -138,6 +153,14 @@ internal static class RoslynUtils
     public static LiteralExpressionSyntax FalseLiteralExpression()
     {
         return LiteralExpression(SyntaxKind.FalseLiteralExpression);
+    }
+
+    public static LiteralExpressionSyntax Utf8StringLiteral(string value)
+    {
+        return LiteralExpression(
+            SyntaxKind.Utf8StringLiteralExpression,
+            ParseToken($"\"{value}\"u8")
+        );
     }
 
     public static LiteralExpressionSyntax StringLiteral(string message)
@@ -253,6 +276,25 @@ internal static class RoslynUtils
             SyntaxKind.SimpleAssignmentExpression,
             left,
             right
+        );
+    }
+
+    public static LocalDeclarationStatementSyntax LocalVariableDeclaration(
+        TypeSyntax type,
+        string name,
+        ExpressionSyntax initExpression)
+    {
+        return LocalDeclarationStatement(
+            VariableDeclaration(
+                type
+            ).AddVariables(
+                VariableDeclarator(name)
+                    .WithInitializer(
+                        EqualsValueClause(
+                            initExpression
+                        )
+                    )
+            )
         );
     }
 }

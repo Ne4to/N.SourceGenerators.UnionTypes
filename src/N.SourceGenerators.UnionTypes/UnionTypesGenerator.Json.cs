@@ -27,6 +27,7 @@ public sealed partial class UnionTypesGenerator
             .AddMembers(
                 GetDiscriminatorMethod(unionType),
                 AddDiscriminatorModifier(unionType),
+                GetSubTypeMethod(unionType),
                 ReadJsonConverterMethod(unionType),
                 WriteJsonConverterMethod(unionType)
             );
@@ -99,22 +100,99 @@ public sealed partial class UnionTypesGenerator
                 }
             }
 
-            yield return ThrowStatement(
-                ObjectCreationExpression(IdentifierName("System.ArgumentOutOfRangeException"))
-                    .AddArgumentListArguments(
-                        Argument(NameOfExpressions("x")),
-                        Argument("x"),
-                        Argument(
-                            InterpolatedString(
-                                Interpolation(
-                                    InvocationExpression(MemberAccess("x", "GetType"))
-                                ),
-                                InterpolatedText(" has no discriminator specified in "),
-                                Interpolation(TypeOfExpression(IdentifierName(unionType.TypeFullName)))
+            yield return ThrowException(
+                "System.ArgumentOutOfRangeException",
+                Argument(NameOfExpressions("x")),
+                Argument("x"),
+                Argument(
+                    InterpolatedString(
+                        Interpolation(
+                            InvocationExpression(MemberAccess("x", "GetType"))
+                        ),
+                        InterpolatedText(" has no discriminator specified in "),
+                        Interpolation(TypeOfExpression(IdentifierName(unionType.TypeFullName)))
+                    )
+                )
+            );
+        }
+    }
+
+    private static MemberDeclarationSyntax GetSubTypeMethod(UnionType unionType)
+    {
+        return MethodDeclaration(
+                IdentifierName("System.Type"),
+                "GetSubType"
+            )
+            .AddModifiers(
+                Token(SyntaxKind.PrivateKeyword),
+                Token(SyntaxKind.StaticKeyword)
+            ).AddParameterListParameters(
+                Parameter("System.Text.Json.Utf8JsonReader", "reader")
+                    .AddModifiers(Token(SyntaxKind.RefKeyword))
+            )
+            .AddBodyStatements(
+                IfStatement(
+                    NotEqualsExpression(
+                        MemberAccess("reader", "TokenType"),
+                        MemberAccess("System.Text.Json.JsonTokenType", "String")
+                    ),
+                    Block(
+                        ThrowException(
+                            "System.Text.Json.JsonException",
+                            Argument(
+                                InterpolatedString(
+                                    InterpolatedText("Expected string discriminator value, got "),
+                                    Interpolation(MemberAccess("reader", "TokenType"))
+                                )
                             )
                         )
                     )
+                )
+            )
+            .AddBodyStatements(
+                GetTypeFromDiscriminator().ToArray()
+            )
+            .AddBodyStatements(
+                ThrowException(
+                    "System.Text.Json.JsonException",
+                    Argument(
+                        InterpolatedString(
+                            Interpolation(
+                                InvocationExpression(MemberAccess("reader", "GetString"))
+                            ),
+                            InterpolatedText(" is not a valid discriminator value")
+                        )
+                    )
+                )
             );
+
+        IEnumerable<StatementSyntax> GetTypeFromDiscriminator()
+        {
+            foreach (var variant in unionType.Variants)
+            {
+                if (!variant.HasValidTypeDiscriminator)
+                {
+                    continue;
+                }
+
+                yield return IfStatement(
+                    InvocationExpression(
+                        MemberAccess("reader", "ValueTextEquals")
+                    ).AddArgumentListArguments(
+                        Argument(
+                            // TODO support int discriminator
+                            Utf8StringLiteral((string)variant.TypeDiscriminator)
+                        )
+                    ),
+                    Block(
+                        ReturnStatement(
+                            TypeOfExpression(
+                                IdentifierName(variant.TypeFullName)
+                            )
+                        )
+                    )
+                );
+            }
         }
     }
 
@@ -146,21 +224,14 @@ public sealed partial class UnionTypesGenerator
             // }
 
             // JsonPropertyInfo jsonPropertyInfo = jsonTypeInfo.CreateJsonPropertyInfo(typeof(string), "$type");
-            LocalDeclarationStatement(
-                VariableDeclaration(
-                    JsonPropertyInfoType()
-                ).AddVariables(
-                    VariableDeclarator("jsonPropertyInfo")
-                        .WithInitializer(
-                            EqualsValueClause(
-                                InvocationExpression(
-                                    MemberAccess("jsonTypeInfo", "CreateJsonPropertyInfo")
-                                ).AddArgumentListArguments(
-                                    Argument(TypeOfExpression(StringType())),
-                                    Argument(StringLiteral(unionType.JsonOptions!.TypeDiscriminatorPropertyName))
-                                )
-                            )
-                        )
+            LocalVariableDeclaration(
+                JsonPropertyInfoType(),
+                "jsonPropertyInfo",
+                InvocationExpression(
+                    MemberAccess("jsonTypeInfo", "CreateJsonPropertyInfo")
+                ).AddArgumentListArguments(
+                    Argument(TypeOfExpression(StringType())),
+                    Argument(StringLiteral(unionType.JsonOptions!.TypeDiscriminatorPropertyName))
                 )
             ),
 
@@ -217,37 +288,29 @@ public sealed partial class UnionTypesGenerator
             Parameter(unionType.TypeFullName, "value"),
             Parameter("System.Text.Json.JsonSerializerOptions", "options")
         ).AddBodyStatements(
-            // TODO simplify
-            LocalDeclarationStatement(
-                VariableDeclaration(
-                    IdentifierName("var")
-                ).AddVariables(
-                    VariableDeclarator("customOptions")
-                        .WithInitializer(
-                            EqualsValueClause(
-                                ObjectCreationExpression(
-                                    IdentifierName("System.Text.Json.JsonSerializerOptions"),
-                                    ArgumentList().AddArguments(Argument("options")),
-                                    ObjectInitializerExpression(
-                                        SimpleAssignmentExpression(
-                                            "TypeInfoResolver",
-                                            ObjectCreationExpression(
-                                                DefaultJsonTypeInfoResolverType()
-                                            ).WithInitializer(
-                                                ObjectInitializerExpression(
-                                                    SimpleAssignmentExpression(
-                                                        "Modifiers",
-                                                        CollectionInitializerExpression(
-                                                            IdentifierName("AddDiscriminatorModifier")
-                                                        )
-                                                    )
-                                                )
-                                            )
+            LocalVariableDeclaration(
+                IdentifierName("var"),
+                "customOptions",
+                ObjectCreationExpression(
+                    IdentifierName("System.Text.Json.JsonSerializerOptions"),
+                    ArgumentList().AddArguments(Argument("options")),
+                    ObjectInitializerExpression(
+                        SimpleAssignmentExpression(
+                            "TypeInfoResolver",
+                            ObjectCreationExpression(
+                                DefaultJsonTypeInfoResolverType()
+                            ).WithInitializer(
+                                ObjectInitializerExpression(
+                                    SimpleAssignmentExpression(
+                                        "Modifiers",
+                                        CollectionInitializerExpression(
+                                            IdentifierName("AddDiscriminatorModifier")
                                         )
                                     )
                                 )
                             )
                         )
+                    )
                 )
             ),
             ExpressionStatement(
@@ -266,6 +329,7 @@ public sealed partial class UnionTypesGenerator
                     SimpleLambdaExpression(
                         Parameter(Identifier("x")),
                         null,
+                        // TODO throw exception if variant doesn't have discriminator
                         InvocationExpression(
                             MemberAccess("System.Text.Json.JsonSerializer", "Serialize")
                         ).AddArgumentListArguments(
