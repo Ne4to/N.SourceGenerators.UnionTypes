@@ -22,7 +22,7 @@ namespace MyApp
             {
                 if (_variantId == SuccessStructId)
                     return _successStruct;
-                throw new System.InvalidOperationException("Inner value is not SuccessStruct");
+                throw new System.InvalidOperationException($"Unable convert to SuccessStruct. Inner value is {ValueAlias} not SuccessStruct.");
             }
         }
 
@@ -37,7 +37,7 @@ namespace MyApp
         {
             if (value._variantId == SuccessStructId)
                 return value._successStruct;
-            throw new System.InvalidOperationException("Inner value is not SuccessStruct");
+            throw new System.InvalidOperationException($"Unable convert to SuccessStruct. Inner value is {value.ValueAlias} not SuccessStruct.");
         }
 
         public bool TryGetSuccessStruct([System.Diagnostics.CodeAnalysis.NotNullWhen(true)] out global::MyApp.SuccessStruct value)
@@ -64,7 +64,7 @@ namespace MyApp
             {
                 if (_variantId == ValidationErrorStructId)
                     return _validationErrorStruct;
-                throw new System.InvalidOperationException("Inner value is not ValidationErrorStruct");
+                throw new System.InvalidOperationException($"Unable convert to ValidationErrorStruct. Inner value is {ValueAlias} not ValidationErrorStruct.");
             }
         }
 
@@ -79,7 +79,7 @@ namespace MyApp
         {
             if (value._variantId == ValidationErrorStructId)
                 return value._validationErrorStruct;
-            throw new System.InvalidOperationException("Inner value is not ValidationErrorStruct");
+            throw new System.InvalidOperationException($"Unable convert to ValidationErrorStruct. Inner value is {value.ValueAlias} not ValidationErrorStruct.");
         }
 
         public bool TryGetValidationErrorStruct([System.Diagnostics.CodeAnalysis.NotNullWhen(true)] out global::MyApp.ValidationErrorStruct value)
@@ -106,7 +106,7 @@ namespace MyApp
             {
                 if (_variantId == NotFoundErrorStructId)
                     return _notFoundErrorStruct;
-                throw new System.InvalidOperationException("Inner value is not NotFoundErrorStruct");
+                throw new System.InvalidOperationException($"Unable convert to NotFoundErrorStruct. Inner value is {ValueAlias} not NotFoundErrorStruct.");
             }
         }
 
@@ -121,7 +121,7 @@ namespace MyApp
         {
             if (value._variantId == NotFoundErrorStructId)
                 return value._notFoundErrorStruct;
-            throw new System.InvalidOperationException("Inner value is not NotFoundErrorStruct");
+            throw new System.InvalidOperationException($"Unable convert to NotFoundErrorStruct. Inner value is {value.ValueAlias} not NotFoundErrorStruct.");
         }
 
         public bool TryGetNotFoundErrorStruct([System.Diagnostics.CodeAnalysis.NotNullWhen(true)] out global::MyApp.NotFoundErrorStruct value)
@@ -216,6 +216,20 @@ namespace MyApp
                     return typeof(global::MyApp.ValidationErrorStruct);
                 if (_variantId == NotFoundErrorStructId)
                     return typeof(global::MyApp.NotFoundErrorStruct);
+                throw new System.InvalidOperationException("Inner type is unknown");
+            }
+        }
+
+        private string ValueAlias
+        {
+            get
+            {
+                if (_variantId == SuccessStructId)
+                    return "SuccessStruct";
+                if (_variantId == ValidationErrorStructId)
+                    return "ValidationErrorStruct";
+                if (_variantId == NotFoundErrorStructId)
+                    return "NotFoundErrorStruct";
                 throw new System.InvalidOperationException("Inner type is unknown");
             }
         }

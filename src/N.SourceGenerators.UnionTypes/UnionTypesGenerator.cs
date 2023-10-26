@@ -38,7 +38,7 @@ public sealed partial class UnionTypesGenerator : IIncrementalGenerator
             .Where(vd => vd.Diagnostics.Count == 0)
             .Where(vd => vd.Value.GenerateJsonConverter);
 
-        // TODO test System.Text.Json is available
+        // TODO test System.Text.Json is available, add diagnostics
         context.RegisterImplementationSourceOutput(
             jsonTypes,
             (ctx, item) => { GenerateJsonConverter(item.Value, ctx); });
@@ -788,16 +788,16 @@ public sealed partial class UnionTypesGenerator : IIncrementalGenerator
                         )
                     )
                 );
-    }
-
-    private static StatementSyntax AliasStatement(UnionTypeVariant variant)
-    {
-        return IfStatement(
-            IsPropertyCondition(variant),
-            ReturnStatement(
-                StringLiteral(variant.Alias)
-            )
-        );
+        
+        static StatementSyntax AliasStatement(UnionTypeVariant variant)
+        {
+            return IfStatement(
+                IsPropertyCondition(variant),
+                ReturnStatement(
+                    StringLiteral(variant.Alias)
+                )
+            );
+        }
     }
 
     private static MemberDeclarationSyntax ToStringMethod(UnionType unionType)
@@ -811,7 +811,7 @@ public sealed partial class UnionTypesGenerator : IIncrementalGenerator
                 Token(SyntaxKind.OverrideKeyword)
             )
             .AddBodyStatements(
-                VariantsBodyStatements(unionType, v => AliasStatement(v))
+                VariantsBodyStatements(unionType, AliasStatement)
             );
 
         static StatementSyntax AliasStatement(UnionTypeVariant variant)

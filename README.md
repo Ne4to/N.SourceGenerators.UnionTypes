@@ -195,6 +195,26 @@ public async Task SwitchAsyncMethod(FooResult result, CancellationToken cancella
 }
 ```
 
+### JSON serialization (EXPERIMENTAL)
+
+To add JSON support
+- add `JsonPolymorphicUnion` attribute to union type
+- add `TypeDiscriminator` to each type variant
+
+#### Limitations:
+- .NET 7 or newer
+- only complex type variants
+
+#### Example
+```csharp
+[UnionType(typeof(JsonTestsFooJ), TypeDiscriminator = "Foo")]
+[UnionType(typeof(JsonTestsBarJ), TypeDiscriminator = "Bar")]
+[JsonPolymorphicUnion]
+public partial class JsonTestsUnion
+{
+}
+```
+
 ### Union to union converter
 
 When one union type's variants is subset of another union type's variants use one of the following attributes to convert one type to another: `UnionConverterTo`, `UnionConverterFrom`, or `UnionConverter`.

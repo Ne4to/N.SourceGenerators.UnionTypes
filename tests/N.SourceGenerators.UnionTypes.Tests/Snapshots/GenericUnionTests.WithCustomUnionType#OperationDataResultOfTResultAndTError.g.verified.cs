@@ -17,7 +17,7 @@ partial class OperationDataResult<TResult, TError> : System.IEquatable<Operation
         {
             if (_variantId == ResultId)
                 return _result;
-            throw new System.InvalidOperationException("Inner value is not Result");
+            throw new System.InvalidOperationException($"Unable convert to Result. Inner value is {ValueAlias} not Result.");
         }
     }
 
@@ -33,7 +33,7 @@ partial class OperationDataResult<TResult, TError> : System.IEquatable<Operation
     {
         if (value._variantId == ResultId)
             return value._result;
-        throw new System.InvalidOperationException("Inner value is not Result");
+        throw new System.InvalidOperationException($"Unable convert to Result. Inner value is {value.ValueAlias} not Result.");
     }
 
     public bool TryGetResult([System.Diagnostics.CodeAnalysis.NotNullWhen(true)] out TResult value)
@@ -59,7 +59,7 @@ partial class OperationDataResult<TResult, TError> : System.IEquatable<Operation
         {
             if (_variantId == ErrorId)
                 return _error;
-            throw new System.InvalidOperationException("Inner value is not Error");
+            throw new System.InvalidOperationException($"Unable convert to Error. Inner value is {ValueAlias} not Error.");
         }
     }
 
@@ -75,7 +75,7 @@ partial class OperationDataResult<TResult, TError> : System.IEquatable<Operation
     {
         if (value._variantId == ErrorId)
             return value._error;
-        throw new System.InvalidOperationException("Inner value is not Error");
+        throw new System.InvalidOperationException($"Unable convert to Error. Inner value is {value.ValueAlias} not Error.");
     }
 
     public bool TryGetError([System.Diagnostics.CodeAnalysis.NotNullWhen(true)] out TError value)
@@ -101,7 +101,7 @@ partial class OperationDataResult<TResult, TError> : System.IEquatable<Operation
         {
             if (_variantId == Int32Id)
                 return _int32;
-            throw new System.InvalidOperationException("Inner value is not Int32");
+            throw new System.InvalidOperationException($"Unable convert to Int32. Inner value is {ValueAlias} not Int32.");
         }
     }
 
@@ -117,7 +117,7 @@ partial class OperationDataResult<TResult, TError> : System.IEquatable<Operation
     {
         if (value._variantId == Int32Id)
             return value._int32;
-        throw new System.InvalidOperationException("Inner value is not Int32");
+        throw new System.InvalidOperationException($"Unable convert to Int32. Inner value is {value.ValueAlias} not Int32.");
     }
 
     public bool TryGetInt32([System.Diagnostics.CodeAnalysis.NotNullWhen(true)] out int value)
@@ -212,6 +212,20 @@ partial class OperationDataResult<TResult, TError> : System.IEquatable<Operation
                 return typeof(TError);
             if (_variantId == Int32Id)
                 return typeof(int);
+            throw new System.InvalidOperationException("Inner type is unknown");
+        }
+    }
+
+    private string ValueAlias
+    {
+        get
+        {
+            if (_variantId == ResultId)
+                return "Result";
+            if (_variantId == ErrorId)
+                return "Error";
+            if (_variantId == Int32Id)
+                return "Int32";
             throw new System.InvalidOperationException("Inner type is unknown");
         }
     }

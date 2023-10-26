@@ -19,7 +19,7 @@ namespace DataAccess
             {
                 if (_variantId == DataAccessModel1Id)
                     return _dataAccessModel1;
-                throw new System.InvalidOperationException("Inner value is not DataAccessModel1");
+                throw new System.InvalidOperationException($"Unable convert to DataAccessModel1. Inner value is {ValueAlias} not DataAccessModel1.");
             }
         }
 
@@ -35,7 +35,7 @@ namespace DataAccess
         {
             if (value._variantId == DataAccessModel1Id)
                 return value._dataAccessModel1;
-            throw new System.InvalidOperationException("Inner value is not DataAccessModel1");
+            throw new System.InvalidOperationException($"Unable convert to DataAccessModel1. Inner value is {value.ValueAlias} not DataAccessModel1.");
         }
 
         public bool TryGetDataAccessModel1([System.Diagnostics.CodeAnalysis.NotNullWhen(true)] out global::DataAccess.DataAccessModel1 value)
@@ -61,7 +61,7 @@ namespace DataAccess
             {
                 if (_variantId == DataAccessModel2Id)
                     return _dataAccessModel2;
-                throw new System.InvalidOperationException("Inner value is not DataAccessModel2");
+                throw new System.InvalidOperationException($"Unable convert to DataAccessModel2. Inner value is {ValueAlias} not DataAccessModel2.");
             }
         }
 
@@ -77,7 +77,7 @@ namespace DataAccess
         {
             if (value._variantId == DataAccessModel2Id)
                 return value._dataAccessModel2;
-            throw new System.InvalidOperationException("Inner value is not DataAccessModel2");
+            throw new System.InvalidOperationException($"Unable convert to DataAccessModel2. Inner value is {value.ValueAlias} not DataAccessModel2.");
         }
 
         public bool TryGetDataAccessModel2([System.Diagnostics.CodeAnalysis.NotNullWhen(true)] out global::DataAccess.DataAccessModel2 value)
@@ -154,6 +154,18 @@ namespace DataAccess
                     return typeof(global::DataAccess.DataAccessModel1);
                 if (_variantId == DataAccessModel2Id)
                     return typeof(global::DataAccess.DataAccessModel2);
+                throw new System.InvalidOperationException("Inner type is unknown");
+            }
+        }
+
+        private string ValueAlias
+        {
+            get
+            {
+                if (_variantId == DataAccessModel1Id)
+                    return "DataAccessModel1";
+                if (_variantId == DataAccessModel2Id)
+                    return "DataAccessModel2";
                 throw new System.InvalidOperationException("Inner type is unknown");
             }
         }

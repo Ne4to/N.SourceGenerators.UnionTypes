@@ -53,7 +53,51 @@ internal class JsonTestsUnionJsonConverter : System.Text.Json.Serialization.Json
 
     public override global::JsonTestsUnion Read(ref System.Text.Json.Utf8JsonReader reader, System.Type typeToConvert, System.Text.Json.JsonSerializerOptions options)
     {
-        throw new System.InvalidOperationException("Inner type is unknown");
+        System.Text.Json.JsonEncodedText discriminatorPropertyName = System.Text.Json.JsonEncodedText.Encode("$type");
+        var nestedReader = reader;
+        if (nestedReader.TokenType == System.Text.Json.JsonTokenType.None)
+        {
+            nestedReader.Read();
+        }
+
+        while (nestedReader.Read())
+        {
+            if (nestedReader.TokenType == System.Text.Json.JsonTokenType.PropertyName && nestedReader.ValueTextEquals(discriminatorPropertyName.EncodedUtf8Bytes))
+            {
+                nestedReader.Read();
+                var subType = GetSubType(ref nestedReader);
+                var result = System.Text.Json.JsonSerializer.Deserialize(ref reader, subType, options);
+                if (result is global::JsonTestsFooJ jsonTestsFooJ)
+                {
+                    return new global::JsonTestsUnion(jsonTestsFooJ);
+                }
+
+                if (result is global::JsonTestsBarJ jsonTestsBarJ)
+                {
+                    return new global::JsonTestsUnion(jsonTestsBarJ);
+                }
+
+                throw new System.InvalidOperationException("Unable to deserialize to JsonTestsUnion");
+            }
+            else if (nestedReader.TokenType == System.Text.Json.JsonTokenType.StartObject || nestedReader.TokenType == System.Text.Json.JsonTokenType.StartArray)
+            {
+                if (!nestedReader.TrySkip())
+                {
+                    return default !;
+                }
+            }
+            else if (nestedReader.TokenType == System.Text.Json.JsonTokenType.EndObject)
+            {
+                break;
+            }
+        }
+
+        if (reader.IsFinalBlock)
+        {
+            throw new System.Text.Json.JsonException($"Unable to find discriminator property $type");
+        }
+
+        return default !;
     }
 
     public override void Write(System.Text.Json.Utf8JsonWriter writer, global::JsonTestsUnion value, System.Text.Json.JsonSerializerOptions options)

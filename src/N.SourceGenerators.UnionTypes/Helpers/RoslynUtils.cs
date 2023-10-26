@@ -216,6 +216,15 @@ internal static class RoslynUtils
             right
         );
     }
+    
+    public static BinaryExpressionSyntax EqualsExpression(ExpressionSyntax left, ExpressionSyntax right)
+    {
+        return BinaryExpression(
+            SyntaxKind.EqualsExpression,
+            left,
+            right
+        );
+    }
 
     public static BinaryExpressionSyntax NotEqualsExpression(ExpressionSyntax left, ExpressionSyntax right)
     {

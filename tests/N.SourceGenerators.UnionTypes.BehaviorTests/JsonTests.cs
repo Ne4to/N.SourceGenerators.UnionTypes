@@ -36,9 +36,23 @@ public class JsonTests
     {
         JsonTestsUnion item = new JsonTestsBarJ(3, 42, JsonTestsBarStatus.Rejected);
     
-        JsonSerializerOptions serializerOptions = new() { Converters = { new JsonStringEnumConverter() }, };
+        JsonSerializerOptions serializerOptions = new() { Converters = { new JsonStringEnumConverter() } };
     
         var json = JsonSerializer.Serialize(item, serializerOptions);
         Assert.Equal("""{"$type":"Bar","Id":3,"Cost":42,"Status":"Rejected"}""", json);
+    }
+    
+    [Fact]
+    public void DeserializeBar()
+    {
+        const string json = """{"Id":3,"Cost":42,"$type":"Bar","Status":"Rejected"}""";
+        JsonSerializerOptions serializerOptions = new() { Converters = { new JsonStringEnumConverter() } };
+        
+        var result = JsonSerializer.Deserialize<JsonTestsUnion>(json, serializerOptions);
+        Assert.NotNull(result);
+        Assert.True(result.IsJsonTestsBarJ);
+        Assert.Equal(3, result.AsJsonTestsBarJ.Id);
+        Assert.Equal(42, result.AsJsonTestsBarJ.Cost);
+        Assert.Equal(JsonTestsBarStatus.Rejected, result.AsJsonTestsBarJ.Status);
     }
 }

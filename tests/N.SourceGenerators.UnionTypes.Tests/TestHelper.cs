@@ -13,16 +13,16 @@ public static class TestHelper
     public static Task Verify<TGenerator>(
         string source,
         string? parametersText = null,
-        Type? additionalReferenceTypeAssembly = null)
+        params PortableExecutableReference[] additionalReferences)
         where TGenerator : IIncrementalGenerator, new()
     {
-        return Verify<TGenerator>(new[] { source }, parametersText, additionalReferenceTypeAssembly);
+        return Verify<TGenerator>(new[] { source }, parametersText, additionalReferences);
     }
 
     public static async Task Verify<TGenerator>(
         string[] sources,
         string? parametersText = null,
-        Type? additionalReferenceTypeAssembly = null)
+        params PortableExecutableReference[] additionalReferences)
         where TGenerator : IIncrementalGenerator, new()
     {
         CSharpCompilation? previousCompilation = null;
@@ -38,35 +38,9 @@ public static class TestHelper
             {
                 MetadataReference.CreateFromFile(typeof(object).Assembly.Location)
             };
+            
+            references.AddRange(additionalReferences);
 
-            if (additionalReferenceTypeAssembly != null)
-            {
-                // TODO fix reference to System.Text.Json
-                references.Add(MetadataReference.CreateFromFile(additionalReferenceTypeAssembly.Assembly.Location));
-                // System.Text.Json.JsonSerializer
-                // references.Add(MetadataReference.CreateFromFile(typeof(System.Runtime.CompilerServices.RuntimeHelpers).Assembly.Location));
-                
-                // // System.Runtime.InteropServices
-                // references.Add(MetadataReference.CreateFromFile(typeof(System.Runtime.InteropServices.RuntimeEnvironment).Assembly.Location));
-                //
-                // // System.Memory
-                // references.Add(MetadataReference.CreateFromFile(typeof(System.Buffers.MemoryPool<>).Assembly.Location));
-                //
-                // // System.Collections
-                // references.Add(MetadataReference.CreateFromFile(typeof(System.Collections.BitArray).Assembly.Location));
-                //
-                // // System.Collections.Concurrent
-                // references.Add(MetadataReference.CreateFromFile(typeof(System.Collections.Concurrent.ConcurrentBag<>).Assembly.Location));
-                //
-                // // System.Text.Encodings.Web
-                // references.Add(MetadataReference.CreateFromFile(typeof(System.Text.Encodings.Web.TextEncoder).Assembly.Location));
-
-                references.Add(MetadataReference.CreateFromFile(Assembly
-                    .Load(new AssemblyName("System.Runtime")).Location));
-                
-                // references.Add(MetadataReference.CreateFromFile(Assembly
-                //     .Load(new AssemblyName("System.ComponentModel.Primitives")).Location));
-            }
             // /usr/local/share/dotnet/shared/Microsoft.NETCore.App/7.0.11/System.Text.Json.dll
             // Create a Roslyn compilation for the syntax tree.
             CSharpCompilation compilation = CSharpCompilation.Create(

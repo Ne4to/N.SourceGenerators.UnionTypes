@@ -1,5 +1,6 @@
 using System.Text;
 
+using N.SourceGenerators.UnionTypes.Extensions;
 using N.SourceGenerators.UnionTypes.Models;
 
 namespace N.SourceGenerators.UnionTypes;
@@ -181,7 +182,7 @@ public sealed partial class UnionTypesGenerator
                     ).AddArgumentListArguments(
                         Argument(
                             // TODO support int discriminator
-                            Utf8StringLiteral((string)variant.TypeDiscriminator)
+                            Utf8StringLiteral((string)variant.TypeDiscriminator!)
                         )
                     ),
                     Block(
@@ -270,8 +271,178 @@ public sealed partial class UnionTypesGenerator
             Parameter("System.Type", "typeToConvert"),
             Parameter("System.Text.Json.JsonSerializerOptions", "options")
         ).AddBodyStatements(
-            ThrowUnknownType()
+            LocalVariableDeclaration(
+                IdentifierName("System.Text.Json.JsonEncodedText"),
+                "discriminatorPropertyName",
+                InvocationExpression(
+                    MemberAccess("System.Text.Json.JsonEncodedText", "Encode")
+                ).AddArgumentListArguments(
+                    Argument(StringLiteral(unionType.JsonOptions!.TypeDiscriminatorPropertyName))
+                )
+            ),
+            LocalVariableDeclaration(
+                IdentifierName("var"),
+                "nestedReader",
+                IdentifierName("reader")
+            ),
+            IfStatement(
+                EqualsExpression(
+                    MemberAccess("nestedReader", "TokenType"),
+                    MemberAccess("System.Text.Json.JsonTokenType", "None")
+                ),
+                Block(
+                    ExpressionStatement(
+                        InvocationExpression(
+                            MemberAccess("nestedReader", "Read")
+                        )
+                    )
+                )
+            ),
+            WhileStatement(
+                InvocationExpression(MemberAccess("nestedReader", "Read")),
+                Block(
+                    IfStatement(
+                        BinaryExpression(
+                            SyntaxKind.LogicalAndExpression,
+                            EqualsExpression(
+                                MemberAccess("nestedReader", "TokenType"),
+                                MemberAccess("System.Text.Json.JsonTokenType", "PropertyName")
+                            ),
+                            InvocationExpression(
+                                MemberAccess("nestedReader", "ValueTextEquals"),
+                                ArgumentList().AddArguments(
+                                    Argument(
+                                        MemberAccess("discriminatorPropertyName", "EncodedUtf8Bytes")
+                                    )
+                                )
+                            )
+                        ),
+                        Block(
+                                ExpressionStatement(
+                                    InvocationExpression(MemberAccess("nestedReader", "Read"))
+                                ),
+                                LocalVariableDeclaration(
+                                    IdentifierName("var"),
+                                    "subType",
+                                    InvocationExpression(IdentifierName("GetSubType"))
+                                        .AddArgumentListArguments(
+                                            Argument(IdentifierName("nestedReader"))
+                                                .WithRefKindKeyword(Token(SyntaxKind.RefKeyword))
+                                        )
+                                ),
+                                LocalVariableDeclaration(
+                                    IdentifierName("var"),
+                                    "result",
+                                    InvocationExpression(
+                                        MemberAccess("System.Text.Json.JsonSerializer", "Deserialize")
+                                    ).AddArgumentListArguments(
+                                        Argument("reader")
+                                            .WithRefKindKeyword(Token(SyntaxKind.RefKeyword)),
+                                        Argument("subType"),
+                                        Argument("options")
+                                    )
+                                )
+                            )
+                            .AddStatements(CreateUnionFromJson(unionType).ToArray())
+                            .AddStatements(
+                                ThrowInvalidOperationException($"Unable to deserialize to {unionType.Name}"))
+                    ).WithElse(
+                        ElseClause(
+                            IfStatement(
+                                BinaryExpression(
+                                    SyntaxKind.LogicalOrExpression,
+                                    EqualsExpression(
+                                        MemberAccess("nestedReader", "TokenType"),
+                                        MemberAccess("System.Text.Json.JsonTokenType", "StartObject")
+                                    ),
+                                    EqualsExpression(
+                                        MemberAccess("nestedReader", "TokenType"),
+                                        MemberAccess("System.Text.Json.JsonTokenType", "StartArray")
+                                    )
+                                ),
+                                Block(
+                                    IfStatement(
+                                        PrefixUnaryExpression(
+                                            SyntaxKind.LogicalNotExpression,
+                                            InvocationExpression(MemberAccess("nestedReader", "TrySkip"))
+                                        ),
+                                        Block(
+                                            ReturnStatement(
+                                                PostfixUnaryExpression(
+                                                    SyntaxKind.SuppressNullableWarningExpression,
+                                                    LiteralExpression(SyntaxKind.DefaultLiteralExpression)
+                                                )
+                                            )
+                                        )
+                                    )
+                                )
+                            ).WithElse(
+                                ElseClause(
+                                    IfStatement(
+                                        EqualsExpression(
+                                            MemberAccess("nestedReader", "TokenType"),
+                                            MemberAccess("System.Text.Json.JsonTokenType", "EndObject")
+                                        ),
+                                        Block(
+                                            BreakStatement()
+                                        )
+                                    )
+                                )
+                            )
+                        )
+                    )
+                )
+            ),
+            IfStatement(
+                MemberAccess("reader", "IsFinalBlock"),
+                Block(
+                    ThrowException(
+                        "System.Text.Json.JsonException",
+                        Argument(
+                            InterpolatedString(
+                                InterpolatedText(
+                                    $"Unable to find discriminator property {unionType.JsonOptions!.TypeDiscriminatorPropertyName}")
+                            )
+                        )
+                    )
+                )
+            ),
+            ReturnStatement(
+                PostfixUnaryExpression(
+                    SyntaxKind.SuppressNullableWarningExpression,
+                    LiteralExpression(
+                        SyntaxKind.DefaultLiteralExpression
+                    )
+                )
+            )
         );
+    }
+
+    private static IEnumerable<StatementSyntax> CreateUnionFromJson(UnionType unionType)
+    {
+        foreach (UnionTypeVariant variant in unionType.Variants)
+        {
+            if (variant.HasValidTypeDiscriminator)
+            {
+                yield return IfStatement(
+                    IsPatternExpression(
+                        IdentifierName("result"),
+                        DeclarationPattern(
+                            IdentifierName(variant.TypeFullName),
+                            SingleVariableDesignation(Identifier(variant.Alias.ToStartLowerCase()))
+                        )
+                    ),
+                    Block(
+                        ReturnStatement(
+                            ObjectCreationExpression(IdentifierName(unionType.TypeFullName))
+                                .AddArgumentListArguments(
+                                    Argument(variant.Alias.ToStartLowerCase())
+                                )
+                        )
+                    )
+                );
+            }
+        }
     }
 
     // public override void Write(Utf8JsonWriter writer, JsonUnion value, JsonSerializerOptions options)

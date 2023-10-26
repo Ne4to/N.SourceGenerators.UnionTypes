@@ -14,5 +14,6 @@ namespace N.SourceGenerators.UnionTypes
     {
         public string? Alias { get; set; }
         public bool AllowNull { get; set; }
+        public object? TypeDiscriminator { get; set; }
     }
 }

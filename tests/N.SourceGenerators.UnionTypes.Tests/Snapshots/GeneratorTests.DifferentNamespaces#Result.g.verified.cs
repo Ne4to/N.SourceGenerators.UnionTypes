@@ -19,7 +19,7 @@ namespace MyApp.Domain.Child
             {
                 if (_variantId == SuccessId)
                     return _success;
-                throw new System.InvalidOperationException("Inner value is not Success");
+                throw new System.InvalidOperationException($"Unable convert to Success. Inner value is {ValueAlias} not Success.");
             }
         }
 
@@ -35,7 +35,7 @@ namespace MyApp.Domain.Child
         {
             if (value._variantId == SuccessId)
                 return value._success;
-            throw new System.InvalidOperationException("Inner value is not Success");
+            throw new System.InvalidOperationException($"Unable convert to Success. Inner value is {value.ValueAlias} not Success.");
         }
 
         public bool TryGetSuccess([System.Diagnostics.CodeAnalysis.NotNullWhen(true)] out global::MyApp.Models.S.Child.Success value)
@@ -61,7 +61,7 @@ namespace MyApp.Domain.Child
             {
                 if (_variantId == ErrorId)
                     return _error;
-                throw new System.InvalidOperationException("Inner value is not Error");
+                throw new System.InvalidOperationException($"Unable convert to Error. Inner value is {ValueAlias} not Error.");
             }
         }
 
@@ -77,7 +77,7 @@ namespace MyApp.Domain.Child
         {
             if (value._variantId == ErrorId)
                 return value._error;
-            throw new System.InvalidOperationException("Inner value is not Error");
+            throw new System.InvalidOperationException($"Unable convert to Error. Inner value is {value.ValueAlias} not Error.");
         }
 
         public bool TryGetError([System.Diagnostics.CodeAnalysis.NotNullWhen(true)] out global::MyApp.Models.E.Child.Error value)
@@ -154,6 +154,18 @@ namespace MyApp.Domain.Child
                     return typeof(global::MyApp.Models.S.Child.Success);
                 if (_variantId == ErrorId)
                     return typeof(global::MyApp.Models.E.Child.Error);
+                throw new System.InvalidOperationException("Inner type is unknown");
+            }
+        }
+
+        private string ValueAlias
+        {
+            get
+            {
+                if (_variantId == SuccessId)
+                    return "Success";
+                if (_variantId == ErrorId)
+                    return "Error";
                 throw new System.InvalidOperationException("Inner type is unknown");
             }
         }
