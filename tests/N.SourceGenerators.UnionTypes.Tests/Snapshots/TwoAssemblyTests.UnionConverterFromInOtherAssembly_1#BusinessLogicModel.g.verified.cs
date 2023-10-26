@@ -19,7 +19,7 @@ namespace BusinessLogic
             {
                 if (_variantId == DataAccessModel1Id)
                     return _dataAccessModel1;
-                throw new System.InvalidOperationException("Inner value is not DataAccessModel1");
+                throw new System.InvalidOperationException($"Unable convert to DataAccessModel1. Inner value is {ValueAlias} not DataAccessModel1.");
             }
         }
 
@@ -35,7 +35,7 @@ namespace BusinessLogic
         {
             if (value._variantId == DataAccessModel1Id)
                 return value._dataAccessModel1;
-            throw new System.InvalidOperationException("Inner value is not DataAccessModel1");
+            throw new System.InvalidOperationException($"Unable convert to DataAccessModel1. Inner value is {value.ValueAlias} not DataAccessModel1.");
         }
 
         public bool TryGetDataAccessModel1([System.Diagnostics.CodeAnalysis.NotNullWhen(true)] out global::DataAccess.DataAccessModel1 value)
@@ -61,7 +61,7 @@ namespace BusinessLogic
             {
                 if (_variantId == DataAccessModel2Id)
                     return _dataAccessModel2;
-                throw new System.InvalidOperationException("Inner value is not DataAccessModel2");
+                throw new System.InvalidOperationException($"Unable convert to DataAccessModel2. Inner value is {ValueAlias} not DataAccessModel2.");
             }
         }
 
@@ -77,7 +77,7 @@ namespace BusinessLogic
         {
             if (value._variantId == DataAccessModel2Id)
                 return value._dataAccessModel2;
-            throw new System.InvalidOperationException("Inner value is not DataAccessModel2");
+            throw new System.InvalidOperationException($"Unable convert to DataAccessModel2. Inner value is {value.ValueAlias} not DataAccessModel2.");
         }
 
         public bool TryGetDataAccessModel2([System.Diagnostics.CodeAnalysis.NotNullWhen(true)] out global::DataAccess.DataAccessModel2 value)
@@ -103,7 +103,7 @@ namespace BusinessLogic
             {
                 if (_variantId == BusinessLogicModel1Id)
                     return _businessLogicModel1;
-                throw new System.InvalidOperationException("Inner value is not BusinessLogicModel1");
+                throw new System.InvalidOperationException($"Unable convert to BusinessLogicModel1. Inner value is {ValueAlias} not BusinessLogicModel1.");
             }
         }
 
@@ -119,7 +119,7 @@ namespace BusinessLogic
         {
             if (value._variantId == BusinessLogicModel1Id)
                 return value._businessLogicModel1;
-            throw new System.InvalidOperationException("Inner value is not BusinessLogicModel1");
+            throw new System.InvalidOperationException($"Unable convert to BusinessLogicModel1. Inner value is {value.ValueAlias} not BusinessLogicModel1.");
         }
 
         public bool TryGetBusinessLogicModel1([System.Diagnostics.CodeAnalysis.NotNullWhen(true)] out global::BusinessLogic.BusinessLogicModel1 value)
@@ -214,6 +214,20 @@ namespace BusinessLogic
                     return typeof(global::DataAccess.DataAccessModel2);
                 if (_variantId == BusinessLogicModel1Id)
                     return typeof(global::BusinessLogic.BusinessLogicModel1);
+                throw new System.InvalidOperationException("Inner type is unknown");
+            }
+        }
+
+        private string ValueAlias
+        {
+            get
+            {
+                if (_variantId == DataAccessModel1Id)
+                    return "DataAccessModel1";
+                if (_variantId == DataAccessModel2Id)
+                    return "DataAccessModel2";
+                if (_variantId == BusinessLogicModel1Id)
+                    return "BusinessLogicModel1";
                 throw new System.InvalidOperationException("Inner type is unknown");
             }
         }

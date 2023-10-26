@@ -17,7 +17,7 @@ partial struct Result : System.IEquatable<Result>
         {
             if (_variantId == SuccessId)
                 return _success;
-            throw new System.InvalidOperationException("Inner value is not Success");
+            throw new System.InvalidOperationException($"Unable convert to Success. Inner value is {ValueAlias} not Success.");
         }
     }
 
@@ -33,7 +33,7 @@ partial struct Result : System.IEquatable<Result>
     {
         if (value._variantId == SuccessId)
             return value._success;
-        throw new System.InvalidOperationException("Inner value is not Success");
+        throw new System.InvalidOperationException($"Unable convert to Success. Inner value is {value.ValueAlias} not Success.");
     }
 
     public bool TryGetSuccess([System.Diagnostics.CodeAnalysis.NotNullWhen(true)] out global::Success value)
@@ -59,7 +59,7 @@ partial struct Result : System.IEquatable<Result>
         {
             if (_variantId == ErrorId)
                 return _error;
-            throw new System.InvalidOperationException("Inner value is not Error");
+            throw new System.InvalidOperationException($"Unable convert to Error. Inner value is {ValueAlias} not Error.");
         }
     }
 
@@ -75,7 +75,7 @@ partial struct Result : System.IEquatable<Result>
     {
         if (value._variantId == ErrorId)
             return value._error;
-        throw new System.InvalidOperationException("Inner value is not Error");
+        throw new System.InvalidOperationException($"Unable convert to Error. Inner value is {value.ValueAlias} not Error.");
     }
 
     public bool TryGetError([System.Diagnostics.CodeAnalysis.NotNullWhen(true)] out global::Error value)
@@ -101,7 +101,7 @@ partial struct Result : System.IEquatable<Result>
         {
             if (_variantId == WrappedOfIReadOnlyListOfStringId)
                 return _wrappedOfIReadOnlyListOfString;
-            throw new System.InvalidOperationException("Inner value is not WrappedOfIReadOnlyListOfString");
+            throw new System.InvalidOperationException($"Unable convert to WrappedOfIReadOnlyListOfString. Inner value is {ValueAlias} not WrappedOfIReadOnlyListOfString.");
         }
     }
 
@@ -117,7 +117,7 @@ partial struct Result : System.IEquatable<Result>
     {
         if (value._variantId == WrappedOfIReadOnlyListOfStringId)
             return value._wrappedOfIReadOnlyListOfString;
-        throw new System.InvalidOperationException("Inner value is not WrappedOfIReadOnlyListOfString");
+        throw new System.InvalidOperationException($"Unable convert to WrappedOfIReadOnlyListOfString. Inner value is {value.ValueAlias} not WrappedOfIReadOnlyListOfString.");
     }
 
     public bool TryGetWrappedOfIReadOnlyListOfString([System.Diagnostics.CodeAnalysis.NotNullWhen(true)] out global::Wrapped<global::System.Collections.Generic.IReadOnlyList<string>> value)
@@ -212,6 +212,20 @@ partial struct Result : System.IEquatable<Result>
                 return typeof(global::Error);
             if (_variantId == WrappedOfIReadOnlyListOfStringId)
                 return typeof(global::Wrapped<global::System.Collections.Generic.IReadOnlyList<string>>);
+            throw new System.InvalidOperationException("Inner type is unknown");
+        }
+    }
+
+    private string ValueAlias
+    {
+        get
+        {
+            if (_variantId == SuccessId)
+                return "Success";
+            if (_variantId == ErrorId)
+                return "Error";
+            if (_variantId == WrappedOfIReadOnlyListOfStringId)
+                return "WrappedOfIReadOnlyListOfString";
             throw new System.InvalidOperationException("Inner type is unknown");
         }
     }

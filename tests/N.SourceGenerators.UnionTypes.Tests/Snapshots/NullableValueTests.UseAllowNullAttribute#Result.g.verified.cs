@@ -17,7 +17,7 @@ partial class Result : System.IEquatable<Result>
         {
             if (_variantId == NullableOfInt32Id)
                 return _nullableOfInt32;
-            throw new System.InvalidOperationException("Inner value is not NullableOfInt32");
+            throw new System.InvalidOperationException($"Unable convert to NullableOfInt32. Inner value is {ValueAlias} not NullableOfInt32.");
         }
     }
 
@@ -32,7 +32,7 @@ partial class Result : System.IEquatable<Result>
     {
         if (value._variantId == NullableOfInt32Id)
             return value._nullableOfInt32;
-        throw new System.InvalidOperationException("Inner value is not NullableOfInt32");
+        throw new System.InvalidOperationException($"Unable convert to NullableOfInt32. Inner value is {value.ValueAlias} not NullableOfInt32.");
     }
 
     public bool TryGetNullableOfInt32(out int? value)
@@ -58,7 +58,7 @@ partial class Result : System.IEquatable<Result>
         {
             if (_variantId == StringId)
                 return _string;
-            throw new System.InvalidOperationException("Inner value is not String");
+            throw new System.InvalidOperationException($"Unable convert to String. Inner value is {ValueAlias} not String.");
         }
     }
 
@@ -74,7 +74,7 @@ partial class Result : System.IEquatable<Result>
     {
         if (value._variantId == StringId)
             return value._string;
-        throw new System.InvalidOperationException("Inner value is not String");
+        throw new System.InvalidOperationException($"Unable convert to String. Inner value is {value.ValueAlias} not String.");
     }
 
     public bool TryGetString([System.Diagnostics.CodeAnalysis.NotNullWhen(true)] out string value)
@@ -151,6 +151,18 @@ partial class Result : System.IEquatable<Result>
                 return typeof(int?);
             if (_variantId == StringId)
                 return typeof(string);
+            throw new System.InvalidOperationException("Inner type is unknown");
+        }
+    }
+
+    private string ValueAlias
+    {
+        get
+        {
+            if (_variantId == NullableOfInt32Id)
+                return "NullableOfInt32";
+            if (_variantId == StringId)
+                return "String";
             throw new System.InvalidOperationException("Inner type is unknown");
         }
     }

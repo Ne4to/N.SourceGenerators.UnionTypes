@@ -19,7 +19,7 @@ namespace MyApp
             {
                 if (_variantId == SuccessId)
                     return _success;
-                throw new System.InvalidOperationException("Inner value is not Success");
+                throw new System.InvalidOperationException($"Unable convert to Success. Inner value is {ValueAlias} not Success.");
             }
         }
 
@@ -35,7 +35,7 @@ namespace MyApp
         {
             if (value._variantId == SuccessId)
                 return value._success;
-            throw new System.InvalidOperationException("Inner value is not Success");
+            throw new System.InvalidOperationException($"Unable convert to Success. Inner value is {value.ValueAlias} not Success.");
         }
 
         public bool TryGetSuccess([System.Diagnostics.CodeAnalysis.NotNullWhen(true)] out global::MyApp.Success value)
@@ -61,7 +61,7 @@ namespace MyApp
             {
                 if (_variantId == ErrorId)
                     return _error;
-                throw new System.InvalidOperationException("Inner value is not Error");
+                throw new System.InvalidOperationException($"Unable convert to Error. Inner value is {ValueAlias} not Error.");
             }
         }
 
@@ -77,7 +77,7 @@ namespace MyApp
         {
             if (value._variantId == ErrorId)
                 return value._error;
-            throw new System.InvalidOperationException("Inner value is not Error");
+            throw new System.InvalidOperationException($"Unable convert to Error. Inner value is {value.ValueAlias} not Error.");
         }
 
         public bool TryGetError([System.Diagnostics.CodeAnalysis.NotNullWhen(true)] out global::MyApp.Error value)
@@ -103,7 +103,7 @@ namespace MyApp
             {
                 if (_variantId == IReadOnlyListOfInt32Id)
                     return _iReadOnlyListOfInt32;
-                throw new System.InvalidOperationException("Inner value is not IReadOnlyListOfInt32");
+                throw new System.InvalidOperationException($"Unable convert to IReadOnlyListOfInt32. Inner value is {ValueAlias} not IReadOnlyListOfInt32.");
             }
         }
 
@@ -137,7 +137,7 @@ namespace MyApp
             {
                 if (_variantId == ArrayOfStringId)
                     return _arrayOfString;
-                throw new System.InvalidOperationException("Inner value is not ArrayOfString");
+                throw new System.InvalidOperationException($"Unable convert to ArrayOfString. Inner value is {ValueAlias} not ArrayOfString.");
             }
         }
 
@@ -153,7 +153,7 @@ namespace MyApp
         {
             if (value._variantId == ArrayOfStringId)
                 return value._arrayOfString;
-            throw new System.InvalidOperationException("Inner value is not ArrayOfString");
+            throw new System.InvalidOperationException($"Unable convert to ArrayOfString. Inner value is {value.ValueAlias} not ArrayOfString.");
         }
 
         public bool TryGetArrayOfString([System.Diagnostics.CodeAnalysis.NotNullWhen(true)] out string[] value)
@@ -179,7 +179,7 @@ namespace MyApp
             {
                 if (_variantId == TupleOfInt32AndStringId)
                     return _tupleOfInt32AndString;
-                throw new System.InvalidOperationException("Inner value is not TupleOfInt32AndString");
+                throw new System.InvalidOperationException($"Unable convert to TupleOfInt32AndString. Inner value is {ValueAlias} not TupleOfInt32AndString.");
             }
         }
 
@@ -195,7 +195,7 @@ namespace MyApp
         {
             if (value._variantId == TupleOfInt32AndStringId)
                 return value._tupleOfInt32AndString;
-            throw new System.InvalidOperationException("Inner value is not TupleOfInt32AndString");
+            throw new System.InvalidOperationException($"Unable convert to TupleOfInt32AndString. Inner value is {value.ValueAlias} not TupleOfInt32AndString.");
         }
 
         public bool TryGetTupleOfInt32AndString([System.Diagnostics.CodeAnalysis.NotNullWhen(true)] out global::System.Tuple<int, string> value)
@@ -326,6 +326,24 @@ namespace MyApp
                     return typeof(string[]);
                 if (_variantId == TupleOfInt32AndStringId)
                     return typeof(global::System.Tuple<int, string>);
+                throw new System.InvalidOperationException("Inner type is unknown");
+            }
+        }
+
+        private string ValueAlias
+        {
+            get
+            {
+                if (_variantId == SuccessId)
+                    return "Success";
+                if (_variantId == ErrorId)
+                    return "Error";
+                if (_variantId == IReadOnlyListOfInt32Id)
+                    return "IReadOnlyListOfInt32";
+                if (_variantId == ArrayOfStringId)
+                    return "ArrayOfString";
+                if (_variantId == TupleOfInt32AndStringId)
+                    return "TupleOfInt32AndString";
                 throw new System.InvalidOperationException("Inner type is unknown");
             }
         }

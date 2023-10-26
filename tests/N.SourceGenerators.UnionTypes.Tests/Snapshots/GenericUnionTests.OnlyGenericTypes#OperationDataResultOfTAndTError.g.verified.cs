@@ -17,7 +17,7 @@ partial class OperationDataResult<T, TError> : System.IEquatable<OperationDataRe
         {
             if (_variantId == ResultId)
                 return _result;
-            throw new System.InvalidOperationException("Inner value is not Result");
+            throw new System.InvalidOperationException($"Unable convert to Result. Inner value is {ValueAlias} not Result.");
         }
     }
 
@@ -33,7 +33,7 @@ partial class OperationDataResult<T, TError> : System.IEquatable<OperationDataRe
     {
         if (value._variantId == ResultId)
             return value._result;
-        throw new System.InvalidOperationException("Inner value is not Result");
+        throw new System.InvalidOperationException($"Unable convert to Result. Inner value is {value.ValueAlias} not Result.");
     }
 
     public bool TryGetResult([System.Diagnostics.CodeAnalysis.NotNullWhen(true)] out T value)
@@ -59,7 +59,7 @@ partial class OperationDataResult<T, TError> : System.IEquatable<OperationDataRe
         {
             if (_variantId == ErrorId)
                 return _error;
-            throw new System.InvalidOperationException("Inner value is not Error");
+            throw new System.InvalidOperationException($"Unable convert to Error. Inner value is {ValueAlias} not Error.");
         }
     }
 
@@ -75,7 +75,7 @@ partial class OperationDataResult<T, TError> : System.IEquatable<OperationDataRe
     {
         if (value._variantId == ErrorId)
             return value._error;
-        throw new System.InvalidOperationException("Inner value is not Error");
+        throw new System.InvalidOperationException($"Unable convert to Error. Inner value is {value.ValueAlias} not Error.");
     }
 
     public bool TryGetError([System.Diagnostics.CodeAnalysis.NotNullWhen(true)] out TError value)
@@ -152,6 +152,18 @@ partial class OperationDataResult<T, TError> : System.IEquatable<OperationDataRe
                 return typeof(T);
             if (_variantId == ErrorId)
                 return typeof(TError);
+            throw new System.InvalidOperationException("Inner type is unknown");
+        }
+    }
+
+    private string ValueAlias
+    {
+        get
+        {
+            if (_variantId == ResultId)
+                return "Result";
+            if (_variantId == ErrorId)
+                return "Error";
             throw new System.InvalidOperationException("Inner type is unknown");
         }
     }

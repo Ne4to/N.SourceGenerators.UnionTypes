@@ -17,7 +17,7 @@ partial class GenericResultNullable<T> : System.IEquatable<GenericResultNullable
         {
             if (_variantId == ValueId)
                 return _value;
-            throw new System.InvalidOperationException("Inner value is not Value");
+            throw new System.InvalidOperationException($"Unable convert to Value. Inner value is {ValueAlias} not Value.");
         }
     }
 
@@ -32,7 +32,7 @@ partial class GenericResultNullable<T> : System.IEquatable<GenericResultNullable
     {
         if (value._variantId == ValueId)
             return value._value;
-        throw new System.InvalidOperationException("Inner value is not Value");
+        throw new System.InvalidOperationException($"Unable convert to Value. Inner value is {value.ValueAlias} not Value.");
     }
 
     public bool TryGetValue(out T value)
@@ -58,7 +58,7 @@ partial class GenericResultNullable<T> : System.IEquatable<GenericResultNullable
         {
             if (_variantId == StatusId)
                 return _status;
-            throw new System.InvalidOperationException("Inner value is not Status");
+            throw new System.InvalidOperationException($"Unable convert to Status. Inner value is {ValueAlias} not Status.");
         }
     }
 
@@ -73,7 +73,7 @@ partial class GenericResultNullable<T> : System.IEquatable<GenericResultNullable
     {
         if (value._variantId == StatusId)
             return value._status;
-        throw new System.InvalidOperationException("Inner value is not Status");
+        throw new System.InvalidOperationException($"Unable convert to Status. Inner value is {value.ValueAlias} not Status.");
     }
 
     public bool TryGetStatus(out string value)
@@ -150,6 +150,18 @@ partial class GenericResultNullable<T> : System.IEquatable<GenericResultNullable
                 return typeof(T);
             if (_variantId == StatusId)
                 return typeof(string);
+            throw new System.InvalidOperationException("Inner type is unknown");
+        }
+    }
+
+    private string ValueAlias
+    {
+        get
+        {
+            if (_variantId == ValueId)
+                return "Value";
+            if (_variantId == StatusId)
+                return "Status";
             throw new System.InvalidOperationException("Inner type is unknown");
         }
     }

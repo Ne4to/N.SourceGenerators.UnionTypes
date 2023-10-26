@@ -16,6 +16,7 @@ namespace N.SourceGenerators.UnionTypes
         public string? Alias { get; }
         public int Order { get; }
         public bool AllowNull { get; set; }
+        public object? TypeDiscriminator { get; set; }
 
         public UnionTypeAttribute(Type type, string? alias = null, [CallerLineNumber] int order = 0)
         {

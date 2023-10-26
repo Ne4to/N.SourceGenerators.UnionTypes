@@ -1,6 +1,7 @@
 ﻿// Ported from https://andrewlock.net/creating-a-source-generator-part-2-testing-an-incremental-generator-with-snapshot-testing/
 
 using System.Collections.Immutable;
+using System.Reflection;
 
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp;
@@ -9,13 +10,19 @@ namespace N.SourceGenerators.UnionTypes.Tests;
 
 public static class TestHelper
 {
-    public static Task Verify<TGenerator>(string source, string? parametersText = null)
+    public static Task Verify<TGenerator>(
+        string source,
+        string? parametersText = null,
+        params PortableExecutableReference[] additionalReferences)
         where TGenerator : IIncrementalGenerator, new()
     {
-        return Verify<TGenerator>(new[] { source }, parametersText);
+        return Verify<TGenerator>(new[] { source }, parametersText, additionalReferences);
     }
 
-    public static async Task Verify<TGenerator>(string[] sources, string? parametersText = null)
+    public static async Task Verify<TGenerator>(
+        string[] sources,
+        string? parametersText = null,
+        params PortableExecutableReference[] additionalReferences)
         where TGenerator : IIncrementalGenerator, new()
     {
         CSharpCompilation? previousCompilation = null;
@@ -27,11 +34,14 @@ public static class TestHelper
             SyntaxTree syntaxTree = CSharpSyntaxTree.ParseText(source);
             // Create references for assemblies we require
             // We could add multiple references if required
-            IEnumerable<PortableExecutableReference> references = new[]
+            var references = new List<PortableExecutableReference>
             {
                 MetadataReference.CreateFromFile(typeof(object).Assembly.Location)
             };
+            
+            references.AddRange(additionalReferences);
 
+            // /usr/local/share/dotnet/shared/Microsoft.NETCore.App/7.0.11/System.Text.Json.dll
             // Create a Roslyn compilation for the syntax tree.
             CSharpCompilation compilation = CSharpCompilation.Create(
                 assemblyName: $"Tests{sourceIndex}",

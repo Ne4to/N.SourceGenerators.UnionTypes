@@ -40,7 +40,7 @@ internal static class SyntaxNodeExtensions
                     IdentifierName("ConfigureAwait")
                 )
             ).AddArgumentListArguments(
-                Argument(LiteralExpression(SyntaxKind.FalseLiteralExpression))
+                Argument(FalseLiteralExpression())
             )
         );
     }

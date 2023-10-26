@@ -59,8 +59,7 @@ public sealed partial class UnionTypesGenerator
                             Token(SyntaxKind.PublicKeyword),
                             Token(SyntaxKind.StaticKeyword)
                         ).AddParameterListParameters(
-                            Parameter(Identifier("value"))
-                                .WithType(IdentifierName(fromType.TypeFullName))
+                            Parameter(fromType.TypeFullName, "value")
                                 .AddModifiersWhen(item.IsStatic, Token(SyntaxKind.ThisKeyword))
                         ).AddBodyStatements(
                             ReturnMatchConversion(fromType, toType)
@@ -251,8 +250,7 @@ public sealed partial class UnionTypesGenerator
             Token(SyntaxKind.PublicKeyword),
             Token(SyntaxKind.StaticKeyword)
         ).AddParameterListParameters(
-            Parameter(Identifier("value"))
-                .WithType(IdentifierName(fromType.TypeFullName))
+            Parameter(fromType.TypeFullName, "value")
         ).AddBodyStatements(
             ReturnMatchConversion(fromType, toType)
         );
@@ -267,26 +265,16 @@ public sealed partial class UnionTypesGenerator
         var arguments = fromType
             .Variants
             .Select(variant => Argument(
-                ParenthesizedLambdaExpression().AddParameterListParameters(
-                        Parameter(Identifier(lambdaParamName)).WithType(IdentifierName(variant.TypeFullName))
+                ParenthesizedLambdaExpression()
+                    .AddParameterListParameters(
+                        Parameter(variant.TypeFullName, lambdaParamName)
                     )
-
-                    // SimpleLambdaExpression(
-                    //     // BracketedParameterList(
-                    //         // new SeparatedSyntaxList<ParameterSyntax>()
-                    //         
-                    //         Parameter(Identifier(lambdaParamName)).WithType(IdentifierName(variant.TypeFullName))
-                    //         
-                    //         
-                    //         // )
-                    //     
-                    // )
                     .WithExpressionBody(
                         CastExpression(IdentifierName(toType.Name),
                             ObjectCreationExpression(
                                 IdentifierName(toType.Name)
                             ).AddArgumentListArguments(
-                                Argument(IdentifierName(lambdaParamName))
+                                Argument(lambdaParamName)
                             ))
                     )
             )).ToArray();
