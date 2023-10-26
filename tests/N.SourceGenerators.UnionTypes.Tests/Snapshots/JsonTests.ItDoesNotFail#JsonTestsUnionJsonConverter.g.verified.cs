@@ -5,7 +5,7 @@
 // </auto-generated>
 #pragma warning disable
 #nullable enable
-class JsonTestsUnionJsonConverter : System.Text.Json.Serialization.JsonConverter<JsonTestsUnion>
+internal class JsonTestsUnionJsonConverter : System.Text.Json.Serialization.JsonConverter<JsonTestsUnion>
 {
     private static object? GetDiscriminator(object x)
     {
@@ -38,6 +38,8 @@ class JsonTestsUnionJsonConverter : System.Text.Json.Serialization.JsonConverter
 
     public override void Write(System.Text.Json.Utf8JsonWriter writer, global::JsonTestsUnion value, System.Text.Json.JsonSerializerOptions options)
     {
-        throw new System.InvalidOperationException("Inner type is unknown");
+        var customOptions = new System.Text.Json.JsonSerializerOptions(options)
+        {TypeInfoResolver = new System.Text.Json.Serialization.Metadata.DefaultJsonTypeInfoResolver{Modifiers = {AddDiscriminatorModifier}}};
+        value.Switch(x => System.Text.Json.JsonSerializer.Serialize(writer, x, customOptions), x => System.Text.Json.JsonSerializer.Serialize(writer, x, customOptions));
     }
 }

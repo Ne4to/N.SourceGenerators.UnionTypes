@@ -31,14 +31,14 @@ public partial class JsonTestsUnion
 
 public class JsonTests
 {
-    // [Fact]
-    // public void SerializeBar()
-    // {
-    //     JsonTestsUnion item = new JsonTestsBarJ(3, 42, JsonTestsBarStatus.Rejected);
-    //
-    //     JsonSerializerOptions serializerOptions = new() { Converters = { new JsonStringEnumConverter() }, };
-    //
-    //     var json = JsonSerializer.Serialize(item, serializerOptions);
-    //     Assert.Equal("""{"$type":"BarJ","Id":3,"Cost":42,"Status":"Rejected"}""", json);
-    // }
+    [Fact]
+    public void SerializeBar()
+    {
+        JsonTestsUnion item = new JsonTestsBarJ(3, 42, JsonTestsBarStatus.Rejected);
+    
+        JsonSerializerOptions serializerOptions = new() { Converters = { new JsonStringEnumConverter() }, };
+    
+        var json = JsonSerializer.Serialize(item, serializerOptions);
+        Assert.Equal("""{"$type":"Bar","Id":3,"Cost":42,"Status":"Rejected"}""", json);
+    }
 }

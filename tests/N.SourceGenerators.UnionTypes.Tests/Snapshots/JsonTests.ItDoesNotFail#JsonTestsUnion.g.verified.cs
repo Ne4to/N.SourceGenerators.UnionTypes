@@ -5,6 +5,7 @@
 // </auto-generated>
 #pragma warning disable
 #nullable enable
+[JsonTestsUnionJsonConverter]
 partial class JsonTestsUnion : System.IEquatable<JsonTestsUnion>
 {
     private readonly int _variantId;

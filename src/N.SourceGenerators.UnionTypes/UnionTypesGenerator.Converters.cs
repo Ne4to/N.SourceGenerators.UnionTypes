@@ -267,8 +267,9 @@ public sealed partial class UnionTypesGenerator
         var arguments = fromType
             .Variants
             .Select(variant => Argument(
-                ParenthesizedLambdaExpression().AddParameterListParameters(
-                        Parameter(Identifier(lambdaParamName)).WithType(IdentifierName(variant.TypeFullName))
+                ParenthesizedLambdaExpression()
+                    .AddParameterListParameters(
+                        Parameter(variant.TypeFullName, lambdaParamName)
                     )
 
                     // SimpleLambdaExpression(

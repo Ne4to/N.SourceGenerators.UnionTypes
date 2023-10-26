@@ -10,17 +10,18 @@ public sealed partial class UnionTypesGenerator
         SourceProductionContext context)
     {
         context.CancellationToken.ThrowIfCancellationRequested();
+        BuildJsonConverter(unionType, context);
+        context.CancellationToken.ThrowIfCancellationRequested();
+        BuildJsonConverterAttribute(unionType, context);
+    }
 
-        TypeDeclarationSyntax typeDeclaration = ClassDeclaration(unionType.Name + "JsonConverter")
-            .WithBaseList(
-                BaseList(
-                    SeparatedList(
-                        new BaseTypeSyntax[]
-                        {
-                            SimpleBaseType(
-                                GenericType("System.Text.Json.Serialization.JsonConverter", unionType.Name)
-                            )
-                        })
+    private static void BuildJsonConverter(UnionType unionType, SourceProductionContext context)
+    {
+        TypeDeclarationSyntax converterDeclaration = ClassDeclaration(unionType.Name + "JsonConverter")
+            .AddModifiers(Token(SyntaxKind.InternalKeyword))
+            .AddBaseListTypes(
+                SimpleBaseType(
+                    GenericType("System.Text.Json.Serialization.JsonConverter", unionType.Name)
                 )
             )
             .AddMembers(
@@ -30,21 +31,54 @@ public sealed partial class UnionTypesGenerator
                 WriteJsonConverterMethod(unionType)
             );
 
-        CompilationUnitSyntax compilationUnit = GetCompilationUnit(typeDeclaration, unionType.Namespace);
+        CompilationUnitSyntax compilationUnit = GetCompilationUnit(converterDeclaration, unionType.Namespace);
         context.AddSource($"{unionType.SourceCodeFileName}JsonConverter.g.cs", compilationUnit.GetText(Encoding.UTF8));
+    }
+
+    private static void BuildJsonConverterAttribute(UnionType unionType, SourceProductionContext context)
+    {
+        TypeDeclarationSyntax converterDeclaration = ClassDeclaration(unionType.Name + "JsonConverterAttribute")
+            .AddModifiers(
+                Token(SyntaxKind.InternalKeyword))
+            .AddBaseListTypes(
+                SimpleBaseType(
+                    IdentifierName("System.Text.Json.Serialization.JsonConverterAttribute")
+                )
+            )
+            .AddMembers(
+                MethodDeclaration(
+                        NullableType(IdentifierName("System.Text.Json.Serialization.JsonConverter")),
+                        "CreateConverter"
+                    ).AddModifiers(
+                        Token(SyntaxKind.PublicKeyword),
+                        Token(SyntaxKind.OverrideKeyword))
+                    .AddParameterListParameters(
+                        Parameter("System.Type", "typeToConvert"))
+                    .AddBodyStatements(
+                        ReturnStatement(
+                            ObjectCreationExpression(
+                                    IdentifierName(unionType.Name + "JsonConverter")
+                                )
+                                .AddArgumentListArguments()
+                        )
+                    )
+            );
+
+        CompilationUnitSyntax compilationUnit = GetCompilationUnit(converterDeclaration, unionType.Namespace);
+        context.AddSource($"{unionType.SourceCodeFileName}JsonConverterAttribute.g.cs",
+            compilationUnit.GetText(Encoding.UTF8));
     }
 
     private static MemberDeclarationSyntax GetDiscriminatorMethod(UnionType unionType)
     {
         return MethodDeclaration(
-            NullableType(PredefinedType(Token(SyntaxKind.ObjectKeyword))),
+            NullableType(ObjectType()),
             "GetDiscriminator"
         ).AddModifiers(
             Token(SyntaxKind.PrivateKeyword),
             Token(SyntaxKind.StaticKeyword)
         ).AddParameterListParameters(
-            Parameter(Identifier("x"))
-                .WithType(PredefinedType(Token(SyntaxKind.ObjectKeyword)))
+            Parameter(ObjectType(), "x")
         ).AddBodyStatements(
             BodyStatements().ToArray()
         );
@@ -56,11 +90,7 @@ public sealed partial class UnionTypesGenerator
                 if (variant.HasValidTypeDiscriminator)
                 {
                     yield return IfStatement(
-                        BinaryExpression(
-                            SyntaxKind.IsExpression,
-                            IdentifierName("x"),
-                            IdentifierName(variant.TypeFullName)
-                        ),
+                        IsExpression("x", IdentifierName(variant.TypeFullName)),
                         Block(
                             // TODO support int discriminator
                             ReturnStatement(StringLiteral(variant.TypeDiscriminator!.ToString()))
@@ -72,10 +102,10 @@ public sealed partial class UnionTypesGenerator
             yield return ThrowStatement(
                 ObjectCreationExpression(IdentifierName("System.ArgumentOutOfRangeException"))
                     .AddArgumentListArguments(
-                        Argument(InvocationExpression(IdentifierName("nameof"))
-                            .AddArgumentListArguments(Argument(IdentifierName("x")))),
+                        Argument(NameOfExpressions("x")),
                         Argument(IdentifierName("x")),
-                        Argument(InterpolatedString(
+                        Argument(
+                            InterpolatedString(
                                 Interpolation(
                                     InvocationExpression(MemberAccess("x", "GetType"))
                                 ),
@@ -91,49 +121,42 @@ public sealed partial class UnionTypesGenerator
     private static MemberDeclarationSyntax AddDiscriminatorModifier(UnionType unionType)
     {
         return MethodDeclaration(
-            PredefinedType(Token(SyntaxKind.VoidKeyword)),
+            VoidType(),
             "AddDiscriminatorModifier"
         ).AddModifiers(
             Token(SyntaxKind.PrivateKeyword),
             Token(SyntaxKind.StaticKeyword)
         ).AddParameterListParameters(
-            Parameter(Identifier("jsonTypeInfo"))
-                .WithType(IdentifierName("System.Text.Json.Serialization.Metadata.JsonTypeInfo"))
+            Parameter("System.Text.Json.Serialization.Metadata.JsonTypeInfo", "jsonTypeInfo")
         ).AddBodyStatements(
             // if (jsonTypeInfo.Kind != JsonTypeInfoKind.Object)
             //     return;
             IfStatement(
-                BinaryExpression(
-                    SyntaxKind.NotEqualsExpression,
+                NotEqualsExpression(
                     MemberAccess("jsonTypeInfo", "Kind"),
                     MemberAccess("System.Text.Json.Serialization.Metadata.JsonTypeInfoKind", "Object")
                 ),
                 ReturnStatement()
             ),
-            
+
             // TODO check x type
             // if (jsonTypeInfo.Type != typeof(FooJ) && jsonTypeInfo.Type != typeof(BarJ))
             // {
             //  return;
             // }
 
-            // TODO simplify
             // JsonPropertyInfo jsonPropertyInfo = jsonTypeInfo.CreateJsonPropertyInfo(typeof(string), "$type");
             LocalDeclarationStatement(
                 VariableDeclaration(
-                    IdentifierName("System.Text.Json.Serialization.Metadata.JsonPropertyInfo")
+                    JsonPropertyInfoType()
                 ).AddVariables(
                     VariableDeclarator("jsonPropertyInfo")
                         .WithInitializer(
                             EqualsValueClause(
                                 InvocationExpression(
-                                    MemberAccessExpression(
-                                        SyntaxKind.SimpleMemberAccessExpression,
-                                        IdentifierName("jsonTypeInfo"),
-                                        IdentifierName("CreateJsonPropertyInfo")
-                                    )
+                                    MemberAccess("jsonTypeInfo", "CreateJsonPropertyInfo")
                                 ).AddArgumentListArguments(
-                                    Argument(TypeOfExpression(PredefinedType(Token(SyntaxKind.StringKeyword)))),
+                                    Argument(TypeOfExpression(StringType())),
                                     Argument(StringLiteral(unionType.JsonOptions!.TypeDiscriminatorPropertyName))
                                 )
                             )
@@ -143,8 +166,7 @@ public sealed partial class UnionTypesGenerator
 
             // jsonPropertyInfo.Get = GetDiscriminator;
             ExpressionStatement(
-                AssignmentExpression(
-                    SyntaxKind.SimpleAssignmentExpression,
+                SimpleAssignmentExpression(
                     MemberAccess("jsonPropertyInfo", "Get"),
                     IdentifierName("GetDiscriminator")
                 )
@@ -153,7 +175,7 @@ public sealed partial class UnionTypesGenerator
             // jsonTypeInfo.Properties.Insert(0, jsonPropertyInfo);
             ExpressionStatement(
                 InvocationExpression(
-                    MemberAccess(MemberAccess("jsonTypeInfo", "Properties"), "Insert")
+                    MemberAccess("jsonTypeInfo", "Properties", "Insert")
                 ).AddArgumentListArguments(
                     Argument(NumericLiteral(0)),
                     Argument(IdentifierName("jsonPropertyInfo"))
@@ -172,13 +194,10 @@ public sealed partial class UnionTypesGenerator
             Token(SyntaxKind.PublicKeyword),
             Token(SyntaxKind.OverrideKeyword)
         ).AddParameterListParameters(
-            Parameter(Identifier("reader"))
-                .AddModifiers(Token(SyntaxKind.RefKeyword))
-                .WithType(IdentifierName("System.Text.Json.Utf8JsonReader")),
-            Parameter(Identifier("typeToConvert"))
-                .WithType(IdentifierName("System.Type")),
-            Parameter(Identifier("options"))
-                .WithType(IdentifierName("System.Text.Json.JsonSerializerOptions"))
+            Parameter("System.Text.Json.Utf8JsonReader", "reader")
+                .AddModifiers(Token(SyntaxKind.RefKeyword)),
+            Parameter("System.Type", "typeToConvert"),
+            Parameter("System.Text.Json.JsonSerializerOptions", "options")
         ).AddBodyStatements(
             ThrowUnknownType()
         );
@@ -188,20 +207,75 @@ public sealed partial class UnionTypesGenerator
     private static MemberDeclarationSyntax WriteJsonConverterMethod(UnionType unionType)
     {
         return MethodDeclaration(
-            PredefinedType(Token(SyntaxKind.VoidKeyword)),
+            VoidType(),
             "Write"
         ).AddModifiers(
             Token(SyntaxKind.PublicKeyword),
             Token(SyntaxKind.OverrideKeyword)
         ).AddParameterListParameters(
-            Parameter(Identifier("writer"))
-                .WithType(IdentifierName("System.Text.Json.Utf8JsonWriter")),
-            Parameter(Identifier("value"))
-                .WithType(IdentifierName(unionType.TypeFullName)),
-            Parameter(Identifier("options"))
-                .WithType(IdentifierName("System.Text.Json.JsonSerializerOptions"))
+            Parameter("System.Text.Json.Utf8JsonWriter", "writer"),
+            Parameter(unionType.TypeFullName, "value"),
+            Parameter("System.Text.Json.JsonSerializerOptions", "options")
         ).AddBodyStatements(
-            ThrowUnknownType()
+            // TODO simplify
+            LocalDeclarationStatement(
+                VariableDeclaration(
+                    IdentifierName("var")
+                ).AddVariables(
+                    VariableDeclarator("customOptions")
+                        .WithInitializer(
+                            EqualsValueClause(
+                                ObjectCreationExpression(
+                                    IdentifierName("System.Text.Json.JsonSerializerOptions"),
+                                    ArgumentList().AddArguments(Argument(IdentifierName("options"))),
+                                    ObjectInitializerExpression(
+                                        SimpleAssignmentExpression(
+                                            "TypeInfoResolver",
+                                            ObjectCreationExpression(
+                                                DefaultJsonTypeInfoResolverType()
+                                            ).WithInitializer(
+                                                ObjectInitializerExpression(
+                                                    SimpleAssignmentExpression(
+                                                        "Modifiers",
+                                                        CollectionInitializerExpression(
+                                                            IdentifierName("AddDiscriminatorModifier")
+                                                        )
+                                                    )
+                                                )
+                                            )
+                                        )
+                                    )
+                                )
+                            )
+                        )
+                )
+            ),
+            ExpressionStatement(
+                InvocationExpression(MemberAccess("value", "Switch"))
+                    .AddArgumentListArguments(
+                        GetSerializeVariantArguments().ToArray()
+                    )
+            )
         );
+
+        IEnumerable<ArgumentSyntax> GetSerializeVariantArguments()
+        {
+            foreach (var _ in unionType.Variants)
+            {
+                yield return Argument(
+                    SimpleLambdaExpression(
+                        Parameter(Identifier("x")),
+                        null,
+                        InvocationExpression(
+                            MemberAccess("System.Text.Json.JsonSerializer", "Serialize")
+                        ).AddArgumentListArguments(
+                            Argument(IdentifierName("writer")),
+                            Argument(IdentifierName("x")),
+                            Argument(IdentifierName("customOptions"))
+                        )
+                    )
+                );
+            }
+        }
     }
 }
