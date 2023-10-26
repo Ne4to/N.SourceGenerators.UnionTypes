@@ -500,7 +500,7 @@ public sealed partial class UnionTypesGenerator : IIncrementalGenerator
                 MemberAccess("System.ArgumentNullException", "ThrowIfNull")
             )
             .AddArgumentListArguments(
-                Argument(IdentifierName(variant.ParameterName))
+                Argument(variant.ParameterName)
             );
 
         AssignmentExpressionSyntax assignmentExpression = SimpleAssignmentExpression(
@@ -510,8 +510,7 @@ public sealed partial class UnionTypesGenerator : IIncrementalGenerator
         return ConstructorDeclaration(Identifier(unionType.NameNoGenerics))
             .AddModifiers(Token(SyntaxKind.PublicKeyword))
             .AddParameterListParameters(
-                Parameter(Identifier(variant.ParameterName))
-                    .WithType(IdentifierName(variant.TypeFullName))
+                Parameter(variant.TypeFullName, variant.ParameterName)
             )
             .AddBodyStatementsWhen(!unionType.UseStructLayout && !variant.AllowNull,
                 ExpressionStatement(checkArgumentExpression))
@@ -536,14 +535,13 @@ public sealed partial class UnionTypesGenerator : IIncrementalGenerator
                 Token(SyntaxKind.StaticKeyword)
             )
             .AddParameterListParameters(
-                Parameter(Identifier(variant.ParameterName))
-                    .WithType(IdentifierName(variant.TypeFullName))
+                Parameter(variant.TypeFullName, variant.ParameterName)
             )
             .WithExpressionBody(
                 ArrowExpressionClause(
                     ObjectCreationExpression(IdentifierName(unionType.Name))
                         .AddArgumentListArguments(
-                            Argument(IdentifierName(variant.ParameterName))
+                            Argument(variant.ParameterName)
                         )
                 ))
             .WithSemicolonToken(Token(SyntaxKind.SemicolonToken));
@@ -551,9 +549,7 @@ public sealed partial class UnionTypesGenerator : IIncrementalGenerator
 
     private static MemberDeclarationSyntax ExplicitOperatorFromUnion(UnionType unionType, UnionTypeVariant variant)
     {
-        ParameterSyntax parameter =
-            Parameter(Identifier("value"))
-                .WithType(IdentifierName(unionType.Name));
+        ParameterSyntax parameter = Parameter(unionType.Name, "value");
 
         var operatorDeclaration = ConversionOperatorDeclaration(
                 Token(SyntaxKind.ExplicitKeyword),
@@ -578,7 +574,7 @@ public sealed partial class UnionTypesGenerator : IIncrementalGenerator
                 Attribute(IdentifierName("System.Diagnostics.CodeAnalysis.NotNullWhen"),
                     AttributeArgumentList(
                         SeparatedList(
-                            new[] { AttributeArgument(LiteralExpression(SyntaxKind.TrueLiteralExpression)) }
+                            new[] { AttributeArgument(TrueLiteralExpression()) }
                         )
                     )
                 )
@@ -593,8 +589,7 @@ public sealed partial class UnionTypesGenerator : IIncrementalGenerator
                 Token(SyntaxKind.PublicKeyword)
             )
             .AddParameterListParameters(
-                Parameter(Identifier("value"))
-                    .WithType(IdentifierName(variant.TypeFullName))
+                Parameter(variant.TypeFullName, "value")
                     .AddModifiers(Token(SyntaxKind.OutKeyword))
                     .AddAttributeListsWhen(attributeList.Attributes.Count > 0, attributeList)
             ).AddBodyStatements(
@@ -642,8 +637,7 @@ public sealed partial class UnionTypesGenerator : IIncrementalGenerator
                 )
                 .AddParameterListParameterWhen(
                     isAsync,
-                    Parameter(Identifier("ct"))
-                        .WithType(CancellationTokenType())
+                    Parameter(CancellationTokenType(), "ct")
                 )
                 .AddBodyStatements(
                     VariantsBodyStatements(unionType, v => MatchStatement(v, isAsync))
@@ -658,10 +652,7 @@ public sealed partial class UnionTypesGenerator : IIncrementalGenerator
                 .AddTypeArgumentListArgumentsWhen(isAsync, CancellationTokenType())
                 .AddTypeArgumentListArguments(isAsync ? TaskIdentifier("TOut") : IdentifierName("TOut"));
 
-        var parameter =
-            Parameter(Identifier($"match{variant.Alias}"))
-                .WithType(parameterType);
-
+        var parameter = Parameter(parameterType, $"match{variant.Alias}");
         return parameter;
     }
 
@@ -676,7 +667,7 @@ public sealed partial class UnionTypesGenerator : IIncrementalGenerator
                     .AddArgumentListArguments(
                         Argument(argumentExpression)
                     )
-                    .AddArgumentListArgumentWhen(isAsync, Argument(IdentifierName("ct")))
+                    .AddArgumentListArgumentWhen(isAsync, Argument("ct"))
                     .AwaitWithConfigureAwaitWhen(isAsync)
             )
         );
@@ -693,7 +684,7 @@ public sealed partial class UnionTypesGenerator : IIncrementalGenerator
     {
         return
             MethodDeclaration(
-                    isAsync ? IdentifierName(TaskType) : VoidType(),
+                    isAsync ? TaskType() : VoidType(),
                     isAsync ? "SwitchAsync" : "Switch"
                 )
                 .AddModifiers(
@@ -718,7 +709,7 @@ public sealed partial class UnionTypesGenerator : IIncrementalGenerator
             GenericName(isAsync ? FuncType : ActionType)
                 .AddTypeArgumentListArguments(IdentifierName(variant.TypeFullName))
                 .AddTypeArgumentListArgumentsWhen(isAsync, CancellationTokenType())
-                .AddTypeArgumentListArgumentsWhen(isAsync, IdentifierName(TaskType));
+                .AddTypeArgumentListArgumentsWhen(isAsync, TaskType());
 
         var parameter = Parameter(parameterType, $"switch{variant.Alias}");
         return parameter;
@@ -736,7 +727,7 @@ public sealed partial class UnionTypesGenerator : IIncrementalGenerator
                         .AddArgumentListArguments(
                             Argument(argumentExpression)
                         )
-                        .AddArgumentListArgumentWhen(isAsync, Argument(IdentifierName("ct")))
+                        .AddArgumentListArgumentWhen(isAsync, Argument("ct"))
                         .AwaitWithConfigureAwaitWhen(isAsync)),
                 ReturnStatement()
             )

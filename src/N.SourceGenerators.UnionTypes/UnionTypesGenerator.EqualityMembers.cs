@@ -39,13 +39,13 @@ public partial class UnionTypesGenerator
             ? InvocationExpression(
                 IdentifierName("Equals")
             ).AddArgumentListArguments(
-                Argument(IdentifierName("left")),
-                Argument(IdentifierName("right"))
+                Argument("left"),
+                Argument("right")
             )
             : InvocationExpression(
                 MemberAccess("left", "Equals")
             ).AddArgumentListArguments(
-                Argument(IdentifierName("right"))
+                Argument("right")
             );
 
         equalExpression = equalExpression.LogicalNotWhen(!equal);
@@ -57,10 +57,8 @@ public partial class UnionTypesGenerator
                 Token(SyntaxKind.PublicKeyword),
                 Token(SyntaxKind.StaticKeyword)
             ).AddParameterListParameters(
-                Parameter(Identifier("left"))
-                    .WithType(parameterType),
-                Parameter(Identifier("right"))
-                    .WithType(parameterType)
+                Parameter(parameterType, "left"),
+                Parameter(parameterType, "right")
             )
             .AddBodyStatements(
                 ReturnStatement(
@@ -97,8 +95,7 @@ public partial class UnionTypesGenerator
             }
 
             yield return IfStatement(
-                BinaryExpression(
-                    SyntaxKind.NotEqualsExpression,
+                NotEqualsExpression(
                     IdentifierName("ValueType"),
                     MemberAccess("other", "ValueType")
                 ),
@@ -110,19 +107,15 @@ public partial class UnionTypesGenerator
             foreach (UnionTypeVariant variant in unionType.Variants)
             {
                 MemberAccessExpressionSyntax memberAccess = MemberAccess("other", variant.FieldName);
-                
+
                 yield return IfStatement(
                     IsPropertyCondition(variant),
                     ReturnStatement(
                         InvocationExpression(
-                            MemberAccessExpression(
-                                SyntaxKind.SimpleMemberAccessExpression,
-                                MemberAccessExpression(
-                                    SyntaxKind.SimpleMemberAccessExpression,
-                                    GenericType("System.Collections.Generic.EqualityComparer", variant.TypeFullName),
-                                    IdentifierName("Default")
-                                ),
-                                IdentifierName("Equals")
+                            MemberAccess(
+                                GenericType("System.Collections.Generic.EqualityComparer", variant.TypeFullName),
+                                "Default",
+                                "Equals"
                             )
                         ).AddArgumentListArguments(
                             Argument(NotNullableArgumentExpression(variant)),
@@ -145,8 +138,7 @@ public partial class UnionTypesGenerator
             Token(SyntaxKind.PublicKeyword),
             Token(SyntaxKind.OverrideKeyword)
         ).AddParameterListParameters(
-            Parameter(Identifier("other"))
-                .WithType(NullableType(IdentifierName("object")))
+            Parameter(NullableType(ObjectType()), "other")
         ).AddBodyStatements(
             BodyStatements().ToArray()
         );
@@ -157,8 +149,7 @@ public partial class UnionTypesGenerator
             yield return ReferenceEqualsThisOther();
 
             yield return IfStatement(
-                BinaryExpression(
-                    SyntaxKind.NotEqualsExpression,
+                NotEqualsExpression(
                     InvocationExpression(MemberAccess("other", "GetType")),
                     TypeOfExpression(IdentifierName(unionType.Name))
                 )
@@ -192,8 +183,7 @@ public partial class UnionTypesGenerator
             Token(SyntaxKind.PublicKeyword),
             Token(SyntaxKind.OverrideKeyword)
         ).AddParameterListParameters(
-            Parameter(Identifier("obj"))
-                .WithType(NullableType(IdentifierName("object")))
+            Parameter(NullableType(ObjectType()), "obj")
         ).AddBodyStatements(
             ReturnStatement(
                 BinaryExpression(
@@ -205,7 +195,7 @@ public partial class UnionTypesGenerator
                     ),
                     InvocationExpression(IdentifierName("Equals"))
                         .AddArgumentListArguments(
-                            Argument(IdentifierName("other"))
+                            Argument("other")
                         )
                 )
             )
@@ -219,7 +209,7 @@ public partial class UnionTypesGenerator
                 IdentifierName("ReferenceEquals")
             ).AddArgumentListArguments(
                 Argument(ThisExpression()),
-                Argument(IdentifierName("other"))
+                Argument("other")
             ),
             Block(
                 ReturnTrue()
@@ -234,7 +224,7 @@ public partial class UnionTypesGenerator
                 IdentifierName("ReferenceEquals")
             ).AddArgumentListArguments(
                 Argument(LiteralExpression(SyntaxKind.NullLiteralExpression)),
-                Argument(IdentifierName("other"))
+                Argument("other")
             ),
             Block(
                 ReturnFalse()

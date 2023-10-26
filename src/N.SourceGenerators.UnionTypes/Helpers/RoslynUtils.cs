@@ -4,7 +4,7 @@ internal static class RoslynUtils
 {
     public const string FuncType = "global::System.Func";
     public const string ActionType = "global::System.Action";
-    public const string TaskType = "global::System.Threading.Tasks.Task";
+    private const string TaskTypeName = "global::System.Threading.Tasks.Task";
 
     public static PredefinedTypeSyntax VoidType()
     {
@@ -21,6 +21,11 @@ internal static class RoslynUtils
         return PredefinedType(Token(SyntaxKind.StringKeyword));
     }
 
+    public static TypeSyntax TaskType()
+    {
+        return IdentifierName(TaskTypeName);
+    }
+    
     public static TypeSyntax CancellationTokenType()
     {
         return IdentifierName("global::System.Threading.CancellationToken");
@@ -47,13 +52,18 @@ internal static class RoslynUtils
             .WithType(type);
     }
 
+    public static ArgumentSyntax Argument(string name)
+    {
+        return SyntaxFactory.Argument(IdentifierName(name));
+    }
+
     private static ObjectCreationExpressionSyntax NewInvalidOperationException(ExpressionSyntax expression)
     {
         return ObjectCreationExpression(
                 IdentifierName("System.InvalidOperationException")
             )
             .AddArgumentListArguments(
-                Argument(expression)
+                SyntaxFactory.Argument(expression)
             );
     }
 
@@ -73,7 +83,7 @@ internal static class RoslynUtils
 
     public static GenericNameSyntax TaskIdentifier(string type)
     {
-        return GenericType(TaskType, type);
+        return GenericType(TaskTypeName, type);
     }
 
     public static MemberAccessExpressionSyntax MemberAccess(
@@ -91,23 +101,43 @@ internal static class RoslynUtils
         return result;
     }
 
-    public static MemberAccessExpressionSyntax MemberAccess(ExpressionSyntax expression, string name)
+    public static MemberAccessExpressionSyntax MemberAccess(
+        ExpressionSyntax expression, 
+        string name,
+        params string[] pathItems)
     {
-        return MemberAccessExpression(
+        var result = MemberAccessExpression(
             SyntaxKind.SimpleMemberAccessExpression,
             expression,
             IdentifierName(name)
         );
+        
+        foreach (var path in pathItems)
+        {
+            result = MemberAccess(result, path);
+        }
+        
+        return result;
     }
 
     public static ReturnStatementSyntax ReturnTrue()
     {
-        return ReturnStatement(LiteralExpression(SyntaxKind.TrueLiteralExpression));
+        return ReturnStatement(TrueLiteralExpression());
+    }
+
+    public static LiteralExpressionSyntax TrueLiteralExpression()
+    {
+        return LiteralExpression(SyntaxKind.TrueLiteralExpression);
     }
 
     public static ReturnStatementSyntax ReturnFalse()
     {
-        return ReturnStatement(LiteralExpression(SyntaxKind.FalseLiteralExpression));
+        return ReturnStatement(FalseLiteralExpression());
+    }
+
+    public static LiteralExpressionSyntax FalseLiteralExpression()
+    {
+        return LiteralExpression(SyntaxKind.FalseLiteralExpression);
     }
 
     public static LiteralExpressionSyntax StringLiteral(string message)
@@ -177,7 +207,7 @@ internal static class RoslynUtils
     {
         return InvocationExpression(IdentifierName("nameof"))
             .AddArgumentListArguments(
-                Argument(IdentifierName(varName))
+                Argument(varName)
             );
     }
 

@@ -103,7 +103,7 @@ public sealed partial class UnionTypesGenerator
                 ObjectCreationExpression(IdentifierName("System.ArgumentOutOfRangeException"))
                     .AddArgumentListArguments(
                         Argument(NameOfExpressions("x")),
-                        Argument(IdentifierName("x")),
+                        Argument("x"),
                         Argument(
                             InterpolatedString(
                                 Interpolation(
@@ -178,7 +178,7 @@ public sealed partial class UnionTypesGenerator
                     MemberAccess("jsonTypeInfo", "Properties", "Insert")
                 ).AddArgumentListArguments(
                     Argument(NumericLiteral(0)),
-                    Argument(IdentifierName("jsonPropertyInfo"))
+                    Argument("jsonPropertyInfo")
                 )
             )
         );
@@ -227,7 +227,7 @@ public sealed partial class UnionTypesGenerator
                             EqualsValueClause(
                                 ObjectCreationExpression(
                                     IdentifierName("System.Text.Json.JsonSerializerOptions"),
-                                    ArgumentList().AddArguments(Argument(IdentifierName("options"))),
+                                    ArgumentList().AddArguments(Argument("options")),
                                     ObjectInitializerExpression(
                                         SimpleAssignmentExpression(
                                             "TypeInfoResolver",
@@ -269,9 +269,9 @@ public sealed partial class UnionTypesGenerator
                         InvocationExpression(
                             MemberAccess("System.Text.Json.JsonSerializer", "Serialize")
                         ).AddArgumentListArguments(
-                            Argument(IdentifierName("writer")),
-                            Argument(IdentifierName("x")),
-                            Argument(IdentifierName("customOptions"))
+                            Argument("writer"),
+                            Argument("x"),
+                            Argument("customOptions")
                         )
                     )
                 );
