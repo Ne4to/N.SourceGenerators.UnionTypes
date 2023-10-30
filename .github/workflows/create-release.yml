@@ -3,8 +3,9 @@ name: Create release
 on:
   push:
     branches: [ main ]
-  pull_request:
-    types: [opened, reopened, synchronize]
+  # pull_request:
+  #   branches:
+  #     - main
 
 permissions:
   contents: read
