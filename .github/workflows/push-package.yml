@@ -6,7 +6,7 @@ on:
   pull_request:
     # Sequence of patterns matched against refs/heads
     branches:
-      - main    
+      - main
 
 jobs:
   build:
@@ -27,7 +27,7 @@ jobs:
       run: dotnet test --configuration Release --no-build --verbosity normal
     - name: Pack release
       if: ${{ github.ref_name == 'main' }}
-      run: dotnet pack --configuration Release --no-build      
+      run: dotnet pack --configuration Release --no-build
     - name: Pack RC
       if: ${{ github.ref_name != 'main' }}
       run: dotnet pack --configuration Release --no-build --version-suffix "rc.${GITHUB_RUN_NUMBER}"
