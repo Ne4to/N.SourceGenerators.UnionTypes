@@ -10,7 +10,7 @@
             "request": "launch",
             "preLaunchTask": "build",
             // If you have changed target frameworks, make sure to update the program path.
-            "program": "${workspaceFolder}/examples/N.SourceGenerators.UnionTypes.Examples/bin/Debug/net7.0/N.SourceGenerators.UnionTypes.Examples.dll",
+            "program": "${workspaceFolder}/examples/N.SourceGenerators.UnionTypes.Examples/bin/Debug/net8.0/N.SourceGenerators.UnionTypes.Examples.dll",
             "args": [],
             "cwd": "${workspaceFolder}/examples/N.SourceGenerators.UnionTypes.Examples",
             "stopAtEntry": false,
