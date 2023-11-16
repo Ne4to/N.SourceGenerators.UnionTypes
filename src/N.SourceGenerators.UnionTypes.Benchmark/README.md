@@ -1,88 +1,88 @@
 ## Ctor
 ``` ini
 
-BenchmarkDotNet=v0.13.4, OS=macOS 14.0 (23A344) [Darwin 23.0.0]
+BenchmarkDotNet=v0.13.4, OS=macOS 14.1.1 (23B81) [Darwin 23.1.0]
 Apple M2 Max, 1 CPU, 12 logical and 12 physical cores
-.NET SDK=7.0.401
-  [Host]     : .NET 7.0.11 (7.0.1123.42427), Arm64 RyuJIT AdvSIMD
-  Job-CPQSKY : .NET 7.0.11 (7.0.1123.42427), Arm64 RyuJIT AdvSIMD
+.NET SDK=8.0.100
+  [Host]     : .NET 8.0.0 (8.0.23.53103), Arm64 RyuJIT AdvSIMD
+  Job-GPAWCK : .NET 8.0.0 (8.0.23.53103), Arm64 RyuJIT AdvSIMD
 
-Runtime=.NET 7.0  Toolchain=net7.0  IterationCount=3  
+Runtime=.NET 8.0  Toolchain=net8.0  IterationCount=3  
 LaunchCount=1  WarmupCount=3  
 
 ```
 |                       Method |      Mean |     Error |    StdDev | Ratio |   Gen0 | Allocated | Alloc Ratio |
 |----------------------------- |----------:|----------:|----------:|------:|-------:|----------:|------------:|
-|                        Class | 6.0429 ns | 0.2688 ns | 0.0147 ns | 1.000 | 0.0086 |      72 B |        1.00 |
-|                  ClassSealed | 6.0265 ns | 0.2679 ns | 0.0147 ns | 0.997 | 0.0086 |      72 B |        1.00 |
-|                       Struct | 2.4038 ns | 0.2048 ns | 0.0112 ns | 0.398 | 0.0029 |      24 B |        0.33 |
-|               StructReadonly | 2.4161 ns | 0.2119 ns | 0.0116 ns | 0.400 | 0.0029 |      24 B |        0.33 |
+|                        Class | 6.2787 ns | 1.6709 ns | 0.0916 ns | 1.000 | 0.0086 |      72 B |        1.00 |
+|                  ClassSealed | 6.1926 ns | 0.3691 ns | 0.0202 ns | 0.986 | 0.0086 |      72 B |        1.00 |
+|                       Struct | 2.5874 ns | 0.1017 ns | 0.0056 ns | 0.412 | 0.0029 |      24 B |        0.33 |
+|               StructReadonly | 2.6129 ns | 0.1318 ns | 0.0072 ns | 0.416 | 0.0029 |      24 B |        0.33 |
 |         StructExplicitLayout | 0.0000 ns | 0.0000 ns | 0.0000 ns | 0.000 |      - |         - |        0.00 |
 | StructReadonlyExplicitLayout | 0.0000 ns | 0.0000 ns | 0.0000 ns | 0.000 |      - |         - |        0.00 |
 
 ## GetHashCode
 ``` ini
 
-BenchmarkDotNet=v0.13.4, OS=macOS 14.0 (23A344) [Darwin 23.0.0]
+BenchmarkDotNet=v0.13.4, OS=macOS 14.1.1 (23B81) [Darwin 23.1.0]
 Apple M2 Max, 1 CPU, 12 logical and 12 physical cores
-.NET SDK=7.0.401
-  [Host]     : .NET 7.0.11 (7.0.1123.42427), Arm64 RyuJIT AdvSIMD
-  Job-MVTOFC : .NET 7.0.11 (7.0.1123.42427), Arm64 RyuJIT AdvSIMD
+.NET SDK=8.0.100
+  [Host]     : .NET 8.0.0 (8.0.23.53103), Arm64 RyuJIT AdvSIMD
+  Job-DWCWZM : .NET 8.0.0 (8.0.23.53103), Arm64 RyuJIT AdvSIMD
 
-Runtime=.NET 7.0  Toolchain=net7.0  IterationCount=3  
+Runtime=.NET 8.0  Toolchain=net8.0  IterationCount=3  
 LaunchCount=1  WarmupCount=3  
 
 ```
-|                       Method |     Mean |     Error |    StdDev | Ratio | Allocated | Alloc Ratio |
-|----------------------------- |---------:|----------:|----------:|------:|----------:|------------:|
-|                        Class | 4.119 ns | 0.0605 ns | 0.0033 ns |  1.00 |         - |          NA |
-|                  ClassSealed | 4.133 ns | 0.0484 ns | 0.0027 ns |  1.00 |         - |          NA |
-|                       Struct | 7.660 ns | 0.1243 ns | 0.0068 ns |  1.86 |         - |          NA |
-|               StructReadonly | 7.677 ns | 0.2665 ns | 0.0146 ns |  1.86 |         - |          NA |
-|         StructExplicitLayout | 1.467 ns | 0.0200 ns | 0.0011 ns |  0.36 |         - |          NA |
-| StructReadonlyExplicitLayout | 1.470 ns | 0.0193 ns | 0.0011 ns |  0.36 |         - |          NA |
+|                       Method |      Mean |     Error |    StdDev | Ratio | Allocated | Alloc Ratio |
+|----------------------------- |----------:|----------:|----------:|------:|----------:|------------:|
+|                        Class | 2.3616 ns | 0.0667 ns | 0.0037 ns |  1.00 |         - |          NA |
+|                  ClassSealed | 2.2898 ns | 0.1473 ns | 0.0081 ns |  0.97 |         - |          NA |
+|                       Struct | 1.7766 ns | 0.0301 ns | 0.0016 ns |  0.75 |         - |          NA |
+|               StructReadonly | 1.7756 ns | 0.1693 ns | 0.0093 ns |  0.75 |         - |          NA |
+|         StructExplicitLayout | 0.6548 ns | 0.0899 ns | 0.0049 ns |  0.28 |         - |          NA |
+| StructReadonlyExplicitLayout | 0.6548 ns | 0.0919 ns | 0.0050 ns |  0.28 |         - |          NA |
 
 ## ReadValue
 ``` ini
 
-BenchmarkDotNet=v0.13.4, OS=macOS 14.0 (23A344) [Darwin 23.0.0]
+BenchmarkDotNet=v0.13.4, OS=macOS 14.1.1 (23B81) [Darwin 23.1.0]
 Apple M2 Max, 1 CPU, 12 logical and 12 physical cores
-.NET SDK=7.0.401
-  [Host]     : .NET 7.0.11 (7.0.1123.42427), Arm64 RyuJIT AdvSIMD
-  Job-NCEFIQ : .NET 7.0.11 (7.0.1123.42427), Arm64 RyuJIT AdvSIMD
+.NET SDK=8.0.100
+  [Host]     : .NET 8.0.0 (8.0.23.53103), Arm64 RyuJIT AdvSIMD
+  Job-WVHIPW : .NET 8.0.0 (8.0.23.53103), Arm64 RyuJIT AdvSIMD
 
-Runtime=.NET 7.0  Toolchain=net7.0  IterationCount=3  
+Runtime=.NET 8.0  Toolchain=net8.0  IterationCount=3  
 LaunchCount=1  WarmupCount=3  
 
 ```
 |                       Method |      Mean |     Error |    StdDev | Ratio | RatioSD | Allocated | Alloc Ratio |
 |----------------------------- |----------:|----------:|----------:|------:|--------:|----------:|------------:|
-|                        Class | 0.3540 ns | 0.0891 ns | 0.0049 ns |  1.00 |    0.00 |         - |          NA |
-|                  ClassSealed | 0.3228 ns | 0.0092 ns | 0.0005 ns |  0.91 |    0.01 |         - |          NA |
-|                       Struct | 3.2880 ns | 0.2043 ns | 0.0112 ns |  9.29 |    0.15 |         - |          NA |
-|               StructReadonly | 3.2877 ns | 0.0631 ns | 0.0035 ns |  9.29 |    0.13 |         - |          NA |
-|         StructExplicitLayout | 0.2804 ns | 0.0901 ns | 0.0049 ns |  0.79 |    0.02 |         - |          NA |
-| StructReadonlyExplicitLayout | 0.3270 ns | 1.9317 ns | 0.1059 ns |  0.92 |    0.30 |         - |          NA |
+|                        Class | 0.2982 ns | 0.1581 ns | 0.0087 ns |  1.00 |    0.00 |         - |          NA |
+|                  ClassSealed | 0.2935 ns | 0.0739 ns | 0.0040 ns |  0.98 |    0.02 |         - |          NA |
+|                       Struct | 0.3001 ns | 0.0391 ns | 0.0021 ns |  1.01 |    0.02 |         - |          NA |
+|               StructReadonly | 0.2973 ns | 0.0775 ns | 0.0042 ns |  1.00 |    0.02 |         - |          NA |
+|         StructExplicitLayout | 0.2729 ns | 0.0535 ns | 0.0029 ns |  0.92 |    0.03 |         - |          NA |
+| StructReadonlyExplicitLayout | 0.2802 ns | 0.0359 ns | 0.0020 ns |  0.94 |    0.03 |         - |          NA |
 
 ## ToString
 ``` ini
 
-BenchmarkDotNet=v0.13.4, OS=macOS 14.0 (23A344) [Darwin 23.0.0]
+BenchmarkDotNet=v0.13.4, OS=macOS 14.1.1 (23B81) [Darwin 23.1.0]
 Apple M2 Max, 1 CPU, 12 logical and 12 physical cores
-.NET SDK=7.0.401
-  [Host]     : .NET 7.0.11 (7.0.1123.42427), Arm64 RyuJIT AdvSIMD
-  Job-MVCCVK : .NET 7.0.11 (7.0.1123.42427), Arm64 RyuJIT AdvSIMD
+.NET SDK=8.0.100
+  [Host]     : .NET 8.0.0 (8.0.23.53103), Arm64 RyuJIT AdvSIMD
+  Job-PQJRUG : .NET 8.0.0 (8.0.23.53103), Arm64 RyuJIT AdvSIMD
 
-Runtime=.NET 7.0  Toolchain=net7.0  IterationCount=3  
+Runtime=.NET 8.0  Toolchain=net8.0  IterationCount=3  
 LaunchCount=1  WarmupCount=3  
 
 ```
 |                       Method |     Mean |    Error |   StdDev | Ratio |   Gen0 | Allocated | Alloc Ratio |
 |----------------------------- |---------:|---------:|---------:|------:|-------:|----------:|------------:|
-|                        Class | 72.75 ns | 0.173 ns | 0.009 ns |  1.00 | 0.0564 |     472 B |        1.00 |
-|                  ClassSealed | 72.83 ns | 2.486 ns | 0.136 ns |  1.00 | 0.0564 |     472 B |        1.00 |
-|                       Struct | 77.59 ns | 3.612 ns | 0.198 ns |  1.07 | 0.0564 |     472 B |        1.00 |
-|               StructReadonly | 76.85 ns | 2.708 ns | 0.148 ns |  1.06 | 0.0564 |     472 B |        1.00 |
-|         StructExplicitLayout | 70.28 ns | 4.734 ns | 0.260 ns |  0.97 | 0.0573 |     480 B |        1.02 |
-| StructReadonlyExplicitLayout | 71.65 ns | 1.785 ns | 0.098 ns |  0.98 | 0.0573 |     480 B |        1.02 |
+|                        Class | 57.24 ns | 2.845 ns | 0.156 ns |  1.00 | 0.0526 |     440 B |        1.00 |
+|                  ClassSealed | 57.20 ns | 0.197 ns | 0.011 ns |  1.00 | 0.0526 |     440 B |        1.00 |
+|                       Struct | 57.28 ns | 3.862 ns | 0.212 ns |  1.00 | 0.0526 |     440 B |        1.00 |
+|               StructReadonly | 57.42 ns | 2.337 ns | 0.128 ns |  1.00 | 0.0526 |     440 B |        1.00 |
+|         StructExplicitLayout | 60.19 ns | 1.652 ns | 0.091 ns |  1.05 | 0.0535 |     448 B |        1.02 |
+| StructReadonlyExplicitLayout | 58.10 ns | 2.044 ns | 0.112 ns |  1.01 | 0.0535 |     448 B |        1.02 |
 

@@ -22,7 +22,7 @@ if ($Mode -eq 'All') {
 }
 
 foreach ($Filter in $Filters) {
-    . dotnet run -c Release -- --job short --runtimes net7.0 --filter $Filter
+    . dotnet run -c Release -- --job short --runtimes net8.0 --filter $Filter
 }
 
 if ($Mode -eq 'All') {
