@@ -48,7 +48,7 @@ public static class TestHelper
                 syntaxTrees: new[] { syntaxTree },
                 references,
                 new CSharpCompilationOptions(OutputKind.DynamicallyLinkedLibrary));
-
+            
             if (previousCompilation != null)
             {
                 compilation = compilation.AddReferences(previousCompilation.ToMetadataReference());

@@ -151,3 +151,5 @@ internal class UnionTypeComparer : IEqualityComparer<UnionType>
         return obj.TypeFullName.GetHashCode();
     }
 }
+
+internal record CompilationContext(bool SupportsNotNullWhenAttribute, bool SupportsThrowIfNull, bool NullableContextEnabled);

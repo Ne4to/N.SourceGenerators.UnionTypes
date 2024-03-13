@@ -70,6 +70,14 @@ internal static class RoslynUtils
             SyntaxFactory.Argument(expression)
         );
     }
+    
+    public static ThrowStatementSyntax ThrowArgumentNullException(ExpressionSyntax expression)
+    {
+        return ThrowException(
+            "System.ArgumentNullException",
+            SyntaxFactory.Argument(expression)
+        );
+    }
 
     public static ThrowStatementSyntax ThrowException(string type, params ArgumentSyntax[] arguments)
     {

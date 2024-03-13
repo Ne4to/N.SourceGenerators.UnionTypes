@@ -8,47 +8,52 @@ namespace N.SourceGenerators.UnionTypes;
 
 public sealed partial class UnionTypesGenerator
 {
-    private static void GenerateConverters(IncrementalGeneratorInitializationContext context)
+    private static void GenerateConverters(IncrementalGeneratorInitializationContext context,
+        IncrementalValueProvider<CompilationContext> compilationContextProvider)
     {
         var toConverters = GetUnionConverters(
             context,
             UnionConverterToAttributeName,
             (containerType, otherTypes) => new UnionToConverter(containerType, otherTypes));
-        ProcessConverters(context, toConverters);
+        ProcessConverters(context, toConverters, compilationContextProvider);
 
         var fromConverters = GetUnionConverters(
             context,
             UnionConverterFromAttributeName,
             (containerType, otherTypes) => new UnionFromConverter(containerType, otherTypes));
-        ProcessConverters(context, fromConverters);
+        ProcessConverters(context, fromConverters, compilationContextProvider);
 
         var unionConverters = GetUnionConverters(context);
-        ProcessConverters(context, unionConverters);
+        ProcessConverters(context, unionConverters, compilationContextProvider);
     }
 
     private static void ProcessConverters(
         IncrementalGeneratorInitializationContext context,
-        IncrementalValuesProvider<UnionConverter> unionConverters)
+        IncrementalValuesProvider<UnionConverter> unionConverters,
+        IncrementalValueProvider<CompilationContext> compilationContextProvider)
     {
+        var combination = unionConverters.Combine(compilationContextProvider);
+        
         context.RegisterImplementationSourceOutput(
-            unionConverters,
+            combination,
             (ctx, item) =>
             {
-                TypeDeclarationSyntax typeDeclaration = ClassDeclaration(item.Name);
+                UnionConverter unionConverter = item.Left;
+                TypeDeclarationSyntax typeDeclaration = ClassDeclaration(unionConverter.Name);
 
                 typeDeclaration = typeDeclaration
                     .AddModifiersWhen(
-                        item.IsStatic,
+                        unionConverter.IsStatic,
                         Token(SyntaxKind.StaticKeyword)
                     ).AddModifiers(Token(SyntaxKind.PartialKeyword));
 
                 bool saveSource = false;
-                foreach (var converter in item.Converters)
+                foreach (var converter in unionConverter.Converters)
                 {
                     UnionType fromType = converter.FromType;
                     UnionType toType = converter.ToType;
 
-                    bool canConvert = CanConvert(fromType, toType, item.Location, out var diagnostic);
+                    bool canConvert = CanConvert(fromType, toType, unionConverter.Location, out var diagnostic);
 
                     if (canConvert)
                     {
@@ -60,7 +65,7 @@ public sealed partial class UnionTypesGenerator
                             Token(SyntaxKind.StaticKeyword)
                         ).AddParameterListParameters(
                             Parameter(fromType.TypeFullName, "value")
-                                .AddModifiersWhen(item.IsStatic, Token(SyntaxKind.ThisKeyword))
+                                .AddModifiersWhen(unionConverter.IsStatic, Token(SyntaxKind.ThisKeyword))
                         ).AddBodyStatements(
                             ReturnMatchConversion(fromType, toType)
                         );
@@ -76,8 +81,8 @@ public sealed partial class UnionTypesGenerator
 
                 if (saveSource)
                 {
-                    CompilationUnitSyntax compilationUnit = GetCompilationUnit(typeDeclaration, item.Namespace);
-                    ctx.AddSource($"{item.Name}Converters.g.cs", compilationUnit.GetText(Encoding.UTF8));
+                    CompilationUnitSyntax compilationUnit = GetCompilationUnit(typeDeclaration, unionConverter.Namespace, item.Right);
+                    ctx.AddSource($"{unionConverter.Name}Converters.g.cs", compilationUnit.GetText(Encoding.UTF8));
                 }
             });
     }
@@ -167,14 +172,18 @@ public sealed partial class UnionTypesGenerator
     }
 
     private static void ProcessConverters<T>(IncrementalGeneratorInitializationContext context,
-        IncrementalValuesProvider<T> fromConverters)
+        IncrementalValuesProvider<T> fromConverters,
+        IncrementalValueProvider<CompilationContext> compilationContextProvider)
         where T : IUnionConverter
     {
+        var combination = fromConverters.Combine(compilationContextProvider);
+        
         context.RegisterImplementationSourceOutput(
-            fromConverters,
+            combination,
             (ctx, item) =>
             {
-                UnionType containerType = item.ContainerType;
+                T unionConverter = item.Left;
+                UnionType containerType = unionConverter.ContainerType;
                 TypeDeclarationSyntax typeDeclaration = containerType.IsReferenceType
                     ? ClassDeclaration(containerType.Name)
                     : StructDeclaration(containerType.Name);
@@ -183,7 +192,7 @@ public sealed partial class UnionTypesGenerator
                     .AddModifiers(Token(SyntaxKind.PartialKeyword));
 
                 bool saveSource = false;
-                foreach ((UnionType fromType, UnionType toType) in item)
+                foreach ((UnionType fromType, UnionType toType) in unionConverter)
                 {
                     bool canConvert = CanConvert(fromType, toType, containerType.Location, out var diagnostic);
 
@@ -201,8 +210,8 @@ public sealed partial class UnionTypesGenerator
                 if (saveSource)
                 {
                     CompilationUnitSyntax compilationUnit =
-                        GetCompilationUnit(typeDeclaration, containerType.Namespace);
-                    ctx.AddSource(item.SourceHintName, compilationUnit.GetText(Encoding.UTF8));
+                        GetCompilationUnit(typeDeclaration, containerType.Namespace, item.Right);
+                    ctx.AddSource(unionConverter.SourceHintName, compilationUnit.GetText(Encoding.UTF8));
                 }
             });
     }
