@@ -125,4 +125,14 @@ internal static class ConditionalSyntaxExtensions
             ? syntax.AddAttributeLists(items)
             : syntax;
     }
+
+    public static SyntaxTriviaList AddWhen(
+        this SyntaxTriviaList syntax,
+        bool condition,
+        SyntaxTrivia trivia)
+    {
+        return condition
+            ? syntax.Add(trivia)
+            : syntax;
+    }
 }

@@ -1,3 +1,5 @@
+using Microsoft.CodeAnalysis.CSharp;
+
 namespace N.SourceGenerators.UnionTypes.Tests;
 
 [UsesVerify]
@@ -26,7 +28,7 @@ public {{typeModifiers}} Result
 }
 """;
 
-        return TestHelper.Verify<UnionTypesGenerator>(source, typeModifiers.Replace(' ', '-'));
+        return TestHelper.Verify<UnionTypesGenerator>(source, LanguageVersion.Latest, typeModifiers.Replace(' ', '-'));
     }
 
     [Theory]
@@ -56,7 +58,7 @@ namespace MyApp
 }
 """;
 
-        return TestHelper.Verify<UnionTypesGenerator>(source, typeModifiers.Replace(' ', '-'));
+        return TestHelper.Verify<UnionTypesGenerator>(source, LanguageVersion.Latest, typeModifiers.Replace(' ', '-'));
     }
     
     [Fact]
@@ -146,11 +148,36 @@ namespace MyApp
 }
 """;
 
-        return TestHelper.Verify<UnionTypesGenerator>(source, typeModifiers.Replace(' ', '-'));
+        return TestHelper.Verify<UnionTypesGenerator>(source, LanguageVersion.Latest, typeModifiers.Replace(' ', '-'));
     }
 
-    public int ToString(int a)
+
+    [Theory]
+    [InlineData("partial class")]
+    [InlineData("partial struct")]
+    public Task CSharp73(string typeModifiers)
     {
-        return 0;
+        string source = $$"""
+using System;
+using System.Collections.Generic;
+using N.SourceGenerators.UnionTypes;
+
+namespace MyApp
+{
+    public class Success{};
+    public class Error{};
+
+    [UnionType(typeof(Success))]
+    [UnionType(typeof(Error))]
+    [UnionType(typeof(IReadOnlyList<int>))]
+    [UnionType(typeof(string[]))]
+    [UnionType(typeof(Tuple<int,string>))]
+    public {{typeModifiers}} Result
+    {
+    }
+}
+""";
+
+        return TestHelper.Verify<UnionTypesGenerator>(source, LanguageVersion.CSharp7_3, typeModifiers.Replace(' ', '-'));
     }
 }

@@ -1,6 +1,7 @@
 using System.Reflection;
 
 using Microsoft.CodeAnalysis;
+using Microsoft.CodeAnalysis.CSharp;
 
 namespace N.SourceGenerators.UnionTypes.Tests;
 
@@ -34,7 +35,8 @@ public class JsonTests
             """;
 
         return TestHelper.Verify<UnionTypesGenerator>(
-            source,
+            source, 
+            LanguageVersion.Latest,
             null,
             MetadataReference.CreateFromFile(Assembly.Load(new AssemblyName("System.Runtime")).Location),
             MetadataReference.CreateFromFile(Assembly.Load(new AssemblyName("System.Text.Json")).Location),

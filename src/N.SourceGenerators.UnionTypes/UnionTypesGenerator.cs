@@ -22,6 +22,19 @@ public sealed partial class UnionTypesGenerator : IIncrementalGenerator
     public void Initialize(IncrementalGeneratorInitializationContext context)
     {
         AddAttributesSource(context);
+        
+        var compilationContextProvider = context.CompilationProvider.Select((compilation, ct) =>
+        {
+            ct.ThrowIfCancellationRequested();
+            // compilation.ReferencedAssemblyNames
+            // compilation.GetSemanticModel().GetNullableContext() == NullableContext.Enabled
+            var supportsNotNullWhenAttribute = compilation.GetTypeByMetadataName("System.Diagnostics.CodeAnalysis.NotNullWhenAttribute") != null;
+            var supportsThrowIfNull = compilation.GetTypeByMetadataName("System.ArgumentNullException")?.GetMembers("ThrowIfNull").Any() ?? false;
+            var nullableContextEnabled = compilation.HasLanguageVersionAtLeastEqualTo(LanguageVersion.CSharp8);
+            var supportsAutoDefaultField = compilation.HasLanguageVersionAtLeastEqualTo(LanguageVersion.CSharp11);
+            CompilationContext compilationContext = new(supportsNotNullWhenAttribute, supportsThrowIfNull, nullableContextEnabled, supportsAutoDefaultField);
+            return compilationContext;
+        });
 
         var unionTypes = GetUnionTypes(context);
         var genericUnionTypes = GetGenericUnionTypes(context);
@@ -32,18 +45,20 @@ public sealed partial class UnionTypesGenerator : IIncrementalGenerator
             .SelectMany(ProcessCollections);
 
         var unionTypeDiagnostics = GetUnionTypeDiagnostics(uniqueUnionTypes);
-        ProcessValues(context, unionTypeDiagnostics, GenerateUnionType);
+        ProcessValues(context, compilationContextProvider, unionTypeDiagnostics, GenerateUnionType);
 
         var jsonTypes = unionTypeDiagnostics
             .Where(vd => vd.Diagnostics.Count == 0)
             .Where(vd => vd.Value.GenerateJsonConverter);
 
+        var jsonTypesCombination = jsonTypes.Combine(compilationContextProvider);
+
         // TODO test System.Text.Json is available, add diagnostics
         context.RegisterImplementationSourceOutput(
-            jsonTypes,
-            (ctx, item) => { GenerateJsonConverter(item.Value, ctx); });
+            jsonTypesCombination,
+            (ctx, item) => { GenerateJsonConverter(item.Left.Value, ctx, item.Right); });
 
-        GenerateConverters(context);
+        GenerateConverters(context, compilationContextProvider);
     }
 
     private IEnumerable<UnionType> ProcessCollections(
@@ -220,6 +235,7 @@ public sealed partial class UnionTypesGenerator : IIncrementalGenerator
     }
 
     static void GenerateUnionType(UnionType unionType,
+        CompilationContext compilationContext,
         SourceProductionContext context)
     {
         context.CancellationToken.ThrowIfCancellationRequested();
@@ -232,7 +248,7 @@ public sealed partial class UnionTypesGenerator : IIncrementalGenerator
             .AddAttributeLists(GetTypeAttributes(unionType))
             .AddModifiers(Token(SyntaxKind.PartialKeyword))
             .AddMembers(VariantIdField(unionType.UseStructLayout))
-            .AddMembers(VariantsMembers(unionType))
+            .AddMembers(VariantsMembers(unionType, compilationContext))
             .AddMembers(
                 MatchMethod(unionType, isAsync: false),
                 MatchMethod(unionType, isAsync: true),
@@ -241,13 +257,13 @@ public sealed partial class UnionTypesGenerator : IIncrementalGenerator
                 ValueTypeProperty(unionType),
                 ValueAliasProperty(unionType),
                 GetHashCodeMethod(unionType),
-                EqualsOperator(unionType, equal: true),
-                EqualsOperator(unionType, equal: false),
-                GenericEqualsMethod(unionType)
+                EqualsOperator(unionType, equal: true, compilationContext),
+                EqualsOperator(unionType, equal: false, compilationContext),
+                GenericEqualsMethod(unionType, compilationContext)
             )
             .AddMembersWhen(!unionType.HasToStringMethod, ToStringMethod(unionType))
-            .AddMembersWhen(unionType.IsReferenceType, ClassEqualsMethod(unionType))
-            .AddMembersWhen(!unionType.IsReferenceType, StructEqualsMethod(unionType))
+            .AddMembersWhen(unionType.IsReferenceType, ClassEqualsMethod(unionType, compilationContext))
+            .AddMembersWhen(!unionType.IsReferenceType, StructEqualsMethod(unionType, compilationContext))
             .WithBaseList(
                 BaseList(
                     SeparatedList(
@@ -261,14 +277,14 @@ public sealed partial class UnionTypesGenerator : IIncrementalGenerator
                 )
             );
 
-        CompilationUnitSyntax compilationUnit = GetCompilationUnit(typeDeclaration, unionType.Namespace);
+        CompilationUnitSyntax compilationUnit = GetCompilationUnit(typeDeclaration, unionType.Namespace, compilationContext);
         context.AddSource($"{unionType.SourceCodeFileName}.g.cs", compilationUnit.GetText(Encoding.UTF8));
     }
 
     private static CompilationUnitSyntax GetCompilationUnit(TypeDeclarationSyntax typeDeclaration,
-        string? typeNamespace)
+        string? typeNamespace, CompilationContext compilationContext)
     {
-        SyntaxTriviaList syntaxTriviaList = GetTriviaList();
+        SyntaxTriviaList syntaxTriviaList = GetTriviaList(compilationContext);
 
         CompilationUnitSyntax compilationUnit;
         if (typeNamespace is null)
@@ -291,27 +307,37 @@ public sealed partial class UnionTypesGenerator : IIncrementalGenerator
         return compilationUnit;
     }
 
-    private static SyntaxTriviaList GetTriviaList()
+    private static SyntaxTriviaList GetTriviaList(CompilationContext compilationContext)
     {
         return TriviaList(
             Comment(AutoGeneratedComment),
-            Trivia(PragmaWarningDirectiveTrivia(Token(SyntaxKind.DisableKeyword), true)),
-            Trivia(NullableDirectiveTrivia(Token(SyntaxKind.EnableKeyword), true)));
+            Trivia(PragmaWarningDirectiveTrivia(Token(SyntaxKind.DisableKeyword), true)))
+            .AddWhen(
+                compilationContext.NullableContextEnabled, 
+                Trivia(NullableDirectiveTrivia(Token(SyntaxKind.EnableKeyword), true)));
     }
 
-    private static void ProcessValues<T>(
-        IncrementalGeneratorInitializationContext context,
+    private static void ProcessValues<T>(IncrementalGeneratorInitializationContext context,
+        IncrementalValueProvider<CompilationContext> compilationContextProvider,
         IncrementalValuesProvider<ValueDiagnostics<T>> valueDiagnostics,
-        Action<T, SourceProductionContext> processAction)
+        Action<T, CompilationContext, SourceProductionContext> processAction)
     {
         ReportDiagnostics(context, valueDiagnostics);
 
         var validValues = valueDiagnostics
             .Where(vd => vd.Diagnostics.Count == 0);
 
+        var combination = validValues.Combine(compilationContextProvider);
+
         context.RegisterImplementationSourceOutput(
-            validValues,
-            (ctx, item) => { processAction(item.Value, ctx); });
+            combination,
+            (ctx, item) =>
+            {
+                ValueDiagnostics<T> diagnostics = item.Left;
+                CompilationContext compilationContext = item.Item2;
+
+                processAction(diagnostics.Value, compilationContext, ctx);
+            });
     }
 
     private static MemberDeclarationSyntax VariantIdField(bool useStructLayout)
@@ -369,11 +395,11 @@ public sealed partial class UnionTypesGenerator : IIncrementalGenerator
         return result.ToArray();
     }
 
-    private static MemberDeclarationSyntax[] VariantsMembers(UnionType unionType)
+    private static MemberDeclarationSyntax[] VariantsMembers(UnionType unionType, CompilationContext compilationContext)
     {
         var variantsMembers = unionType
             .Variants
-            .SelectMany(v => VariantMembers(unionType, v))
+            .SelectMany(v => VariantMembers(unionType, v, compilationContext))
             .ToArray();
 
         return variantsMembers;
@@ -381,20 +407,21 @@ public sealed partial class UnionTypesGenerator : IIncrementalGenerator
 
     private static IEnumerable<MemberDeclarationSyntax> VariantMembers(
         UnionType unionType,
-        UnionTypeVariant variant)
+        UnionTypeVariant variant,
+        CompilationContext compilationContext)
     {
         yield return VariantConstant(variant);
         yield return Field(unionType, variant);
         yield return IsProperty(variant);
         yield return AsPropertyWithStructLayout(variant);
-        yield return Ctor(unionType, variant);
+        yield return Ctor(unionType, variant, compilationContext);
         if (!variant.IsInterface)
         {
             yield return ImplicitOperatorToUnion(unionType, variant);
             yield return ExplicitOperatorFromUnion(unionType, variant);
         }
 
-        yield return TryGetMethod(variant);
+        yield return TryGetMethod(variant, compilationContext);
     }
 
     /// <code>
@@ -479,8 +506,8 @@ public sealed partial class UnionTypesGenerator : IIncrementalGenerator
     {
         ExpressionSyntax returnSyntax = NotNullableArgumentExpression(variant, memberName);
 
-        return new StatementSyntax[]
-        {
+        return
+        [
             IfStatement(
                 IsPropertyCondition(variant, memberName),
                 ReturnStatement(returnSyntax)
@@ -495,10 +522,10 @@ public sealed partial class UnionTypesGenerator : IIncrementalGenerator
                     InterpolatedText($" not {variant.Alias}.")
                 )
             )
-        };
+        ];
     }
 
-    private static MemberDeclarationSyntax Ctor(UnionType unionType, UnionTypeVariant variant)
+    private static MemberDeclarationSyntax Ctor(UnionType unionType, UnionTypeVariant variant, CompilationContext compilationContext)
     {
         InvocationExpressionSyntax checkArgumentExpression = InvocationExpression(
                 MemberAccess("System.ArgumentNullException", "ThrowIfNull")
@@ -507,24 +534,41 @@ public sealed partial class UnionTypesGenerator : IIncrementalGenerator
                 Argument(variant.ParameterName)
             );
 
+        var checkArgumentLegacy = IfStatement(
+            BinaryExpression(
+                SyntaxKind.EqualsExpression,
+                IdentifierName(variant.ParameterName),
+                LiteralExpression(SyntaxKind.NullLiteralExpression)),
+            ThrowArgumentNullException(NameOfExpressions(variant.ParameterName))
+        );
+
         AssignmentExpressionSyntax assignmentExpression = SimpleAssignmentExpression(
             variant.FieldName,
             variant.ParameterName);
+
+        var initOtherVariants = unionType.Variants.Except([variant])
+            .Select(otherVariant => SimpleAssignmentExpression(otherVariant.FieldName, DefaultExpression(IdentifierName(otherVariant.TypeFullName))))
+            .Select(ExpressionStatement);
 
         return ConstructorDeclaration(Identifier(unionType.NameNoGenerics))
             .AddModifiers(Token(SyntaxKind.PublicKeyword))
             .AddParameterListParameters(
                 Parameter(variant.TypeFullName, variant.ParameterName)
             )
-            .AddBodyStatementsWhen(!unionType.UseStructLayout && !variant.AllowNull,
+            .AddBodyStatementsWhen(!unionType.UseStructLayout && !variant.AllowNull && compilationContext.SupportsThrowIfNull,
                 ExpressionStatement(checkArgumentExpression))
+            .AddBodyStatementsWhen(!unionType.UseStructLayout && !variant.AllowNull && !compilationContext.SupportsThrowIfNull,
+                checkArgumentLegacy)            
             .AddBodyStatements(
                 ExpressionStatement(SimpleAssignmentExpression(
                     VariantIdFieldName,
                     variant.IdConstName)))
             .AddBodyStatements(
                 ExpressionStatement(assignmentExpression)
-            );
+            )
+            .AddBodyStatementsWhen(
+                !compilationContext.SupportsAutoDefaultField && unionType.IsValueType, 
+                initOtherVariants.Cast<StatementSyntax>().ToArray());
     }
 
     private static ConversionOperatorDeclarationSyntax ImplicitOperatorToUnion(UnionType unionType,
@@ -569,10 +613,10 @@ public sealed partial class UnionTypesGenerator : IIncrementalGenerator
             .AddBodyStatements(AsPropertyWithStructLayoutBody(variant, "value"));
     }
 
-    private static MemberDeclarationSyntax TryGetMethod(UnionTypeVariant variant)
+    private static MemberDeclarationSyntax TryGetMethod(UnionTypeVariant variant, CompilationContext compilationContext)
     {
         AttributeListSyntax attributeList = AttributeList();
-        if (!variant.AllowNull)
+        if (!variant.AllowNull && compilationContext.SupportsNotNullWhenAttribute)
         {
             attributeList = attributeList.AddAttributes(
                 Attribute(IdentifierName("System.Diagnostics.CodeAnalysis.NotNullWhen"),
@@ -788,7 +832,7 @@ public sealed partial class UnionTypesGenerator : IIncrementalGenerator
                         )
                     )
                 );
-        
+
         static StatementSyntax AliasStatement(UnionTypeVariant variant)
         {
             return IfStatement(

@@ -30,10 +30,10 @@ public partial class UnionTypesGenerator
         }
     }
 
-    private static OperatorDeclarationSyntax EqualsOperator(UnionType unionType, bool equal)
+    private static OperatorDeclarationSyntax EqualsOperator(UnionType unionType, bool equal, CompilationContext compilationContext)
     {
         TypeSyntax parameterType = IdentifierName(unionType.Name)
-            .NullableTypeWhen(unionType.IsReferenceType);
+            .NullableTypeWhen(unionType.IsReferenceType && compilationContext.NullableContextEnabled);
 
         ExpressionSyntax equalExpression = unionType.IsReferenceType
             ? InvocationExpression(
@@ -67,7 +67,7 @@ public partial class UnionTypesGenerator
             );
     }
 
-    private static MemberDeclarationSyntax GenericEqualsMethod(UnionType unionType)
+    private static MemberDeclarationSyntax GenericEqualsMethod(UnionType unionType, CompilationContext compilationContext)
     {
         bool isReferenceType = unionType.IsReferenceType;
 
@@ -80,7 +80,7 @@ public partial class UnionTypesGenerator
             Parameter(Identifier("other"))
                 .WithType(
                     IdentifierName(unionType.Name)
-                        .NullableTypeWhen(isReferenceType)
+                        .NullableTypeWhen(isReferenceType && compilationContext.NullableContextEnabled)
                 )
         ).AddBodyStatements(
             BodyStatements().ToArray()
@@ -129,7 +129,7 @@ public partial class UnionTypesGenerator
         }
     }
 
-    private static MemberDeclarationSyntax ClassEqualsMethod(UnionType unionType)
+    private static MemberDeclarationSyntax ClassEqualsMethod(UnionType unionType, CompilationContext compilationContext)
     {
         return MethodDeclaration(
             IdentifierName("bool"),
@@ -138,7 +138,7 @@ public partial class UnionTypesGenerator
             Token(SyntaxKind.PublicKeyword),
             Token(SyntaxKind.OverrideKeyword)
         ).AddParameterListParameters(
-            Parameter(NullableType(ObjectType()), "other")
+            Parameter(ObjectType().NullableTypeWhen(compilationContext.NullableContextEnabled), "other")
         ).AddBodyStatements(
             BodyStatements().ToArray()
         );
@@ -174,7 +174,7 @@ public partial class UnionTypesGenerator
         }
     }
 
-    private static MemberDeclarationSyntax StructEqualsMethod(UnionType unionType)
+    private static MemberDeclarationSyntax StructEqualsMethod(UnionType unionType, CompilationContext compilationContext)
     {
         return MethodDeclaration(
             IdentifierName("bool"),
@@ -183,7 +183,7 @@ public partial class UnionTypesGenerator
             Token(SyntaxKind.PublicKeyword),
             Token(SyntaxKind.OverrideKeyword)
         ).AddParameterListParameters(
-            Parameter(NullableType(ObjectType()), "obj")
+            Parameter(ObjectType().NullableTypeWhen(compilationContext.NullableContextEnabled), "obj")
         ).AddBodyStatements(
             ReturnStatement(
                 BinaryExpression(
