@@ -1,7 +1,6 @@
 ﻿// Ported from https://andrewlock.net/creating-a-source-generator-part-2-testing-an-incremental-generator-with-snapshot-testing/
 
 using System.Collections.Immutable;
-using System.Reflection;
 
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp;
@@ -12,15 +11,21 @@ public static class TestHelper
 {
     public static Task Verify<TGenerator>(
         string source,
+        LanguageVersion languageVersion = LanguageVersion.Latest,
         string? parametersText = null,
         params PortableExecutableReference[] additionalReferences)
         where TGenerator : IIncrementalGenerator, new()
     {
-        return Verify<TGenerator>(new[] { source }, parametersText, additionalReferences);
+        return Verify<TGenerator>(
+            [source], 
+            languageVersion, 
+            parametersText,
+            additionalReferences);
     }
 
     public static async Task Verify<TGenerator>(
         string[] sources,
+        LanguageVersion languageVersion = LanguageVersion.Latest,
         string? parametersText = null,
         params PortableExecutableReference[] additionalReferences)
         where TGenerator : IIncrementalGenerator, new()
@@ -31,7 +36,8 @@ public static class TestHelper
         {
             string source = sources[sourceIndex];
             // Parse the provided string into a C# syntax tree
-            SyntaxTree syntaxTree = CSharpSyntaxTree.ParseText(source);
+            var options = CSharpParseOptions.Default.WithLanguageVersion(languageVersion);
+            SyntaxTree syntaxTree = CSharpSyntaxTree.ParseText(source, options);
             // Create references for assemblies we require
             // We could add multiple references if required
             var references = new List<PortableExecutableReference>
@@ -43,11 +49,13 @@ public static class TestHelper
 
             // /usr/local/share/dotnet/shared/Microsoft.NETCore.App/7.0.11/System.Text.Json.dll
             // Create a Roslyn compilation for the syntax tree.
+            CSharpCompilationOptions compilationOptions = new(OutputKind.DynamicallyLinkedLibrary);
+            
             CSharpCompilation compilation = CSharpCompilation.Create(
                 assemblyName: $"Tests{sourceIndex}",
                 syntaxTrees: new[] { syntaxTree },
                 references,
-                new CSharpCompilationOptions(OutputKind.DynamicallyLinkedLibrary));
+                compilationOptions);
             
             if (previousCompilation != null)
             {
@@ -58,7 +66,7 @@ public static class TestHelper
             var generator = new TGenerator();
 
             // The GeneratorDriver is used to run our generator against a compilation
-            GeneratorDriver driver = CSharpGeneratorDriver.Create(generator);
+            GeneratorDriver driver = CSharpGeneratorDriver.Create(parseOptions: options, generators: [generator.AsSourceGenerator()]);
 
             // Run the source generator!
             driver = driver.RunGeneratorsAndUpdateCompilation(compilation, out var outputCompilation,

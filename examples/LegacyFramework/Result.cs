@@ -16,4 +16,10 @@ namespace LegacyFramework
     public partial class Result
     {
     }
+    
+    [UnionType(typeof(Foo))]
+    [UnionType(typeof(Bar))]
+    public partial struct StructResult
+    {
+    }
 }

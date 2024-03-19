@@ -174,7 +174,7 @@ public partial class UnionTypesGenerator
         }
     }
 
-    private static MemberDeclarationSyntax StructEqualsMethod(UnionType unionType)
+    private static MemberDeclarationSyntax StructEqualsMethod(UnionType unionType, CompilationContext compilationContext)
     {
         return MethodDeclaration(
             IdentifierName("bool"),
@@ -183,7 +183,7 @@ public partial class UnionTypesGenerator
             Token(SyntaxKind.PublicKeyword),
             Token(SyntaxKind.OverrideKeyword)
         ).AddParameterListParameters(
-            Parameter(NullableType(ObjectType()), "obj")
+            Parameter(ObjectType().NullableTypeWhen(compilationContext.NullableContextEnabled), "obj")
         ).AddBodyStatements(
             ReturnStatement(
                 BinaryExpression(
