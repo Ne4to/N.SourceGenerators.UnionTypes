@@ -12,6 +12,7 @@ using System.Runtime.CompilerServices;
 namespace N.SourceGenerators.UnionTypes
 {
     [AttributeUsage(AttributeTargets.Class | AttributeTargets.Struct, Inherited = false, AllowMultiple = true)]
+    [System.Diagnostics.CodeAnalysis.ExcludeFromCodeCoverage]
     sealed class UnionConverterFromAttribute : Attribute
     {
         public Type FromType { get; }

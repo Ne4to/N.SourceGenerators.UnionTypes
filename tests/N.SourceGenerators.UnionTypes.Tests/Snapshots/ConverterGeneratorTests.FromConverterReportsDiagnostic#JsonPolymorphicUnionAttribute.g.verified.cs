@@ -12,6 +12,7 @@ using System.Runtime.CompilerServices;
 namespace N.SourceGenerators.UnionTypes
 {
     [AttributeUsage(AttributeTargets.Class | AttributeTargets.Struct, Inherited = false, AllowMultiple = false)]
+    [System.Diagnostics.CodeAnalysis.ExcludeFromCodeCoverage]
     internal sealed class JsonPolymorphicUnionAttribute : Attribute
     {
 #if NETCOREAPP3_1_OR_GREATER

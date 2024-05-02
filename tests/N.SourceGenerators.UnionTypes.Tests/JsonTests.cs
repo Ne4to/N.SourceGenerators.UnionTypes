@@ -38,6 +38,7 @@ public class JsonTests
             source, 
             LanguageVersion.Latest,
             null,
+            null,
             MetadataReference.CreateFromFile(Assembly.Load(new AssemblyName("System.Runtime")).Location),
             MetadataReference.CreateFromFile(Assembly.Load(new AssemblyName("System.Text.Json")).Location),
             MetadataReference.CreateFromFile(Assembly.Load(new AssemblyName("System.Text.Encodings.Web")).Location)

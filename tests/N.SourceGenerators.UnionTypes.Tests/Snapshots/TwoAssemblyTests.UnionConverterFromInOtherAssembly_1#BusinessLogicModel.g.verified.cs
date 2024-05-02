@@ -7,6 +7,7 @@
 #nullable enable
 namespace BusinessLogic
 {
+    [System.Diagnostics.CodeAnalysis.ExcludeFromCodeCoverage]
     partial class BusinessLogicModel : System.IEquatable<BusinessLogicModel>
     {
         private readonly int _variantId;

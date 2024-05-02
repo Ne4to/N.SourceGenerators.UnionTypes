@@ -10,7 +10,7 @@
         <IsRoslynComponent>true</IsRoslynComponent>
         <IsPackable>true</IsPackable>
         <PackageOutputPath>./nupkg</PackageOutputPath>
-        <VersionPrefix>0.27.0</VersionPrefix>
+        <VersionPrefix>0.28.0</VersionPrefix>
         <EnableNETAnalyzers>true</EnableNETAnalyzers>
         <NoWarn>$(NoWarn);NU5128</NoWarn>
     </PropertyGroup>
@@ -25,6 +25,10 @@
         <Description>Discriminated union type source generator</Description>
         <PackageReadmeFile>README.md</PackageReadmeFile>
     </PropertyGroup>
+    
+    <PropertyGroup>
+        <UnionTypesGenerator_ExcludeFromCodeCoverage>true</UnionTypesGenerator_ExcludeFromCodeCoverage>
+    </PropertyGroup>
 
     <ItemGroup>
         <None Include="../../README.md" Pack="true" PackagePath="\" />
@@ -33,6 +37,9 @@
     <ItemGroup>
         <!-- Package the generator in the analyzer directory of the nuget package -->
         <None Include="$(OutputPath)\$(AssemblyName).dll" Pack="true" PackagePath="analyzers/dotnet/cs" Visible="false" />
+
+        <!-- Package the props file -->
+        <None Include="N.SourceGenerators.UnionTypes.props" Pack="true" PackagePath="build" Visible="false" />
     </ItemGroup>
 
     <ItemGroup>

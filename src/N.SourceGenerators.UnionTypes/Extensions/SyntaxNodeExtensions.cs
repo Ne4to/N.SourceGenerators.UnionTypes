@@ -1,4 +1,6 @@
-﻿namespace N.SourceGenerators.UnionTypes.Extensions;
+﻿using N.SourceGenerators.UnionTypes.Models;
+
+namespace N.SourceGenerators.UnionTypes.Extensions;
 
 internal static class SyntaxNodeExtensions
 {
@@ -9,7 +11,7 @@ internal static class SyntaxNodeExtensions
             AttributeLists.Count: > 0
         };
     }
-    
+
     public static bool IsGenericTypeAttribute(this SyntaxNode s)
     {
         if (s is not TypeParameterSyntax typeParameter)
@@ -29,7 +31,7 @@ internal static class SyntaxNodeExtensions
     {
         return s.Modifiers.Any(SyntaxKind.PartialKeyword);
     }
-    
+
     public static AwaitExpressionSyntax AwaitWithConfigureAwait(this ExpressionSyntax expression)
     {
         return AwaitExpression(
@@ -43,5 +45,22 @@ internal static class SyntaxNodeExtensions
                 Argument(FalseLiteralExpression())
             )
         );
+    }
+
+    public static TSyntax ExcludeFromCodeCoverage<TSyntax>(this TSyntax node, GeneratorOptions options)
+        where TSyntax : BaseTypeDeclarationSyntax
+    {
+        if (!options.ExcludeFromCodeCoverage)
+        {
+            return node;
+        }
+
+        AttributeListSyntax attributeList = AttributeList()
+            .AddAttributes(
+                Attribute(IdentifierName("System.Diagnostics.CodeAnalysis.ExcludeFromCodeCoverage"))
+            );
+
+
+        return (TSyntax)node.AddAttributeLists(attributeList);
     }
 }

@@ -8,16 +8,16 @@ namespace N.SourceGenerators.UnionTypes;
 public sealed partial class UnionTypesGenerator
 {
     private static void GenerateJsonConverter(UnionType unionType,
-        SourceProductionContext context, 
-        CompilationContext compilationContext)
+        SourceProductionContext context,
+        GeneratorContext generatorContext)
     {
         context.CancellationToken.ThrowIfCancellationRequested();
-        BuildJsonConverter(unionType, context, compilationContext);
+        BuildJsonConverter(unionType, context, generatorContext);
         context.CancellationToken.ThrowIfCancellationRequested();
-        BuildJsonConverterAttribute(unionType, context, compilationContext);
+        BuildJsonConverterAttribute(unionType, context, generatorContext);
     }
 
-    private static void BuildJsonConverter(UnionType unionType, SourceProductionContext context, CompilationContext compilationContext)
+    private static void BuildJsonConverter(UnionType unionType, SourceProductionContext context, GeneratorContext generatorContext)
     {
         TypeDeclarationSyntax converterDeclaration = ClassDeclaration(unionType.Name + "JsonConverter")
             .AddModifiers(Token(SyntaxKind.InternalKeyword))
@@ -26,6 +26,7 @@ public sealed partial class UnionTypesGenerator
                     GenericType("System.Text.Json.Serialization.JsonConverter", unionType.Name)
                 )
             )
+            .ExcludeFromCodeCoverage(generatorContext.Options)
             .AddMembers(
                 GetDiscriminatorMethod(unionType),
                 AddDiscriminatorModifier(unionType),
@@ -34,11 +35,11 @@ public sealed partial class UnionTypesGenerator
                 WriteJsonConverterMethod(unionType)
             );
 
-        CompilationUnitSyntax compilationUnit = GetCompilationUnit(converterDeclaration, unionType.Namespace, compilationContext);
+        CompilationUnitSyntax compilationUnit = GetCompilationUnit(converterDeclaration, unionType.Namespace, generatorContext.Compilation);
         context.AddSource($"{unionType.SourceCodeFileName}JsonConverter.g.cs", compilationUnit.GetText(Encoding.UTF8));
     }
 
-    private static void BuildJsonConverterAttribute(UnionType unionType, SourceProductionContext context, CompilationContext compilationContext)
+    private static void BuildJsonConverterAttribute(UnionType unionType, SourceProductionContext context, GeneratorContext generatorContext)
     {
         TypeDeclarationSyntax converterDeclaration = ClassDeclaration(unionType.Name + "JsonConverterAttribute")
             .AddModifiers(
@@ -48,6 +49,7 @@ public sealed partial class UnionTypesGenerator
                     IdentifierName("System.Text.Json.Serialization.JsonConverterAttribute")
                 )
             )
+            .ExcludeFromCodeCoverage(generatorContext.Options)
             .AddMembers(
                 MethodDeclaration(
                         NullableType(IdentifierName("System.Text.Json.Serialization.JsonConverter")),
@@ -67,7 +69,7 @@ public sealed partial class UnionTypesGenerator
                     )
             );
 
-        CompilationUnitSyntax compilationUnit = GetCompilationUnit(converterDeclaration, unionType.Namespace, compilationContext);
+        CompilationUnitSyntax compilationUnit = GetCompilationUnit(converterDeclaration, unionType.Namespace, generatorContext.Compilation);
         context.AddSource($"{unionType.SourceCodeFileName}JsonConverterAttribute.g.cs",
             compilationUnit.GetText(Encoding.UTF8));
     }

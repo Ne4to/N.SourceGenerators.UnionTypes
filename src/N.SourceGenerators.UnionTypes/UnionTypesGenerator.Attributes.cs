@@ -24,6 +24,7 @@ public partial class UnionTypesGenerator
         namespace N.SourceGenerators.UnionTypes
         {
             [AttributeUsage(AttributeTargets.Class | AttributeTargets.Struct, Inherited = false, AllowMultiple = true)]
+            [System.Diagnostics.CodeAnalysis.ExcludeFromCodeCoverage]
             internal sealed class UnionTypeAttribute : Attribute
             {
                 public Type Type { get; }
@@ -65,6 +66,7 @@ public partial class UnionTypesGenerator
         namespace N.SourceGenerators.UnionTypes
         {
             [AttributeUsage(AttributeTargets.GenericParameter, Inherited = false, AllowMultiple = false)]
+            [System.Diagnostics.CodeAnalysis.ExcludeFromCodeCoverage]
             internal sealed class GenericUnionTypeAttribute : Attribute
             {
         #if NETCOREAPP3_1_OR_GREATER
@@ -91,6 +93,7 @@ public partial class UnionTypesGenerator
         namespace N.SourceGenerators.UnionTypes
         {
             [AttributeUsage(AttributeTargets.Class | AttributeTargets.Struct, Inherited = false, AllowMultiple = false)]
+            [System.Diagnostics.CodeAnalysis.ExcludeFromCodeCoverage]
             internal sealed class JsonPolymorphicUnionAttribute : Attribute
             {
         #if NETCOREAPP3_1_OR_GREATER
@@ -113,6 +116,7 @@ public partial class UnionTypesGenerator
         namespace N.SourceGenerators.UnionTypes
         {
             [AttributeUsage(AttributeTargets.Class | AttributeTargets.Struct, Inherited = false, AllowMultiple = true)]
+            [System.Diagnostics.CodeAnalysis.ExcludeFromCodeCoverage]
             sealed class UnionConverterFromAttribute : Attribute
             {
                 public Type FromType { get; }
@@ -136,6 +140,7 @@ public partial class UnionTypesGenerator
         namespace N.SourceGenerators.UnionTypes
         {
             [AttributeUsage(AttributeTargets.Class | AttributeTargets.Struct, Inherited = false, AllowMultiple = true)]
+            [System.Diagnostics.CodeAnalysis.ExcludeFromCodeCoverage]
             sealed class UnionConverterToAttribute : Attribute
             {
                 public Type ToType { get; }
@@ -158,6 +163,7 @@ public partial class UnionTypesGenerator
         namespace N.SourceGenerators.UnionTypes
         {
             [AttributeUsage(AttributeTargets.Class, Inherited = false, AllowMultiple = true)]
+            [System.Diagnostics.CodeAnalysis.ExcludeFromCodeCoverage]
             sealed class UnionConverterAttribute : Attribute
             {
                 public Type FromType { get; }

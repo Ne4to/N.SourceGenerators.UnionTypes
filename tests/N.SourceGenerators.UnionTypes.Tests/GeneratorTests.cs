@@ -6,10 +6,13 @@ namespace N.SourceGenerators.UnionTypes.Tests;
 public class GeneratorTests
 {
     [Theory]
-    [InlineData("partial class")]
-    [InlineData("partial struct")]
-    [InlineData("readonly partial struct")]
-    public Task WithoutNamespace(string typeModifiers)
+    [InlineData("partial class", true)]
+    [InlineData("partial struct", true)]
+    [InlineData("readonly partial struct", true)]
+    [InlineData("partial class", false)]
+    [InlineData("partial struct", false)]
+    [InlineData("readonly partial struct", false)]    
+    public Task WithoutNamespace(string typeModifiers, bool excludeCodeCoverage)
     {
         string source = $$"""           
 using System;
@@ -28,7 +31,13 @@ public {{typeModifiers}} Result
 }
 """;
 
-        return TestHelper.Verify<UnionTypesGenerator>(source, LanguageVersion.Latest, typeModifiers.Replace(' ', '-'));
+        UnionTypesAnalyzerConfigOptions analyzerOptions = new() { ExcludeFromCodeCoverage = excludeCodeCoverage };
+
+        return TestHelper.Verify<UnionTypesGenerator>(
+            source, 
+            LanguageVersion.Latest, 
+            typeModifiers.Replace(' ', '-') + $"-exclude-{excludeCodeCoverage}",
+            analyzerOptions);
     }
 
     [Theory]

@@ -5,6 +5,7 @@
 // </auto-generated>
 #pragma warning disable
 #nullable enable
+[System.Diagnostics.CodeAnalysis.ExcludeFromCodeCoverage]
 partial class OperationDataResult<T, TError> : System.IEquatable<OperationDataResult<T, TError>>
 {
     private readonly int _variantId;

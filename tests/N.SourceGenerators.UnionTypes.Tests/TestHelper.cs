@@ -13,13 +13,15 @@ public static class TestHelper
         string source,
         LanguageVersion languageVersion = LanguageVersion.Latest,
         string? parametersText = null,
+        UnionTypesAnalyzerConfigOptions? analyzerOptions = null,
         params PortableExecutableReference[] additionalReferences)
         where TGenerator : IIncrementalGenerator, new()
     {
         return Verify<TGenerator>(
-            [source], 
-            languageVersion, 
+            [source],
+            languageVersion,
             parametersText,
+            analyzerOptions,
             additionalReferences);
     }
 
@@ -27,6 +29,7 @@ public static class TestHelper
         string[] sources,
         LanguageVersion languageVersion = LanguageVersion.Latest,
         string? parametersText = null,
+        UnionTypesAnalyzerConfigOptions? analyzerOptions = null,
         params PortableExecutableReference[] additionalReferences)
         where TGenerator : IIncrementalGenerator, new()
     {
@@ -40,23 +43,20 @@ public static class TestHelper
             SyntaxTree syntaxTree = CSharpSyntaxTree.ParseText(source, options);
             // Create references for assemblies we require
             // We could add multiple references if required
-            var references = new List<PortableExecutableReference>
-            {
-                MetadataReference.CreateFromFile(typeof(object).Assembly.Location)
-            };
-            
+            var references = new List<PortableExecutableReference> { MetadataReference.CreateFromFile(typeof(object).Assembly.Location) };
+
             references.AddRange(additionalReferences);
 
             // /usr/local/share/dotnet/shared/Microsoft.NETCore.App/7.0.11/System.Text.Json.dll
             // Create a Roslyn compilation for the syntax tree.
             CSharpCompilationOptions compilationOptions = new(OutputKind.DynamicallyLinkedLibrary);
-            
+
             CSharpCompilation compilation = CSharpCompilation.Create(
                 assemblyName: $"Tests{sourceIndex}",
                 syntaxTrees: new[] { syntaxTree },
                 references,
                 compilationOptions);
-            
+
             if (previousCompilation != null)
             {
                 compilation = compilation.AddReferences(previousCompilation.ToMetadataReference());
@@ -66,7 +66,10 @@ public static class TestHelper
             var generator = new TGenerator();
 
             // The GeneratorDriver is used to run our generator against a compilation
-            GeneratorDriver driver = CSharpGeneratorDriver.Create(parseOptions: options, generators: [generator.AsSourceGenerator()]);
+            GeneratorDriver driver = CSharpGeneratorDriver.Create(
+                parseOptions: options,
+                generators: [generator.AsSourceGenerator()],
+                optionsProvider: new GeneratorAnalyzerConfigOptionsProvider(analyzerOptions));
 
             // Run the source generator!
             driver = driver.RunGeneratorsAndUpdateCompilation(compilation, out var outputCompilation,

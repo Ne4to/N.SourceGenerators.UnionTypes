@@ -6,6 +6,7 @@
 #pragma warning disable
 #nullable enable
 [JsonTestsUnionJsonConverter]
+[System.Diagnostics.CodeAnalysis.ExcludeFromCodeCoverage]
 partial class JsonTestsUnion : System.IEquatable<JsonTestsUnion>
 {
     private readonly int _variantId;

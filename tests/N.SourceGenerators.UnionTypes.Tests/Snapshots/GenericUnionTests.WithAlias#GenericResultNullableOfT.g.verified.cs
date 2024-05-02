@@ -5,6 +5,7 @@
 // </auto-generated>
 #pragma warning disable
 #nullable enable
+[System.Diagnostics.CodeAnalysis.ExcludeFromCodeCoverage]
 partial class GenericResultNullable<T> : System.IEquatable<GenericResultNullable<T>>
 {
     private readonly int _variantId;

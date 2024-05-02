@@ -265,3 +265,16 @@ public class Service
     private bool IsValid() => throw new NotImplementedException();
 }
 ```
+
+## Configuration
+|Property|Default|Description|
+|--|--|--|
+|UnionTypesGenerator_ExcludeFromCodeCoverage|true|Add [ExcludeFromCodeCoverage]([https://](https://learn.microsoft.com/en-us/dotnet/api/system.diagnostics.codeanalysis.excludefromcodecoverageattribute?view=net-8.0)) attribute when `true`|
+
+```xml
+<Project Sdk="Microsoft.NET.Sdk">
+    <PropertyGroup>
+        <UnionTypesGenerator_ExcludeFromCodeCoverage>false</UnionTypesGenerator_ExcludeFromCodeCoverage>
+    </PropertyGroup>
+</Project>
+```

@@ -8,6 +8,7 @@ using System.Runtime.CompilerServices;
 namespace N.SourceGenerators.UnionTypes
 {
     [AttributeUsage(AttributeTargets.Class, Inherited = false, AllowMultiple = true)]
+    [System.Diagnostics.CodeAnalysis.ExcludeFromCodeCoverage]
     sealed class UnionConverterAttribute : Attribute
     {
         public Type FromType { get; }
