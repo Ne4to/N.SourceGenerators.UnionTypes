@@ -6,6 +6,7 @@
 #pragma warning disable
 namespace MyApp
 {
+    [System.Diagnostics.CodeAnalysis.ExcludeFromCodeCoverage]
     partial struct Result : System.IEquatable<Result>
     {
         private readonly int _variantId;

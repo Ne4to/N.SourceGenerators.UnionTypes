@@ -12,6 +12,7 @@ using System.Runtime.CompilerServices;
 namespace N.SourceGenerators.UnionTypes
 {
     [AttributeUsage(AttributeTargets.GenericParameter, Inherited = false, AllowMultiple = false)]
+    [System.Diagnostics.CodeAnalysis.ExcludeFromCodeCoverage]
     internal sealed class GenericUnionTypeAttribute : Attribute
     {
 #if NETCOREAPP3_1_OR_GREATER

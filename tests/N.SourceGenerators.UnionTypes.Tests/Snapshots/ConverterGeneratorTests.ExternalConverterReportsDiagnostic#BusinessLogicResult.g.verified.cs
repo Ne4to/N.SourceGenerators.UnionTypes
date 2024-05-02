@@ -7,6 +7,7 @@
 #nullable enable
 namespace MyApp
 {
+    [System.Diagnostics.CodeAnalysis.ExcludeFromCodeCoverage]
     partial class BusinessLogicResult : System.IEquatable<BusinessLogicResult>
     {
         private readonly int _variantId;

@@ -5,6 +5,7 @@
 // </auto-generated>
 #pragma warning disable
 #nullable enable
+[System.Diagnostics.CodeAnalysis.ExcludeFromCodeCoverage]
 internal class JsonTestsUnionJsonConverter : System.Text.Json.Serialization.JsonConverter<JsonTestsUnion>
 {
     private static object? GetDiscriminator(object x)

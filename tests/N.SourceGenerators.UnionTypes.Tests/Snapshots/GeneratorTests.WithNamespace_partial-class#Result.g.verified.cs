@@ -7,6 +7,7 @@
 #nullable enable
 namespace MyApp
 {
+    [System.Diagnostics.CodeAnalysis.ExcludeFromCodeCoverage]
     partial class Result : System.IEquatable<Result>
     {
         private readonly int _variantId;

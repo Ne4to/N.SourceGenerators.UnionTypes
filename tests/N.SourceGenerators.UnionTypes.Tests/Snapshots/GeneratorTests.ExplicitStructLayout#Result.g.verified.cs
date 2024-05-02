@@ -8,6 +8,7 @@
 namespace MyApp
 {
     [System.Runtime.InteropServices.StructLayout(System.Runtime.InteropServices.LayoutKind.Explicit)]
+    [System.Diagnostics.CodeAnalysis.ExcludeFromCodeCoverage]
     partial struct Result : System.IEquatable<Result>
     {
         [System.Runtime.InteropServices.FieldOffset(0)]

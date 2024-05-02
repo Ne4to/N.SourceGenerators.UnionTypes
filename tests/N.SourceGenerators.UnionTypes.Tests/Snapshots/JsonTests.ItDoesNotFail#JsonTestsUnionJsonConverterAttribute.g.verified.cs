@@ -5,6 +5,7 @@
 // </auto-generated>
 #pragma warning disable
 #nullable enable
+[System.Diagnostics.CodeAnalysis.ExcludeFromCodeCoverage]
 internal class JsonTestsUnionJsonConverterAttribute : System.Text.Json.Serialization.JsonConverterAttribute
 {
     public override System.Text.Json.Serialization.JsonConverter? CreateConverter(System.Type typeToConvert)

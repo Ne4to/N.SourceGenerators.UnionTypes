@@ -7,6 +7,7 @@
 #nullable enable
 namespace DataAccess
 {
+    [System.Diagnostics.CodeAnalysis.ExcludeFromCodeCoverage]
     partial class DataAccessModel : System.IEquatable<DataAccessModel>
     {
         private readonly int _variantId;

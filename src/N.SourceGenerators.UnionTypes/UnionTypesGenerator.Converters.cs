@@ -9,30 +9,30 @@ namespace N.SourceGenerators.UnionTypes;
 public sealed partial class UnionTypesGenerator
 {
     private static void GenerateConverters(IncrementalGeneratorInitializationContext context,
-        IncrementalValueProvider<CompilationContext> compilationContextProvider)
+        IncrementalValueProvider<GeneratorContext> generatorContextProvider)
     {
         var toConverters = GetUnionConverters(
             context,
             UnionConverterToAttributeName,
             (containerType, otherTypes) => new UnionToConverter(containerType, otherTypes));
-        ProcessConverters(context, toConverters, compilationContextProvider);
+        ProcessConverters(context, toConverters, generatorContextProvider);
 
         var fromConverters = GetUnionConverters(
             context,
             UnionConverterFromAttributeName,
             (containerType, otherTypes) => new UnionFromConverter(containerType, otherTypes));
-        ProcessConverters(context, fromConverters, compilationContextProvider);
+        ProcessConverters(context, fromConverters, generatorContextProvider);
 
         var unionConverters = GetUnionConverters(context);
-        ProcessConverters(context, unionConverters, compilationContextProvider);
+        ProcessConverters(context, unionConverters, generatorContextProvider);
     }
 
     private static void ProcessConverters(
         IncrementalGeneratorInitializationContext context,
         IncrementalValuesProvider<UnionConverter> unionConverters,
-        IncrementalValueProvider<CompilationContext> compilationContextProvider)
+        IncrementalValueProvider<GeneratorContext> generatorContextProvider)
     {
-        var combination = unionConverters.Combine(compilationContextProvider);
+        var combination = unionConverters.Combine(generatorContextProvider);
         
         context.RegisterImplementationSourceOutput(
             combination,
@@ -81,7 +81,7 @@ public sealed partial class UnionTypesGenerator
 
                 if (saveSource)
                 {
-                    CompilationUnitSyntax compilationUnit = GetCompilationUnit(typeDeclaration, unionConverter.Namespace, item.Right);
+                    CompilationUnitSyntax compilationUnit = GetCompilationUnit(typeDeclaration, unionConverter.Namespace, item.Right.Compilation);
                     ctx.AddSource($"{unionConverter.Name}Converters.g.cs", compilationUnit.GetText(Encoding.UTF8));
                 }
             });
@@ -173,10 +173,10 @@ public sealed partial class UnionTypesGenerator
 
     private static void ProcessConverters<T>(IncrementalGeneratorInitializationContext context,
         IncrementalValuesProvider<T> fromConverters,
-        IncrementalValueProvider<CompilationContext> compilationContextProvider)
+        IncrementalValueProvider<GeneratorContext> generatorContextProvider)
         where T : IUnionConverter
     {
-        var combination = fromConverters.Combine(compilationContextProvider);
+        var combination = fromConverters.Combine(generatorContextProvider);
         
         context.RegisterImplementationSourceOutput(
             combination,
@@ -210,7 +210,7 @@ public sealed partial class UnionTypesGenerator
                 if (saveSource)
                 {
                     CompilationUnitSyntax compilationUnit =
-                        GetCompilationUnit(typeDeclaration, containerType.Namespace, item.Right);
+                        GetCompilationUnit(typeDeclaration, containerType.Namespace, item.Right.Compilation);
                     ctx.AddSource(unionConverter.SourceHintName, compilationUnit.GetText(Encoding.UTF8));
                 }
             });
