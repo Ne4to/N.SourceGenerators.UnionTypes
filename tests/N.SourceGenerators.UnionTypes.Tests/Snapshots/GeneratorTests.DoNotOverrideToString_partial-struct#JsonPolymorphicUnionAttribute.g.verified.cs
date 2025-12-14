@@ -6,12 +6,13 @@
 #if NETCOREAPP3_1_OR_GREATER
 #nullable enable
 #endif
-using System;
-using System.Runtime.CompilerServices;
+using Attribute = global::System.Attribute;
+using AttributeUsageAttribute = global::System.AttributeUsageAttribute;
+using AttributeTargets = global::System.AttributeTargets;
 
 namespace N.SourceGenerators.UnionTypes
 {
-    [AttributeUsage(AttributeTargets.Class | AttributeTargets.Struct, Inherited = false, AllowMultiple = false)]
+    [AttributeUsageAttribute(AttributeTargets.Class | AttributeTargets.Struct, Inherited = false, AllowMultiple = false)]
     [System.Diagnostics.CodeAnalysis.ExcludeFromCodeCoverage]
     internal sealed class JsonPolymorphicUnionAttribute : Attribute
     {

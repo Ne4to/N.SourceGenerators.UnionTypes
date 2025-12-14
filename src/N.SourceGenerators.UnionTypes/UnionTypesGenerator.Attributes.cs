@@ -18,12 +18,15 @@ public partial class UnionTypesGenerator
         #if NETCOREAPP3_1_OR_GREATER
         #nullable enable
         #endif
-        using System;
-        using System.Runtime.CompilerServices;
+        using Attribute = global::System.Attribute;
+        using AttributeUsageAttribute = global::System.AttributeUsageAttribute;
+        using AttributeTargets = global::System.AttributeTargets;
+        using Type = global::System.Type;
+        using CallerLineNumber = System.Runtime.CompilerServices.CallerLineNumberAttribute;
         
         namespace N.SourceGenerators.UnionTypes
         {
-            [AttributeUsage(AttributeTargets.Class | AttributeTargets.Struct, Inherited = false, AllowMultiple = true)]
+            [AttributeUsageAttribute(AttributeTargets.Class | AttributeTargets.Struct, Inherited = false, AllowMultiple = true)]
             [System.Diagnostics.CodeAnalysis.ExcludeFromCodeCoverage]
             internal sealed class UnionTypeAttribute : Attribute
             {
@@ -60,12 +63,13 @@ public partial class UnionTypesGenerator
         #if NETCOREAPP3_1_OR_GREATER
         #nullable enable
         #endif
-        using System;
-        using System.Runtime.CompilerServices;
+        using Attribute = global::System.Attribute;
+        using AttributeUsageAttribute = global::System.AttributeUsageAttribute;
+        using AttributeTargets = global::System.AttributeTargets;
         
         namespace N.SourceGenerators.UnionTypes
         {
-            [AttributeUsage(AttributeTargets.GenericParameter, Inherited = false, AllowMultiple = false)]
+            [AttributeUsageAttribute(AttributeTargets.GenericParameter, Inherited = false, AllowMultiple = false)]
             [System.Diagnostics.CodeAnalysis.ExcludeFromCodeCoverage]
             internal sealed class GenericUnionTypeAttribute : Attribute
             {
@@ -87,12 +91,13 @@ public partial class UnionTypesGenerator
         #if NETCOREAPP3_1_OR_GREATER
         #nullable enable
         #endif
-        using System;
-        using System.Runtime.CompilerServices;
+        using Attribute = global::System.Attribute;
+        using AttributeUsageAttribute = global::System.AttributeUsageAttribute;
+        using AttributeTargets = global::System.AttributeTargets;
         
         namespace N.SourceGenerators.UnionTypes
         {
-            [AttributeUsage(AttributeTargets.Class | AttributeTargets.Struct, Inherited = false, AllowMultiple = false)]
+            [AttributeUsageAttribute(AttributeTargets.Class | AttributeTargets.Struct, Inherited = false, AllowMultiple = false)]
             [System.Diagnostics.CodeAnalysis.ExcludeFromCodeCoverage]
             internal sealed class JsonPolymorphicUnionAttribute : Attribute
             {
@@ -110,12 +115,14 @@ public partial class UnionTypesGenerator
         #if NETCOREAPP3_1_OR_GREATER
         #nullable enable
         #endif
-        using System;
-        using System.Runtime.CompilerServices;
+        using Attribute = global::System.Attribute;
+        using AttributeUsageAttribute = global::System.AttributeUsageAttribute;
+        using AttributeTargets = global::System.AttributeTargets;
+        using Type = global::System.Type;
         
         namespace N.SourceGenerators.UnionTypes
         {
-            [AttributeUsage(AttributeTargets.Class | AttributeTargets.Struct, Inherited = false, AllowMultiple = true)]
+            [AttributeUsageAttribute(AttributeTargets.Class | AttributeTargets.Struct, Inherited = false, AllowMultiple = true)]
             [System.Diagnostics.CodeAnalysis.ExcludeFromCodeCoverage]
             sealed class UnionConverterFromAttribute : Attribute
             {
@@ -134,12 +141,14 @@ public partial class UnionTypesGenerator
         #if NETCOREAPP3_1_OR_GREATER
         #nullable enable
         #endif
-        using System;
-        using System.Runtime.CompilerServices;
+        using Attribute = global::System.Attribute;
+        using AttributeUsageAttribute = global::System.AttributeUsageAttribute;
+        using AttributeTargets = global::System.AttributeTargets;
+        using Type = global::System.Type;
         
         namespace N.SourceGenerators.UnionTypes
         {
-            [AttributeUsage(AttributeTargets.Class | AttributeTargets.Struct, Inherited = false, AllowMultiple = true)]
+            [AttributeUsageAttribute(AttributeTargets.Class | AttributeTargets.Struct, Inherited = false, AllowMultiple = true)]
             [System.Diagnostics.CodeAnalysis.ExcludeFromCodeCoverage]
             sealed class UnionConverterToAttribute : Attribute
             {
@@ -157,12 +166,14 @@ public partial class UnionTypesGenerator
         #if NETCOREAPP3_1_OR_GREATER
         #nullable enable
         #endif
-        using System;
-        using System.Runtime.CompilerServices;
+        using Attribute = global::System.Attribute;
+        using AttributeUsageAttribute = global::System.AttributeUsageAttribute;
+        using AttributeTargets = global::System.AttributeTargets;
+        using Type = global::System.Type;
         
         namespace N.SourceGenerators.UnionTypes
         {
-            [AttributeUsage(AttributeTargets.Class, Inherited = false, AllowMultiple = true)]
+            [AttributeUsageAttribute(AttributeTargets.Class, Inherited = false, AllowMultiple = true)]
             [System.Diagnostics.CodeAnalysis.ExcludeFromCodeCoverage]
             sealed class UnionConverterAttribute : Attribute
             {
