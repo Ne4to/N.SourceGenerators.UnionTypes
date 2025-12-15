@@ -2,12 +2,14 @@
 #if NETCOREAPP3_1_OR_GREATER
 #nullable enable
 #endif
-using System;
-using System.Runtime.CompilerServices;
+using Attribute = global::System.Attribute;
+using AttributeUsageAttribute = global::System.AttributeUsageAttribute;
+using AttributeTargets = global::System.AttributeTargets;
+using Type = global::System.Type;
 
 namespace N.SourceGenerators.UnionTypes
 {
-    [AttributeUsage(AttributeTargets.Class, Inherited = false, AllowMultiple = true)]
+    [AttributeUsageAttribute(AttributeTargets.Class, Inherited = false, AllowMultiple = true)]
     [System.Diagnostics.CodeAnalysis.ExcludeFromCodeCoverage]
     sealed class UnionConverterAttribute : Attribute
     {
