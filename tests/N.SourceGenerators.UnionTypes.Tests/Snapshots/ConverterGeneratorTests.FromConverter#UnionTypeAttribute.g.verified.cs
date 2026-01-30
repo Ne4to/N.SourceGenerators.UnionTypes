@@ -10,7 +10,7 @@ using Attribute = global::System.Attribute;
 using AttributeUsageAttribute = global::System.AttributeUsageAttribute;
 using AttributeTargets = global::System.AttributeTargets;
 using Type = global::System.Type;
-using CallerLineNumber = System.Runtime.CompilerServices.CallerLineNumberAttribute;
+using CallerLineNumberAttribute = System.Runtime.CompilerServices.CallerLineNumberAttribute;
 
 namespace N.SourceGenerators.UnionTypes
 {
@@ -33,9 +33,9 @@ namespace N.SourceGenerators.UnionTypes
 #endif
 
 #if NETCOREAPP3_1_OR_GREATER
-        public UnionTypeAttribute(Type type, string? alias = null, [CallerLineNumber] int order = 0)
+        public UnionTypeAttribute(Type type, string? alias = null, [CallerLineNumberAttribute] int order = 0)
 #else
-        public UnionTypeAttribute(Type type, string alias = null, [CallerLineNumber] int order = 0)
+        public UnionTypeAttribute(Type type, string alias = null, [CallerLineNumberAttribute] int order = 0)
 #endif
         {
             Type = type;
